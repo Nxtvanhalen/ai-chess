@@ -312,3 +312,50 @@ select {
     perspective: 1000;
   }
 }
+
+/* Mobile keyboard fixes */
+@media screen and (max-width: 1024px) {
+  /* When keyboard appears, adjust layout */
+  .mobile-keyboard-active {
+    height: 50vh !important;
+  }
+  
+  /* Ensure chat input stays visible when keyboard opens */
+  .chat-input-container {
+    position: relative;
+    z-index: 1000;
+    padding-bottom: env(keyboard-inset-height);
+  }
+  
+  /* Reduce mobile chat size */
+  .mobile-chat-container {
+    max-height: 40vh;
+    overflow-y: auto;
+  }
+}
+
+/* Visual indicator for possible moves */
+.possible-move-indicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: radial-gradient(circle, hsla(142, 76%, 55%, 0.8), hsla(142, 76%, 55%, 0.4));
+  box-shadow: 0 0 10px hsla(142, 76%, 55%, 0.6);
+  pointer-events: none;
+  animation: pulse-glow 2s infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+    opacity: 1;
+  }
+}

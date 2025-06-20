@@ -19,6 +19,8 @@ export default function ChessBoard({
 }: ChessBoardProps) {
   const [game, setGame] = useState(new Chess());
   const [boardWidth, setBoardWidth] = useState(400);
+  const [selectedSquare, setSelectedSquare] = useState<string | null>(null);
+  const [possibleMoves, setPossibleMoves] = useState<string[]>([]);
 
   useEffect(() => {
     const updateBoardSize = () => {
@@ -47,6 +49,45 @@ export default function ChessBoard({
     }
   }, [position, game]);
 
+  const handleSquareClick = useCallback((square: string) => {
+    if (!interactive) return;
+
+    const piece = game.get(square);
+    
+    if (selectedSquare === square) {
+      // Clicking same square deselects
+      setSelectedSquare(null);
+      setPossibleMoves([]);
+    } else if (possibleMoves.includes(square)) {
+      // Clicking a possible move - make the move
+      const gameCopy = new Chess(game.fen());
+      try {
+        const move = gameCopy.move({
+          from: selectedSquare!,
+          to: square,
+          promotion: 'q',
+        });
+        if (move) {
+          setGame(gameCopy);
+          onMove(move);
+          setSelectedSquare(null);
+          setPossibleMoves([]);
+        }
+      } catch (error) {
+        console.error('Invalid move:', error);
+      }
+    } else if (piece && piece.color === game.turn()) {
+      // Clicking a piece of current player - select it and show moves
+      setSelectedSquare(square);
+      const moves = game.moves({ square, verbose: true });
+      setPossibleMoves(moves.map(move => move.to));
+    } else {
+      // Clicking empty square or opponent piece - deselect
+      setSelectedSquare(null);
+      setPossibleMoves([]);
+    }
+  }, [game, interactive, onMove, selectedSquare, possibleMoves]);
+
   const handleDrop = useCallback(
     (sourceSquare: string, targetSquare: string) => {
       if (!interactive) return false;
@@ -64,6 +105,11 @@ export default function ChessBoard({
 
         setGame(gameCopy);
         onMove(move);
+        
+        // Clear selection after successful move
+        setSelectedSquare(null);
+        setPossibleMoves([]);
+        
         return true;
       } catch {
         return false;
@@ -86,6 +132,21 @@ export default function ChessBoard({
         boxShadow: '0 0 20px hsla(var(--chess-accent), 0.6), inset 0 0 0 2px hsla(var(--chess-accent), 0.8)',
       },
     }),
+    // Highlight selected square
+    ...(selectedSquare && {
+      [selectedSquare]: {
+        backgroundColor: 'hsla(142, 76%, 55%, 0.6)',
+        boxShadow: '0 0 15px hsla(142, 76%, 55%, 0.8), inset 0 0 0 3px hsla(142, 76%, 55%, 0.9)',
+      },
+    }),
+    // Highlight possible moves
+    ...possibleMoves.reduce((acc, square) => {
+      acc[square] = {
+        background: 'radial-gradient(circle, hsla(142, 76%, 55%, 0.3), transparent 70%)',
+        boxShadow: 'inset 0 0 0 2px hsla(142, 76%, 55%, 0.6)',
+      };
+      return acc;
+    }, {} as Record<string, any>),
   };
 
   const renderSquareIdentifiers = () => {
@@ -143,6 +204,7 @@ export default function ChessBoard({
         <Chessboard
           position={game.fen()}
           onPieceDrop={handleDrop}
+          onSquareClick={handleSquareClick}
           boardOrientation={orientation}
           customSquareStyles={customSquareStyles}
           customBoardStyle={{

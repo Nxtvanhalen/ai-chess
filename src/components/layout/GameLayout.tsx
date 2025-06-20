@@ -12,10 +12,10 @@ export default function GameLayout({ chessBoard, chat }: GameLayoutProps) {
     <div className="h-screen w-screen overflow-hidden">
       {/* Mobile Layout: Stacked */}
       <div className="flex flex-col h-full lg:hidden">
-        <div className="flex-shrink-0 shadow-2xl relative" style={{ height: '50vh' }}>
+        <div className="flex-shrink-0 shadow-2xl relative" style={{ height: '60vh' }}>
           {chessBoard}
         </div>
-        <div className="flex-1 min-h-0 border-t border-purple-400/30 shadow-2xl backdrop-blur-sm overflow-hidden">
+        <div className="flex-1 min-h-0 border-t border-purple-400/30 shadow-2xl backdrop-blur-sm overflow-hidden" style={{ height: '40vh' }}>
           {chat}
         </div>
       </div>

@@ -56,7 +56,7 @@ export default function ChatInterface({
       </div>
 
       <div 
-        className="flex-1 overflow-y-auto chat-messages"
+        className="flex-1 overflow-y-auto chat-messages mobile-chat-container"
         onScroll={handleScroll}
       >
         {messages.length === 0 && (

@@ -14,6 +14,7 @@ export default function ChatInput({
   placeholder = "Message Chess Butler..."
 }: ChatInputProps) {
   const [message, setMessage] = useState('');
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -22,6 +23,34 @@ export default function ChatInput({
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
     }
   }, [message]);
+
+  // Handle mobile keyboard appearance
+  useEffect(() => {
+    const handleFocus = () => {
+      if (window.innerWidth < 1024) { // Mobile
+        setIsKeyboardOpen(true);
+        // Scroll the input into view after a slight delay
+        setTimeout(() => {
+          textareaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 300);
+      }
+    };
+
+    const handleBlur = () => {
+      setIsKeyboardOpen(false);
+    };
+
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.addEventListener('focus', handleFocus);
+      textarea.addEventListener('blur', handleBlur);
+      
+      return () => {
+        textarea.removeEventListener('focus', handleFocus);
+        textarea.removeEventListener('blur', handleBlur);
+      };
+    }
+  }, []);
 
   const handleSubmit = () => {
     if (message.trim() && !disabled) {
@@ -38,7 +67,7 @@ export default function ChatInput({
   };
 
   return (
-    <div className="border-t border-purple-400/20 bg-gradient-to-r from-purple-900/30 via-blue-900/30 to-purple-900/30 p-4 lg:p-6 backdrop-blur-sm">
+    <div className={`border-t border-purple-400/20 bg-gradient-to-r from-purple-900/30 via-blue-900/30 to-purple-900/30 p-4 lg:p-6 backdrop-blur-sm chat-input-container ${isKeyboardOpen ? 'mobile-keyboard-active' : ''}`}>
       <div className="max-w-3xl mx-auto relative">
         <textarea
           ref={textareaRef}
