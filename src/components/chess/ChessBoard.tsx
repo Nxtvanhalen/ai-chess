@@ -49,22 +49,22 @@ export default function ChessBoard({
     }
   }, [position, game]);
 
-  const handleSquareClick = useCallback((square: Square) => {
+  const handleSquareClick = useCallback((square: string) => {
     if (!interactive) return;
 
-    const piece = game.get(square);
+    const piece = game.get(square as Square);
     
     if (selectedSquare === square) {
       // Clicking same square deselects
       setSelectedSquare(null);
       setPossibleMoves([]);
-    } else if (possibleMoves.includes(square)) {
+    } else if (possibleMoves.includes(square as Square)) {
       // Clicking a possible move - make the move
       const gameCopy = new Chess(game.fen());
       try {
         const move = gameCopy.move({
           from: selectedSquare!,
-          to: square,
+          to: square as Square,
           promotion: 'q',
         });
         if (move) {
@@ -78,8 +78,8 @@ export default function ChessBoard({
       }
     } else if (piece && piece.color === game.turn()) {
       // Clicking a piece of current player - select it and show moves
-      setSelectedSquare(square);
-      const moves = game.moves({ square, verbose: true });
+      setSelectedSquare(square as Square);
+      const moves = game.moves({ square: square as Square, verbose: true });
       setPossibleMoves(moves.map(move => move.to));
     } else {
       // Clicking empty square or opponent piece - deselect
@@ -89,15 +89,15 @@ export default function ChessBoard({
   }, [game, interactive, onMove, selectedSquare, possibleMoves]);
 
   const handleDrop = useCallback(
-    (sourceSquare: Square, targetSquare: Square) => {
+    (sourceSquare: string, targetSquare: string) => {
       if (!interactive) return false;
 
       const gameCopy = new Chess(game.fen());
       
       try {
         const move = gameCopy.move({
-          from: sourceSquare,
-          to: targetSquare,
+          from: sourceSquare as Square,
+          to: targetSquare as Square,
           promotion: 'q', // Always promote to queen for simplicity
         });
 
