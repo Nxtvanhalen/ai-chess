@@ -79,6 +79,11 @@ body {
   -moz-osx-font-smoothing: grayscale;
   font-feature-settings: 'cv11', 'ss01';
   font-variant-numeric: tabular-nums;
+  
+  /* Fix mobile Chrome display issues */
+  -webkit-overflow-scrolling: touch;
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
 }
 
 /* Prevent zoom on mobile devices */
@@ -279,4 +284,31 @@ select {
 
 .loading-dot:nth-child(3) {
   animation-delay: 0.4s;
+}
+
+/* Chrome Mobile specific fixes */
+@supports (-webkit-touch-callout: none) {
+  /* iOS Safari and Chrome mobile */
+  body {
+    height: 100vh;
+    height: -webkit-fill-available;
+  }
+  
+  html {
+    height: -webkit-fill-available;
+  }
+  
+  /* Fix viewport issues */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Ensure proper rendering */
+  .chess-board-container,
+  .chat-messages {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-perspective: 1000;
+    perspective: 1000;
+  }
 }

@@ -155,19 +155,23 @@ export default function Home() {
         // Save AI commentary to database
         await saveMessage(conversationId, 'assistant', aiResponse.content);
         
-        // After AI commentary, get AI's move (if it's black's turn)
-        setTimeout(async () => {
-          try {
-            const aiMoveResponse = await fetch('/api/chess/ai-move', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                fen: move.after,
-                difficulty: 'medium',
-              }),
-            });
+        // After AI commentary, get AI's move (only if it's AI's turn to play)
+        // Check if it's black's turn (AI plays black)
+        const isAiTurn = move.after.includes(' b '); // FEN notation: 'b' means black to move
+        
+        if (isAiTurn) {
+          setTimeout(async () => {
+            try {
+              const aiMoveResponse = await fetch('/api/chess/ai-move', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  fen: move.after,
+                  difficulty: 'medium',
+                }),
+              });
             
             if (aiMoveResponse.ok) {
               const aiMoveData = await aiMoveResponse.json();
@@ -211,6 +215,7 @@ export default function Home() {
             console.error('Error getting AI move:', error);
           }
         }, 2000); // Wait 2 seconds after commentary
+        }
       }
     } catch (error) {
       console.error('Error getting AI move commentary:', error);
