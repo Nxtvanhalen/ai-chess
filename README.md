@@ -2,7 +2,16 @@
 
 A futuristic, AI-driven chess application featuring a sophisticated Chess Butler powered by GPT-4o, complete AI opponent, and stunning OpenAI-inspired design.
 
-🚀 **Live on GitHub**: https://github.com/Nxtvanhalen/ai-chess
+🚀 **Live Application**: https://ai-chess-cfah.onrender.com  
+📂 **GitHub Repository**: https://github.com/Nxtvanhalen/ai-chess
+
+## 🎯 Production Deployment
+
+✅ **Successfully deployed to Render**  
+✅ **Full functionality working**  
+✅ **GPT-4o chat integration active**  
+✅ **Supabase persistence operational**  
+✅ **AI chess opponent functional**
 
 ## ✨ Current Features
 
