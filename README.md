@@ -16,25 +16,32 @@ A futuristic, AI-driven chess application featuring a sophisticated Chess Butler
 ## ✨ Current Features
 
 🎮 **Complete Chess Experience**
-- **Intelligent AI Opponent** - Advanced chess engine with minimax algorithm
-- **Real-time Move Analysis** - GPT-4o provides strategic commentary on every move
-- **Chess Butler Coaching** - Ongoing advice and insights throughout the game
-- **Interactive Gameplay** - Make moves, get analysis, watch AI respond
+- **Intelligent AI Opponent** - Advanced chess engine with minimax algorithm and proper evaluation
+- **Move Highlighting Teaching Tool** - Click any piece to see all possible moves highlighted
+- **Real-time Move Analysis** - GPT-4o provides concise strategic commentary
+- **Chess Butler Coaching** - Brief, focused insights and tactical advice
+- **Interactive Gameplay** - Drag pieces or click to move, with visual feedback
 - **Persistent Game Memory** - All games and conversations saved to Supabase
 
 🎨 **Futuristic Design**
 - **Dark Purple Aesthetic** - Sleek, modern OpenAI-inspired interface
 - **Enhanced Chess Board** - Individual square identifiers (a1, b2, etc.) for clarity
-- **Mobile-First Layout** - Optimized for touch interactions and small screens
+- **Mobile-Optimized Layout** - 60/40 split for better screen utilization
 - **Smooth Typing Animation** - Character-by-character AI response rendering
-- **High Contrast Visibility** - Optimized colors for better board readability
+- **Visual Move Indicators** - Green highlights show legal moves for selected pieces
 
 🤖 **AI Integration**
-- **GPT-4o Powered** - Advanced language model for natural chess conversation
-- **Streaming Responses** - Real-time AI commentary with smooth typing effect
-- **Strategic Analysis** - Deep move evaluation and position assessment
-- **Personality-Driven** - Dignified Chess Butler character with consistent voice
+- **GPT-4o Powered** - Advanced language model with concise, tactical responses
+- **Faster AI Moves** - Reduced thinking time for quicker gameplay
+- **Strategic Engine** - Proper position evaluation with mobility and center control
+- **Personality-Driven** - Sharp, confident Chess Butler with minimal verbosity
 - **Full Memory Persistence** - AI remembers all previous games and conversations
+
+📱 **Mobile Experience**
+- **Touch-Optimized Controls** - Seamless piece movement on mobile devices
+- **Keyboard-Smart Interface** - Chat input stays visible when mobile keyboard appears
+- **Responsive Sizing** - Optimized proportions for single-page mobile viewing
+- **Chrome Mobile Fixes** - Enhanced compatibility and rendering improvements
 
 ## Architecture
 
