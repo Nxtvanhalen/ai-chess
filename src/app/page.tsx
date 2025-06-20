@@ -107,8 +107,8 @@ export default function Home() {
         'human'
       );
       
-      // Update game position
-      await updateGamePosition(currentGameId, move.after, move.pgn || '');
+      // Update game position  
+      await updateGamePosition(currentGameId, move.after, '');
       
       // Add user move message
       const moveMessage: ChatMessage = {
@@ -213,7 +213,7 @@ export default function Home() {
               );
               
               // Update game position with AI move
-              await updateGamePosition(currentGameId!, aiMoveData.fen, aiMoveData.pgn || '');
+              await updateGamePosition(currentGameId!, aiMoveData.fen, '');
               
               // Add AI move message
               const aiMoveMessage: ChatMessage = {
