@@ -2,6 +2,8 @@
 
 A futuristic, AI-driven chess application featuring a sophisticated Chess Butler powered by GPT-4o, complete AI opponent, and stunning OpenAI-inspired design.
 
+🚀 **Live on GitHub**: https://github.com/Nxtvanhalen/ai-chess
+
 ## ✨ Current Features
 
 🎮 **Complete Chess Experience**
@@ -9,18 +11,21 @@ A futuristic, AI-driven chess application featuring a sophisticated Chess Butler
 - **Real-time Move Analysis** - GPT-4o provides strategic commentary on every move
 - **Chess Butler Coaching** - Ongoing advice and insights throughout the game
 - **Interactive Gameplay** - Make moves, get analysis, watch AI respond
+- **Persistent Game Memory** - All games and conversations saved to Supabase
 
 🎨 **Futuristic Design**
 - **Dark Purple Aesthetic** - Sleek, modern OpenAI-inspired interface
-- **Glowing Chess Board** - Custom gradients and animated move highlights
+- **Enhanced Chess Board** - Individual square identifiers (a1, b2, etc.) for clarity
 - **Mobile-First Layout** - Optimized for touch interactions and small screens
-- **Smooth Animations** - Message transitions, hover effects, and glow pulses
+- **Smooth Typing Animation** - Character-by-character AI response rendering
+- **High Contrast Visibility** - Optimized colors for better board readability
 
 🤖 **AI Integration**
 - **GPT-4o Powered** - Advanced language model for natural chess conversation
-- **Streaming Responses** - Real-time AI commentary as you type
+- **Streaming Responses** - Real-time AI commentary with smooth typing effect
 - **Strategic Analysis** - Deep move evaluation and position assessment
 - **Personality-Driven** - Dignified Chess Butler character with consistent voice
+- **Full Memory Persistence** - AI remembers all previous games and conversations
 
 ## Architecture
 
@@ -89,7 +94,7 @@ SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 
 ```bash
 # Clone the repository
-git clone https://github.com/nxtvanhalen/ai-chess.git
+git clone https://github.com/Nxtvanhalen/ai-chess.git
 cd ai-chess
 
 # Install dependencies
