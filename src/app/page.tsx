@@ -30,36 +30,11 @@ export default function Home() {
   useEffect(() => {
     const initializeGame = async () => {
       try {
-        // Try to get current active game
-        const existingGame = await getCurrentGame();
+        // Always create a new game for now (to avoid loading old data)
+        // const existingGame = await getCurrentGame();
         
-        if (existingGame) {
-          // Restore existing game
-          setCurrentGameId(existingGame.id);
-          setCurrentPosition(existingGame.fen);
-          
-          // Get conversation for this game
-          const { data: conversations } = await supabase
-            .from('conversations')
-            .select('*')
-            .eq('game_id', existingGame.id)
-            .single();
-            
-          if (conversations) {
-            setConversationId(conversations.id);
-            
-            // Load message history
-            const savedMessages = await getConversationMessages(conversations.id);
-            const chatMessages: ChatMessage[] = savedMessages.map(msg => ({
-              id: msg.id,
-              role: msg.role as 'user' | 'assistant' | 'system',
-              content: msg.content,
-              timestamp: new Date(msg.created_at),
-              metadata: msg.metadata
-            }));
-            setMessages(chatMessages);
-          }
-        } else {
+        // Create new game instead of restoring existing
+        {
           // Create new game
           const newGame = await createGame('white');
           setCurrentGameId(newGame.id);
