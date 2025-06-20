@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { Chessboard } from 'react-chessboard';
-import { Chess, Move } from 'chess.js';
+import { Chess, Move, Square } from 'chess.js';
 
 interface ChessBoardProps {
   onMove: (move: Move) => void;
@@ -19,8 +19,8 @@ export default function ChessBoard({
 }: ChessBoardProps) {
   const [game, setGame] = useState(new Chess());
   const [boardWidth, setBoardWidth] = useState(400);
-  const [selectedSquare, setSelectedSquare] = useState<string | null>(null);
-  const [possibleMoves, setPossibleMoves] = useState<string[]>([]);
+  const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
+  const [possibleMoves, setPossibleMoves] = useState<Square[]>([]);
 
   useEffect(() => {
     const updateBoardSize = () => {
@@ -49,7 +49,7 @@ export default function ChessBoard({
     }
   }, [position, game]);
 
-  const handleSquareClick = useCallback((square: string) => {
+  const handleSquareClick = useCallback((square: Square) => {
     if (!interactive) return;
 
     const piece = game.get(square);
@@ -89,7 +89,7 @@ export default function ChessBoard({
   }, [game, interactive, onMove, selectedSquare, possibleMoves]);
 
   const handleDrop = useCallback(
-    (sourceSquare: string, targetSquare: string) => {
+    (sourceSquare: Square, targetSquare: Square) => {
       if (!interactive) return false;
 
       const gameCopy = new Chess(game.fen());
