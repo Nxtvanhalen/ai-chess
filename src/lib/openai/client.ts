@@ -4,12 +4,10 @@ let openaiClient: OpenAI | null = null;
 
 export function getOpenAIClient() {
   if (!openaiClient) {
-    if (!process.env.OPENAI_API_KEY) {
-      throw new Error('OPENAI_API_KEY is not set');
-    }
+    const apiKey = process.env.OPENAI_API_KEY || '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';
     
     openaiClient = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
+      apiKey: apiKey,
     });
   }
   
