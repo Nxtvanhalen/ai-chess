@@ -214,7 +214,7 @@ export default function Home() {
           } catch (error) {
             console.error('Error getting AI move:', error);
           }
-        }, 2000); // Wait 2 seconds after commentary
+        }, 800); // Wait 0.8 seconds after commentary
         }
       }
     } catch (error) {
