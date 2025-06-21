@@ -367,12 +367,11 @@ select {
   
   /* When keyboard appears, adjust layout smoothly */
   .mobile-keyboard-active .chess-section {
-    max-height: 40vh !important;
+    max-height: 45vh !important;
   }
   
   .mobile-keyboard-active .chat-section {
-    flex: 1 !important;
-    min-height: 0 !important;
+    height: 55vh !important;
   }
   
   /* Ensure chat input stays visible when keyboard opens */
