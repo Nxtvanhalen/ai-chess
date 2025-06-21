@@ -42,18 +42,18 @@ export default function ChatMessage({ message }: ChatMessageProps) {
   const isThinking = message.metadata?.isThinking;
   
   return (
-    <div className={`flex gap-2 lg:gap-4 px-2 lg:px-6 py-2 lg:py-6 animate-in slide-in-from-bottom-6 lg:slide-in-from-bottom-8 fade-in duration-700 lg:duration-1000 ease-out ${
+    <div className={`flex gap-1 lg:gap-4 px-1 lg:px-6 py-1 lg:py-6 animate-in slide-in-from-bottom-6 lg:slide-in-from-bottom-8 fade-in duration-700 lg:duration-1000 ease-out ${
       isAssistant 
         ? 'bg-gradient-to-r from-purple-900/20 via-blue-900/10 to-purple-900/20 border-l-4 border-purple-400/40 rounded-r-2xl mx-2' 
         : 'hover:bg-purple-900/10 rounded-l-2xl mx-2'
     }`}>
       <div className="flex-shrink-0">
         {isAssistant ? (
-          <div className="w-6 h-6 lg:w-10 lg:h-10 rounded-full bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 text-white glow-effect flex items-center justify-center text-sm lg:text-lg shadow-lg">
+          <div className="w-5 h-5 lg:w-10 lg:h-10 rounded-full bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 text-white glow-effect flex items-center justify-center text-xs lg:text-lg shadow-lg">
             {isThinking ? '🤔' : '🤓'}
           </div>
         ) : (
-          <div className="w-6 h-6 lg:w-10 lg:h-10 rounded-full overflow-hidden shadow-lg relative">
+          <div className="w-5 h-5 lg:w-10 lg:h-10 rounded-full overflow-hidden shadow-lg relative">
             <img
               src="/profile.jpg"
               alt="Chris"
@@ -84,10 +84,10 @@ export default function ChatMessage({ message }: ChatMessageProps) {
           </span>
         </div>
         
-        <div className={`markdown-content prose prose-sm max-w-none prose-invert prose-p:leading-relaxed prose-headings:font-bold prose-a:text-blue-400 text-slate-200 ${
+        <div className={`markdown-content prose prose-sm max-w-none prose-invert prose-p:leading-tight prose-p:mb-0 prose-headings:font-bold prose-a:text-blue-400 text-slate-200 text-sm lg:text-base ${
           isAssistant 
-            ? 'bg-purple-900/15 p-2 lg:p-4 rounded-xl lg:rounded-2xl border border-purple-400/30 shadow-lg backdrop-blur-sm' 
-            : 'bg-slate-800/25 p-2 lg:p-4 rounded-xl lg:rounded-2xl border border-slate-400/30 shadow-lg backdrop-blur-sm'
+            ? 'bg-purple-900/15 px-1 py-0.5 lg:p-4 rounded-md lg:rounded-2xl border border-purple-400/30 shadow-lg backdrop-blur-sm' 
+            : 'bg-slate-800/25 px-1 py-0.5 lg:p-4 rounded-md lg:rounded-2xl border border-slate-400/30 shadow-lg backdrop-blur-sm'
         }`}>
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}

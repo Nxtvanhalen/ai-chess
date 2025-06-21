@@ -37,27 +37,12 @@ export default function ChatInterface({
   };
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-b from-purple-950/80 to-slate-950/90 backdrop-blur-md rounded-2xl overflow-hidden">
-      <div className="flex-shrink-0 border-b border-purple-400/20 p-2 lg:p-6 bg-gradient-to-r from-purple-900/30 via-blue-900/30 to-purple-900/30 backdrop-blur-sm rounded-t-2xl">
-        <div className="flex items-center gap-3 lg:gap-4">
-          <div className="w-8 h-8 lg:w-12 lg:h-12 rounded-full bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 flex items-center justify-center text-white font-bold text-sm lg:text-xl shadow-lg glow-effect">
-            🤓
-          </div>
-          <div className="flex-1 min-w-0">
-            <h2 className="text-sm lg:text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent truncate">Chester</h2>
-            <p className="text-xs lg:text-sm text-slate-300 font-medium truncate hidden lg:block">
-              Your dignified AI chess companion
-            </p>
-          </div>
-          <div className="flex-shrink-0">
-            <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
-          </div>
-        </div>
-      </div>
+    <div className="flex flex-col h-full bg-gradient-to-b from-purple-950/80 to-slate-950/90 backdrop-blur-md rounded-t-2xl lg:rounded-2xl overflow-hidden">
 
       <div 
         className="flex-1 overflow-y-auto chat-messages mobile-chat-container"
         onScroll={handleScroll}
+        style={{ minHeight: 0 }}
       >
         {messages.length === 0 && (
           <div className="flex items-center justify-center h-full p-8 text-center">

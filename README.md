@@ -43,12 +43,15 @@ A futuristic, AI-driven chess application featuring Chester, a sophisticated AI 
 
 📱 **Mobile Experience**
 - **Touch-Optimized Controls** - Seamless piece movement on mobile devices
-- **Optimized Mobile Layout** - 70/30 chess/chat split with larger board size
-- **Keyboard-Smart Interface** - Chat input stays visible when mobile keyboard appears
-- **Single-Page Mobile Design** - Everything fits on one screen without scrolling
+- **Optimized Mobile Layout** - Chess board positioned properly with chat section below
 - **Smooth Animations** - Slower, more elegant slide-in effects for chat messages
 - **Compact Mobile UI** - Reduced padding and header sizes for maximum space efficiency
 - **Chrome Mobile Fixes** - Enhanced compatibility and rendering improvements
+
+⚠️ **Known Mobile Issues (TO BE FIXED)**
+- **Keyboard Input Positioning** - Text input does not properly move above mobile keyboard when typing
+- **Chat-Input Gap** - Large empty space between chat messages and text input area on mobile
+- **Layout Responsiveness** - Mobile layout needs refinement for optimal screen space usage
 
 ## Architecture
 

@@ -27,11 +27,11 @@ export default function GameLayout({ chessBoard, chat }: GameLayoutProps) {
   return (
     <div className="h-screen w-screen overflow-auto lg:overflow-hidden relative">
       {/* Mobile Layout: Stacked with keyboard handling */}
-      <div className={`flex flex-col min-h-screen lg:hidden ${isKeyboardOpen ? 'mobile-keyboard-active' : ''}`}>
-        <div className={`chess-section flex-shrink-0 shadow-2xl relative transition-all duration-300 ease-in-out`} style={{ height: 'auto', maxHeight: isKeyboardOpen ? '45vh' : '75vh' }}>
+      <div className={`flex flex-col h-screen lg:hidden ${isKeyboardOpen ? 'mobile-keyboard-active' : ''}`}>
+        <div className={`chess-section flex-shrink-0 shadow-2xl relative transition-all duration-300 ease-in-out`} style={{ height: 'auto', maxHeight: isKeyboardOpen ? '45vh' : '70vh' }}>
           {chessBoard}
         </div>
-        <div className={`chat-section shadow-2xl backdrop-blur-sm overflow-visible transition-all duration-300 ease-in-out border-t border-purple-400/30`} style={{ height: isKeyboardOpen ? '55vh' : '25vh' }}>
+        <div className={`chat-section flex-1 shadow-2xl backdrop-blur-sm overflow-visible transition-all duration-300 ease-in-out border-t border-purple-400/30 mt-28 lg:mt-0`}>
           {chat}
         </div>
       </div>

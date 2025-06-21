@@ -266,7 +266,14 @@ select {
 }
 
 .markdown-content p {
-  margin-bottom: 1em;
+  margin-bottom: 0 !important;
+}
+
+@media screen and (max-width: 1024px) {
+  .markdown-content p {
+    margin-bottom: 0 !important;
+    margin-top: 0 !important;
+  }
 }
 
 .markdown-content pre {
@@ -365,27 +372,55 @@ select {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
-  /* When keyboard appears, adjust layout smoothly */
+  /* When keyboard appears, push chess board off screen but keep chat visible */
   .mobile-keyboard-active .chess-section {
-    max-height: 45vh !important;
+    transform: translateY(-100vh) !important;
+    max-height: 0 !important;
+    overflow: hidden !important;
   }
   
   .mobile-keyboard-active .chat-section {
-    height: 55vh !important;
+    margin-top: 0 !important;
+    height: 100dvh !important;
+    display: flex !important;
+    flex-direction: column !important;
   }
   
-  /* Ensure chat input stays visible when keyboard opens */
-  .chat-input-container {
-    position: relative;
-    z-index: 1000;
-    padding-bottom: env(safe-area-inset-bottom, 8px);
-    margin-bottom: 0;
+  /* Chat input positioning */
+  @media screen and (max-width: 1024px) {
+    .chat-input-container {
+      position: fixed;
+      bottom: 24px;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+    }
+    
+    .mobile-keyboard-active .chat-input-container {
+      bottom: 300px !important;
+    }
+  }
+  
+  @media screen and (min-width: 1025px) {
+    .chat-input-container {
+      position: fixed;
+      bottom: 24px;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+    }
   }
   
   /* Reduce mobile chat size when keyboard active */
   .mobile-chat-container {
-    max-height: 15vh;
+    max-height: 30vh;
     overflow-y: auto;
+  }
+  
+  .mobile-keyboard-active .chat-messages {
+    height: calc(100vh - 120px) !important;
+    max-height: calc(100vh - 120px) !important;
+    flex: none !important;
   }
   
   /* Allow proper mobile scrolling while preventing bounce */

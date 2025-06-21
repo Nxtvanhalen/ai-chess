@@ -35,7 +35,7 @@ export default function ChessBoard({
       // Desktop: responsive to container width
       const isMobile = viewportWidth < 1024; // lg breakpoint
       const maxSize = isMobile 
-        ? Math.min(viewportWidth - 8, (viewportHeight * 0.70) - 24) // Use 70vh with minimal padding
+        ? Math.min(viewportWidth - 20, (viewportHeight * 0.55) - 36) // Slightly bigger board
         : Math.min(viewportWidth * 0.55 - 48, viewportHeight - 120);
       
       setBoardWidth(Math.floor(maxSize));
@@ -342,7 +342,7 @@ export default function ChessBoard({
                 }
               `}
               style={{
-                transform: 'scale(0.6)',
+                transform: 'scale(0.95)',
                 transformOrigin: 'center',
                 textShadow: '0 0 3px #000, 0 0 5px #000, 0 1px 0 #000, 0 -1px 0 #000, 1px 0 0 #000, -1px 0 0 #000',
                 WebkitFontSmoothing: 'subpixel-antialiased',
@@ -363,7 +363,7 @@ export default function ChessBoard({
   };
 
   return (
-    <div className="chess-board-container flex items-center justify-center p-1 lg:p-6 bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-indigo-900/20" style={{ height: `${boardWidth + 8}px` }}>
+    <div className="chess-board-container flex items-center justify-center p-1 lg:p-6 pt-56 lg:pt-6 bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-indigo-900/20" style={{ height: `${boardWidth + 8}px` }}>
       <div style={{ width: boardWidth, height: boardWidth }} className="relative">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-2xl pointer-events-none" />
         <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl opacity-10 blur-sm pointer-events-none" />

@@ -11,7 +11,7 @@ interface ChatInputProps {
 export default function ChatInput({ 
   onSendMessage, 
   disabled = false,
-  placeholder = "Message Chess Butler..."
+  placeholder = "Message Chester..."
 }: ChatInputProps) {
   const [message, setMessage] = useState('');
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
@@ -67,7 +67,7 @@ export default function ChatInput({
   };
 
   return (
-    <div className={`border-t border-purple-400/20 bg-gradient-to-r from-purple-900/30 via-blue-900/30 to-purple-900/30 p-2 lg:p-6 backdrop-blur-sm chat-input-container rounded-b-2xl ${isKeyboardOpen ? 'mobile-keyboard-active' : ''}`}>
+    <div className={`border-t border-purple-400/20 bg-gradient-to-r from-purple-900/30 via-blue-900/30 to-purple-900/30 p-2 lg:p-6 backdrop-blur-sm chat-input-container lg:rounded-b-2xl ${isKeyboardOpen ? 'mobile-keyboard-active' : ''}`}>
       <div className="max-w-3xl mx-auto relative">
         <textarea
           ref={textareaRef}
