@@ -44,7 +44,7 @@ export default function ChatInterface({
             🤓
           </div>
           <div className="flex-1 min-w-0">
-            <h2 className="text-sm lg:text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent truncate">Chess Butler</h2>
+            <h2 className="text-sm lg:text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent truncate">Chester</h2>
             <p className="text-xs lg:text-sm text-slate-300 font-medium truncate hidden lg:block">
               Your dignified AI chess companion
             </p>
@@ -73,7 +73,7 @@ export default function ChatInterface({
                   Welcome, Chris
                 </h3>
                 <p className="text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
-                  I&apos;m your Chess Butler, ready to assist with strategic insights, 
+                  I&apos;m Chester, your chess companion, ready to assist with strategic insights, 
                   thoughtful analysis, and perhaps a dash of wisdom. Make your opening move 
                   or share what&apos;s on your mind.
                 </p>

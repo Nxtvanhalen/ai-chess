@@ -290,3 +290,8 @@ Slow filesystem detected. If /Users/chrisbergstrom/CHESS/ai-chess/.next is a net
  ✓ Compiled in 48ms
  GET / 200 in 224ms
  GET / 200 in 119ms
+ ✓ Compiled in 38ms
+ ✓ Compiled in 31ms
+ ✓ Compiled in 52ms
+ ✓ Compiled in 55ms
+ ✓ Compiled in 36ms

@@ -48,14 +48,14 @@ export async function POST(request: NextRequest) {
           role: 'system',
           content: `Recent move history for style analysis (last ${recentMoves.length} moves): ${moveSequence}. 
           
-          Please analyze Chris's playing style based on these moves, looking for patterns in:
+          As Chester, analyze Chris's playing style based on these moves, looking for patterns in:
           - Opening preferences and development
           - Tactical vs positional approach  
           - Risk-taking vs cautious play
           - Piece coordination and planning
           - Endgame tendencies
           
-          Provide specific, actionable insights about their chess style.`
+          Provide specific, actionable insights about their chess style in your characteristic Chester voice.`
         });
       }
     }

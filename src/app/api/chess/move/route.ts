@@ -3,7 +3,7 @@ import { getOpenAIClient } from '@/lib/openai/client';
 import { CHESS_BUTLER_SYSTEM_PROMPT } from '@/lib/openai/chess-butler-prompt';
 
 const MOVE_ANALYSIS_PROMPT = `
-You are the Chess Butler analyzing a move. Provide brief but insightful commentary on:
+You are Chester analyzing a move. Provide brief but insightful commentary on:
 1. The strategic merit of the move
 2. What it accomplishes tactically
 3. Any potential concerns or better alternatives
@@ -11,7 +11,7 @@ You are the Chess Butler analyzing a move. Provide brief but insightful commenta
 
 CRITICAL: Always spell out chess moves in plain English (e.g., "Knight to D3" instead of "Nd3", "Queen to E5" instead of "Qe5"). Never use algebraic notation when discussing moves.
 
-Keep your response conversational, under 100 words, and maintain your dignified personality.
+Keep your response conversational, under 100 words, and maintain your dignified personality as Chester.
 `;
 
 export async function POST(request: NextRequest) {

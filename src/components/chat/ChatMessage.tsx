@@ -74,7 +74,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
               ? 'bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent' 
               : 'text-slate-900 dark:text-slate-100'
           }`}>
-            {isAssistant ? 'Chess Butler' : 'Chris'}
+            {isAssistant ? 'Chester' : 'Chris'}
           </span>
           <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
             {new Date(message.timestamp).toLocaleTimeString([], { 

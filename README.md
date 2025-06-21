@@ -1,6 +1,6 @@
-# AI Chess - CLB Chess Butler
+# AI Chess - Chester
 
-A futuristic, AI-driven chess application featuring a sophisticated Chess Butler powered by GPT-4o, complete AI opponent, and stunning OpenAI-inspired design.
+A futuristic, AI-driven chess application featuring Chester, a sophisticated AI chess companion powered by GPT-4o, complete AI opponent, and stunning OpenAI-inspired design.
 
 🚀 **Live Application**: https://ai-chess-cfah.onrender.com  
 📂 **GitHub Repository**: https://github.com/Nxtvanhalen/ai-chess
@@ -19,7 +19,7 @@ A futuristic, AI-driven chess application featuring a sophisticated Chess Butler
 - **Intelligent AI Opponent** - Advanced chess engine with minimax algorithm and proper evaluation
 - **Move Highlighting Teaching Tool** - Click any piece to see all possible moves highlighted
 - **Real-time Move Analysis** - GPT-4o provides concise strategic commentary with full game context
-- **Chess Butler Coaching** - Playing style analysis using complete move history
+- **Chester's Coaching** - Playing style analysis using complete move history
 - **Interactive Gameplay** - Drag pieces or click to move, with visual feedback
 - **Plain English Moves** - All moves displayed as "Knight to E6" instead of algebraic notation
 - **Highlighted Chess Moves** - Chess moves glow with blue highlights in chat for easy recognition
@@ -38,7 +38,7 @@ A futuristic, AI-driven chess application featuring a sophisticated Chess Butler
 - **GPT-4o Powered** - Advanced language model with concise, tactical responses
 - **Faster AI Moves** - Reduced thinking time for quicker gameplay
 - **Strategic Engine** - Proper position evaluation with mobility and center control
-- **Personality-Driven** - Sharp, confident Chess Butler with minimal verbosity
+- **Personality-Driven** - Sharp, confident Chester with minimal verbosity
 - **Full Memory Persistence** - AI remembers all previous games and conversations
 
 📱 **Mobile Experience**
@@ -73,11 +73,11 @@ A futuristic, AI-driven chess application featuring a sophisticated Chess Butler
    - Message status indicators
    - Responsive layout (beside/below board)
 
-3. **AI Chess Butler**
-   - Single, unified AI personality
+3. **Chester - AI Chess Companion**
+   - Single, unified AI personality named Chester
    - Persistent memory of all games and conversations
    - Chess coaching, commentary, and subtle life advice
-   - Meta-aware, dignified character
+   - Meta-aware, dignified character who knows his name
 
 4. **Persistent Memory System**
    - Supabase-powered game history

@@ -58,7 +58,7 @@ export default function Home() {
           const welcomeMessage: ChatMessage = {
             id: uuidv4(),
             role: 'assistant',
-            content: "Welcome back, Chris! I'm your Chess Butler, ready for our next game. I'll remember our entire journey together. Make your opening move when you're ready!",
+            content: "Welcome back, Chris! I'm Chester, your chess companion, ready for our next game. I'll remember our entire journey together. Make your opening move when you're ready!",
             timestamp: new Date(),
           };
           
@@ -438,7 +438,7 @@ export default function Home() {
       const newGameMessage: ChatMessage = {
         id: uuidv4(),
         role: 'assistant',
-        content: "New game! The board is reset and we're ready for another match. Your move, Chris!",
+        content: "New game! The board is reset and Chester's ready for another match. Your move, Chris!",
         timestamp: new Date(),
       };
       
