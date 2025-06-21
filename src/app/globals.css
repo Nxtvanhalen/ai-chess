@@ -384,7 +384,7 @@ select {
   
   /* Reduce mobile chat size when keyboard active */
   .mobile-chat-container {
-    max-height: 35vh;
+    max-height: 15vh;
     overflow-y: auto;
   }
   
