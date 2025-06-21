@@ -24,20 +24,20 @@ export default function ChatInput({
     }
   }, [message]);
 
-  // Handle mobile keyboard appearance
+  // Handle mobile keyboard appearance without disruptive scrolling
   useEffect(() => {
     const handleFocus = () => {
       if (window.innerWidth < 1024) { // Mobile
         setIsKeyboardOpen(true);
-        // Scroll the input into view after a slight delay
-        setTimeout(() => {
-          textareaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 300);
+        // Dispatch custom event for layout to handle
+        window.dispatchEvent(new Event('keyboard-open'));
       }
     };
 
     const handleBlur = () => {
       setIsKeyboardOpen(false);
+      // Dispatch custom event for layout to handle
+      window.dispatchEvent(new Event('keyboard-close'));
     };
 
     const textarea = textareaRef.current;
@@ -67,7 +67,7 @@ export default function ChatInput({
   };
 
   return (
-    <div className={`border-t border-purple-400/20 bg-gradient-to-r from-purple-900/30 via-blue-900/30 to-purple-900/30 p-4 lg:p-6 backdrop-blur-sm chat-input-container ${isKeyboardOpen ? 'mobile-keyboard-active' : ''}`}>
+    <div className={`border-t border-purple-400/20 bg-gradient-to-r from-purple-900/30 via-blue-900/30 to-purple-900/30 p-4 lg:p-6 backdrop-blur-sm chat-input-container rounded-b-2xl ${isKeyboardOpen ? 'mobile-keyboard-active' : ''}`}>
       <div className="max-w-3xl mx-auto relative">
         <textarea
           ref={textareaRef}
@@ -77,7 +77,7 @@ export default function ChatInput({
           disabled={disabled}
           placeholder={placeholder}
           rows={1}
-          className="w-full resize-none rounded-xl lg:rounded-2xl border-2 border-purple-400/30 bg-slate-900/80 backdrop-blur-sm px-5 lg:px-6 py-5 lg:py-6 pr-16 lg:pr-18 text-base lg:text-lg text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg hover:shadow-xl font-medium"
+          className="w-full resize-none rounded-xl lg:rounded-2xl border-2 border-purple-400/30 bg-slate-900/80 backdrop-blur-sm px-5 lg:px-6 py-5 lg:py-6 pr-16 lg:pr-18 text-base lg:text-lg text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg hover:shadow-xl font-medium scrollbar-hide overflow-hidden"
           style={{ maxHeight: '200px', minHeight: '56px' }}
         />
         

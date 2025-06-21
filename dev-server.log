@@ -1,0 +1,292 @@
+
+> ai-chess@0.1.0 dev
+> next dev --turbopack
+
+   ▲ Next.js 15.3.4 (Turbopack)
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.0.112:3000
+   - Environments: .env.local
+
+ ✓ Starting...
+Slow filesystem detected. If /Users/chrisbergstrom/CHESS/ai-chess/.next is a network drive, consider moving it to a local folder. If you have an antivirus enabled, consider excluding your project directory.
+ ✓ Ready in 1070ms
+ ⚠ Webpack is configured while Turbopack is not, which may cause problems.
+ ⚠ See instructions if you need to configure Turbopack:
+  https://nextjs.org/docs/app/api-reference/next-config-js/turbo
+
+ ○ Compiling / ...
+ ✓ Compiled / in 1569ms
+ GET / 200 in 1544ms
+ ✓ Compiled in 109ms
+ ✓ Compiled in 119ms
+ ✓ Compiled in 50ms
+ ✓ Compiled in 42ms
+ ✓ Compiled in 8ms
+ ✓ Compiled in 67ms
+ ✓ Compiled in 20ms
+ ✓ Compiled in 54ms
+ ✓ Compiled in 48ms
+ ✓ Compiled in 40ms
+ ✓ Compiled in 49ms
+ ✓ Compiled in 35ms
+ ✓ Compiled in 40ms
+ GET / 200 in 228ms
+ ✓ Compiled in 47ms
+ ✓ Compiled in 50ms
+ ✓ Compiled /api/chess/move in 377ms
+ POST /api/chess/move 200 in 2232ms
+ ✓ Compiled /api/chess/ai-move in 200ms
+ POST /api/chess/ai-move 200 in 298ms
+ ✓ Compiled in 66ms
+ GET / 200 in 204ms
+ ✓ Compiled in 63ms
+ ✓ Compiled in 57ms
+ ✓ Compiled in 73ms
+ ✓ Compiled in 59ms
+ ✓ Compiled in 51ms
+ GET / 200 in 223ms
+ ✓ Compiled in 74ms
+ ✓ Compiled in 77ms
+ GET / 200 in 201ms
+ ✓ Compiled in 61ms
+ ✓ Compiled in 46ms
+ ✓ Compiled in 38ms
+ ✓ Compiled in 68ms
+ ✓ Compiled in 47ms
+ ✓ Compiled in 54ms
+ ✓ Compiled in 72ms
+ ✓ Compiled in 311ms
+ ✓ Compiled / in 15ms
+ GET / 200 in 110ms
+ ✓ Compiled in 123ms
+ ✓ Compiled in 40ms
+ ✓ Compiled in 159ms
+ ✓ Compiled in 85ms
+ ✓ Compiled in 64ms
+ ✓ Compiled in 38ms
+ GET / 200 in 234ms
+ ✓ Compiled /api/chat in 459ms
+ POST /api/chat 200 in 1615ms
+ ✓ Compiled in 64ms
+ ✓ Compiled in 110ms
+ ✓ Compiled in 53ms
+ GET / 200 in 231ms
+ POST /api/chat 200 in 5357ms
+ ✓ Compiled in 58ms
+ ✓ Compiled in 57ms
+ POST /api/chat 200 in 8565ms
+ ✓ Compiled in 68ms
+ GET / 200 in 188ms
+ POST /api/chat 200 in 1544ms
+ ✓ Compiled in 54ms
+ ✓ Compiled in 48ms
+ ✓ Compiled in 43ms
+ GET / 200 in 200ms
+ POST /api/chat 200 in 1571ms
+ ✓ Compiled in 115ms
+ ✓ Compiled / in 24ms
+ GET / 200 in 101ms
+ ✓ Compiled in 49ms
+ ✓ Compiled in 49ms
+ GET / 200 in 222ms
+ POST /api/chat 200 in 1132ms
+ ✓ Compiled in 78ms
+ GET / 200 in 348ms
+ POST /api/chat 200 in 415ms
+ ✓ Compiled in 54ms
+ ✓ Compiled in 179ms
+ ✓ Compiled in 92ms
+ ✓ Compiled in 44ms
+ ✓ Compiled in 44ms
+ ✓ Compiled in 49ms
+ ✓ Compiled in 39ms
+ ✓ Compiled in 33ms
+ ✓ Compiled in 70ms
+ ✓ Compiled in 103ms
+ POST /api/chat 200 in 919ms
+ POST /api/chat 200 in 733ms
+ ✓ Compiled in 64ms
+ ✓ Compiled in 55ms
+ ✓ Compiled in 106ms
+ POST /api/chat 200 in 626ms
+ ✓ Compiled in 83ms
+ ✓ Compiled in 31ms
+ GET / 200 in 220ms
+ POST /api/chat 200 in 884ms
+ POST /api/chat 200 in 578ms
+ ✓ Compiled in 65ms
+ ✓ Compiled in 43ms
+ POST /api/chat 200 in 1253ms
+ POST /api/chat 200 in 699ms
+ POST /api/chat 200 in 660ms
+ ✓ Compiled in 118ms
+ ✓ Compiled in 133ms
+ ✓ Compiled in 104ms
+ ✓ Compiled in 52ms
+ ✓ Compiled in 42ms
+ ✓ Compiled in 76ms
+ POST /api/chat 200 in 955ms
+ POST /api/chess/move 200 in 4564ms
+ POST /api/chess/ai-move 200 in 139ms
+ POST /api/chess/move 200 in 2452ms
+ POST /api/chess/ai-move 200 in 147ms
+ POST /api/chess/move 200 in 1728ms
+ POST /api/chess/ai-move 200 in 213ms
+ POST /api/chess/move 200 in 2279ms
+ POST /api/chess/ai-move 200 in 363ms
+ POST /api/chess/move 200 in 2165ms
+ POST /api/chess/ai-move 200 in 365ms
+ POST /api/chess/move 200 in 2018ms
+ POST /api/chess/ai-move 200 in 462ms
+ POST /api/chess/move 200 in 2540ms
+ POST /api/chess/ai-move 200 in 533ms
+ POST /api/chess/move 200 in 2019ms
+ POST /api/chess/ai-move 200 in 378ms
+ POST /api/chess/move 200 in 1616ms
+ POST /api/chess/ai-move 200 in 430ms
+ POST /api/chess/move 200 in 1644ms
+ POST /api/chess/ai-move 200 in 329ms
+ POST /api/chess/move 200 in 1954ms
+ POST /api/chess/ai-move 200 in 342ms
+ POST /api/chess/move 200 in 1469ms
+ POST /api/chess/ai-move 200 in 227ms
+ POST /api/chess/move 200 in 2302ms
+ POST /api/chess/ai-move 200 in 252ms
+ POST /api/chess/move 200 in 1578ms
+ POST /api/chess/ai-move 200 in 399ms
+ POST /api/chess/move 200 in 2037ms
+ POST /api/chess/ai-move 200 in 292ms
+ POST /api/chess/move 200 in 1600ms
+ POST /api/chess/ai-move 200 in 289ms
+ POST /api/chess/move 200 in 1788ms
+ POST /api/chess/ai-move 200 in 340ms
+ POST /api/chess/move 200 in 2291ms
+ POST /api/chess/ai-move 200 in 233ms
+ POST /api/chess/move 200 in 1922ms
+ POST /api/chess/ai-move 200 in 172ms
+ POST /api/chess/move 200 in 1631ms
+ POST /api/chess/ai-move 200 in 230ms
+ POST /api/chess/move 200 in 1419ms
+ POST /api/chess/ai-move 200 in 174ms
+ POST /api/chess/move 200 in 1582ms
+ POST /api/chess/ai-move 200 in 260ms
+ POST /api/chess/move 200 in 2297ms
+ POST /api/chess/ai-move 200 in 224ms
+ POST /api/chess/move 200 in 3040ms
+ POST /api/chess/ai-move 200 in 235ms
+ POST /api/chess/move 200 in 3121ms
+ POST /api/chess/ai-move 200 in 206ms
+ POST /api/chess/move 200 in 2863ms
+ POST /api/chess/ai-move 200 in 162ms
+ POST /api/chess/move 200 in 2395ms
+ POST /api/chess/ai-move 200 in 178ms
+ POST /api/chess/move 200 in 1799ms
+ POST /api/chess/ai-move 200 in 150ms
+ POST /api/chess/move 200 in 1859ms
+ POST /api/chess/ai-move 200 in 176ms
+ POST /api/chess/move 200 in 1860ms
+ POST /api/chess/ai-move 200 in 138ms
+ POST /api/chess/move 200 in 2345ms
+ POST /api/chess/ai-move 200 in 176ms
+ POST /api/chess/move 200 in 1957ms
+ POST /api/chess/ai-move 200 in 167ms
+ POST /api/chat 200 in 1085ms
+ ✓ Compiled in 70ms
+ ✓ Compiled in 51ms
+ ✓ Compiled in 55ms
+ ✓ Compiled in 49ms
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ✓ Compiled in 80ms
+ GET / 200 in 226ms
+ ✓ Compiled in 47ms
+ ✓ Compiled in 55ms
+ ✓ Compiled in 36ms
+ ✓ Compiled in 35ms
+ ✓ Compiled in 44ms
+ POST /api/chess/move 200 in 1299ms
+ POST /api/chess/ai-move 200 in 140ms
+ ✓ Compiled in 72ms
+ ✓ Compiled in 40ms
+ POST /api/chess/move 200 in 1979ms
+ POST /api/chess/ai-move 200 in 143ms
+ ✓ Compiled in 90ms
+ ✓ Compiled in 72ms
+ ✓ Compiled in 37ms
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ✓ Compiled in 45ms
+ GET / 200 in 236ms
+ POST /api/chess/move 200 in 2009ms
+ POST /api/chess/ai-move 200 in 145ms
+ ✓ Compiled in 55ms
+ ✓ Compiled in 42ms
+ POST /api/chess/move 200 in 1806ms
+ POST /api/chess/ai-move 200 in 127ms
+ ✓ Compiled in 37ms
+ POST /api/chess/move 200 in 3883ms
+ POST /api/chess/ai-move 200 in 123ms
+ ✓ Compiled in 67ms
+ ✓ Compiled in 86ms
+ POST /api/chess/move 200 in 2126ms
+ POST /api/chess/ai-move 200 in 171ms
+ POST /api/chess/move 200 in 1890ms
+ POST /api/chess/ai-move 200 in 252ms
+ POST /api/chess/move 200 in 1879ms
+ POST /api/chess/ai-move 200 in 275ms
+ ✓ Compiled in 96ms
+ ✓ Compiled in 78ms
+ POST /api/chess/move 200 in 3303ms
+ POST /api/chess/ai-move 200 in 374ms
+ POST /api/chat 200 in 892ms
+ ✓ Compiled in 101ms
+ ✓ Compiled in 40ms
+ POST /api/chess/move 200 in 2112ms
+ POST /api/chess/ai-move 200 in 358ms
+ GET / 200 in 237ms
+ POST /api/chess/move 200 in 2893ms
+ POST /api/chess/ai-move 200 in 102ms
+ ✓ Compiled in 72ms
+ ✓ Compiled in 53ms
+ GET / 200 in 226ms
+ POST /api/chess/move 200 in 1933ms
+ POST /api/chess/ai-move 200 in 120ms
+ POST /api/chess/move 200 in 2007ms
+ POST /api/chess/ai-move 200 in 124ms
+ POST /api/chess/move 200 in 1911ms
+ POST /api/chess/ai-move 200 in 185ms
+ POST /api/chess/move 200 in 2421ms
+ POST /api/chess/ai-move 200 in 189ms
+ POST /api/chess/move 200 in 1624ms
+ POST /api/chess/ai-move 200 in 275ms
+ POST /api/chess/move 200 in 3512ms
+ POST /api/chess/ai-move 200 in 378ms
+ POST /api/chess/move 200 in 1915ms
+ POST /api/chess/ai-move 200 in 372ms
+ POST /api/chat 200 in 903ms
+ POST /api/chess/move 200 in 1959ms
+ POST /api/chess/ai-move 200 in 510ms
+ POST /api/chat 200 in 964ms
+ POST /api/chess/move 200 in 2545ms
+ POST /api/chess/ai-move 200 in 652ms
+ GET / 200 in 121ms
+ ✓ Compiled in 80ms
+ GET / 200 in 241ms
+ ✓ Compiled in 122ms
+ ✓ Compiled in 65ms
+ GET / 200 in 253ms
+ ✓ Compiled in 171ms
+ ✓ Compiled in 45ms
+ ✓ Compiled in 42ms
+ ✓ Compiled in 38ms
+ ✓ Compiled in 41ms
+ ✓ Compiled in 97ms
+ GET / 200 in 235ms
+ ✓ Compiled in 78ms
+ GET / 200 in 241ms
+ ✓ Compiled in 95ms
+ ✓ Compiled in 51ms
+ GET / 200 in 232ms
+ ✓ Compiled in 66ms
+ ✓ Compiled in 53ms
+ ✓ Compiled in 48ms
+ GET / 200 in 224ms
+ GET / 200 in 119ms

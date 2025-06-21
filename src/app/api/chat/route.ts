@@ -4,13 +4,24 @@ import { CHESS_BUTLER_SYSTEM_PROMPT, formatMoveContext } from '@/lib/openai/ches
 
 export async function POST(request: NextRequest) {
   try {
-    const { message, gameContext } = await request.json();
+    const { message, gameContext, moveHistory } = await request.json();
     
     if (!message) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
     }
     
     const openai = getOpenAIClient();
+    
+    // Check if this is a playing style analysis question
+    const styleAnalysisKeywords = [
+      'playing style', 'my style', 'how am i playing', 'my gameplay', 'my approach',
+      'my strategy', 'my tactics', 'my moves', 'analyze my play', 'my chess',
+      'how do i play', 'my tendencies', 'my patterns', 'my strengths', 'my weaknesses'
+    ];
+    
+    const isStyleAnalysis = styleAnalysisKeywords.some(keyword => 
+      message.toLowerCase().includes(keyword)
+    );
     
     // Build context message if game state is provided
     const messages: any[] = [
@@ -22,6 +33,31 @@ export async function POST(request: NextRequest) {
         role: 'system',
         content: formatMoveContext(gameContext.fen, gameContext.lastMove)
       });
+    }
+    
+    // Add move history for style analysis questions
+    if (isStyleAnalysis && moveHistory && moveHistory.length > 0) {
+      const recentMoves = moveHistory.slice(-50); // Last 50 moves
+      const moveSequence = recentMoves
+        .filter((m: any) => m.metadata?.moveContext)
+        .map((m: any) => `${m.role === 'user' ? 'Chris' : 'AI'}: ${m.metadata.moveContext}`)
+        .join(', ');
+      
+      if (moveSequence) {
+        messages.push({
+          role: 'system',
+          content: `Recent move history for style analysis (last ${recentMoves.length} moves): ${moveSequence}. 
+          
+          Please analyze Chris's playing style based on these moves, looking for patterns in:
+          - Opening preferences and development
+          - Tactical vs positional approach  
+          - Risk-taking vs cautious play
+          - Piece coordination and planning
+          - Endgame tendencies
+          
+          Provide specific, actionable insights about their chess style.`
+        });
+      }
     }
     
     messages.push({ role: 'user', content: message });

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Move } from 'chess.js';
 import { v4 as uuidv4 } from 'uuid';
 import ChessBoard from '@/components/chess/ChessBoard';
@@ -25,6 +25,16 @@ export default function Home() {
   const [currentGameId, setCurrentGameId] = useState<string | null>(null);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [moveCount, setMoveCount] = useState(0);
+  const [gameOver, setGameOver] = useState<{checkmate: boolean, winner?: 'white' | 'black'}>({checkmate: false});
+  const timeoutRefs = useRef<Set<NodeJS.Timeout>>(new Set());
+
+  // Cleanup timeouts on unmount
+  useEffect(() => {
+    return () => {
+      timeoutRefs.current.forEach(clearTimeout);
+      timeoutRefs.current.clear();
+    };
+  }, []);
 
   // Initialize or restore game on mount
   useEffect(() => {
@@ -89,7 +99,7 @@ export default function Home() {
       const moveMessage: ChatMessage = {
         id: uuidv4(),
         role: 'user',
-        content: `I played ${move.san}`,
+        content: `I played ${convertMoveToPlainEnglish(move.san)}`,
         timestamp: new Date(),
         metadata: {
           moveContext: move.san,
@@ -111,7 +121,15 @@ export default function Home() {
         body: JSON.stringify({
           move: move.san,
           fen: move.after,
-          moveHistory: messages.filter(m => m.metadata?.moveContext).slice(-10),
+          moveHistory: messages.filter(m => m.metadata?.moveContext),
+          gameContext: {
+            fen: move.after,
+            fullMoveHistory: messages.filter(m => m.metadata?.moveContext).map(m => ({
+              role: m.role,
+              move: m.metadata?.moveContext,
+              position: m.metadata?.position
+            }))
+          },
         }),
       });
       
@@ -121,34 +139,45 @@ export default function Home() {
         let aiResponse: ChatMessage = {
           id: uuidv4(),
           role: 'assistant',
-          content: '',
+          content: '🤔 thinking...',
           timestamp: new Date(),
+          metadata: { isThinking: true }
         };
         
         setMessages(prev => [...prev, aiResponse]);
         
         if (reader) {
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            
-            const chunk = decoder.decode(value);
-            
-            // Add characters one by one with a slight delay for smooth typing effect
-            for (const char of chunk) {
-              aiResponse.content += char;
+          try {
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
               
+              const chunk = decoder.decode(value);
+              aiResponse.content += chunk;
+            }
+            
+            // Add small delay before showing content to allow fade-in animation
+            const fadeTimeout = setTimeout(() => {
               setMessages(prev => 
                 prev.map(msg => 
                   msg.id === aiResponse.id 
-                    ? { ...msg, content: aiResponse.content }
+                    ? { ...msg, content: aiResponse.content, metadata: { isThinking: false } }
                     : msg
                 )
               );
-              
-              // Add a small delay between characters for smooth typing effect
-              await new Promise(resolve => setTimeout(resolve, 15));
-            }
+              timeoutRefs.current.delete(fadeTimeout);
+            }, 300);
+            timeoutRefs.current.add(fadeTimeout);
+          } catch (streamError) {
+            console.error('Stream reading error:', streamError);
+            aiResponse.content = "I encountered an error while generating my response. Please try again.";
+            setMessages(prev => 
+              prev.map(msg => 
+                msg.id === aiResponse.id 
+                  ? { ...msg, content: aiResponse.content, metadata: { isThinking: false } }
+                  : msg
+              )
+            );
           }
         }
         
@@ -160,7 +189,7 @@ export default function Home() {
         const isAiTurn = move.after.includes(' b '); // FEN notation: 'b' means black to move
         
         if (isAiTurn) {
-          setTimeout(async () => {
+          const aiMoveTimeout = setTimeout(async () => {
             try {
               const aiMoveResponse = await fetch('/api/chess/ai-move', {
                 method: 'POST',
@@ -198,7 +227,7 @@ export default function Home() {
               const aiMoveMessage: ChatMessage = {
                 id: uuidv4(),
                 role: 'assistant',
-                content: `I respond with ${aiMoveData.san}. ${getRandomMoveComment()}`,
+                content: `I respond with ${convertMoveToPlainEnglish(aiMoveData.san)}. ${getRandomMoveComment()}`,
                 timestamp: new Date(),
                 metadata: {
                   moveContext: aiMoveData.san,
@@ -213,8 +242,11 @@ export default function Home() {
             }
           } catch (error) {
             console.error('Error getting AI move:', error);
+          } finally {
+            timeoutRefs.current.delete(aiMoveTimeout);
           }
         }, 800); // Wait 0.8 seconds after commentary
+        timeoutRefs.current.add(aiMoveTimeout);
         }
       }
     } catch (error) {
@@ -223,6 +255,37 @@ export default function Home() {
       setIsLoading(false);
     }
   }, [messages, moveCount, currentGameId, conversationId]);
+
+  const convertMoveToPlainEnglish = (san: string) => {
+    // Convert algebraic notation to plain English
+    const pieceMap: Record<string, string> = {
+      'K': 'King',
+      'Q': 'Queen', 
+      'R': 'Rook',
+      'B': 'Bishop',
+      'N': 'Knight',
+      'O-O': 'castles kingside',
+      'O-O-O': 'castles queenside'
+    };
+    
+    // Handle castling
+    if (san === 'O-O') return 'castles kingside';
+    if (san === 'O-O-O') return 'castles queenside';
+    
+    // Handle regular moves
+    const piece = san[0];
+    if (pieceMap[piece]) {
+      // Extract destination square
+      const match = san.match(/[a-h][1-8]/);
+      const destination = match ? match[0].toUpperCase() : '';
+      return `${pieceMap[piece]} to ${destination}`;
+    } else {
+      // Pawn move
+      const match = san.match(/[a-h][1-8]/);
+      const destination = match ? match[0].toUpperCase() : '';
+      return `Pawn to ${destination}`;
+    }
+  };
 
   const getRandomMoveComment = () => {
     const comments = [
@@ -268,6 +331,7 @@ export default function Home() {
             fen: currentPosition,
             lastMove: messages.filter(m => m.role === 'system').slice(-1)[0]?.metadata?.moveContext
           } : undefined,
+          moveHistory: messages,
         }),
       });
       
@@ -281,34 +345,45 @@ export default function Home() {
       let assistantMessage: ChatMessage = {
         id: uuidv4(),
         role: 'assistant',
-        content: '',
+        content: '🤔 thinking...',
         timestamp: new Date(),
+        metadata: { isThinking: true }
       };
       
       setMessages(prev => [...prev, assistantMessage]);
       
       if (reader) {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          
-          const chunk = decoder.decode(value);
-          
-          // Add characters one by one with a slight delay for smooth typing effect
-          for (const char of chunk) {
-            assistantMessage.content += char;
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
             
+            const chunk = decoder.decode(value);
+            assistantMessage.content += chunk;
+          }
+          
+          // Add small delay before showing content to allow fade-in animation
+          const chatFadeTimeout = setTimeout(() => {
             setMessages(prev => 
               prev.map(msg => 
                 msg.id === assistantMessage.id 
-                  ? { ...msg, content: assistantMessage.content }
+                  ? { ...msg, content: assistantMessage.content, metadata: { isThinking: false } }
                   : msg
               )
             );
-            
-            // Add a small delay between characters for smooth typing effect
-            await new Promise(resolve => setTimeout(resolve, 15));
-          }
+            timeoutRefs.current.delete(chatFadeTimeout);
+          }, 300);
+          timeoutRefs.current.add(chatFadeTimeout);
+        } catch (streamError) {
+          console.error('Stream reading error:', streamError);
+          assistantMessage.content = "I encountered an error while generating my response. Please try again.";
+          setMessages(prev => 
+            prev.map(msg => 
+              msg.id === assistantMessage.id 
+                ? { ...msg, content: assistantMessage.content, metadata: { isThinking: false } }
+                : msg
+            )
+          );
         }
       }
       
@@ -328,15 +403,82 @@ export default function Home() {
     }
   }, [currentPosition, messages, conversationId]);
 
+  const handleCheckmate = useCallback((winner: 'white' | 'black') => {
+    setGameOver({ checkmate: true, winner });
+    
+    // Add checkmate message
+    const checkmateMessage: ChatMessage = {
+      id: uuidv4(),
+      role: 'assistant',
+      content: winner === 'white' 
+        ? "Checkmate! Well played, Chris. You've secured victory. Would you like to play again?"
+        : "Checkmate! I've managed to secure the win this time. Good game, Chris! Ready for another?",
+      timestamp: new Date(),
+    };
+    
+    setMessages(prev => [...prev, checkmateMessage]);
+  }, []);
+
+  const handleRestart = useCallback(async () => {
+    // Reset game state
+    setGameOver({ checkmate: false });
+    setMoveCount(0);
+    
+    try {
+      // Create new game
+      const newGame = await createGame('white');
+      setCurrentGameId(newGame.id);
+      setCurrentPosition(newGame.fen);
+      
+      // Create conversation for this game
+      const conversation = await createConversation(newGame.id);
+      setConversationId(conversation.id);
+      
+      // Add new game message
+      const newGameMessage: ChatMessage = {
+        id: uuidv4(),
+        role: 'assistant',
+        content: "New game! The board is reset and we're ready for another match. Your move, Chris!",
+        timestamp: new Date(),
+      };
+      
+      setMessages([newGameMessage]);
+      await saveMessage(conversation.id, 'assistant', newGameMessage.content);
+    } catch (error) {
+      console.error('Error restarting game:', error);
+    }
+  }, []);
+
   return (
     <GameLayout
       chessBoard={
-        <ChessBoard
-          onMove={handleMove}
-          position={currentPosition}
-          orientation="white"
-          interactive={true}
-        />
+        <div className="relative h-full">
+          <ChessBoard
+            onMove={handleMove}
+            position={currentPosition}
+            orientation="white"
+            interactive={!gameOver.checkmate}
+            onCheckmate={handleCheckmate}
+          />
+          {gameOver.checkmate && (
+            <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-2xl backdrop-blur-sm">
+              <div className="bg-gradient-to-br from-purple-900 to-blue-900 p-8 rounded-2xl shadow-2xl text-center">
+                <h2 className="text-3xl font-bold text-white mb-4">
+                  Checkmate!
+                </h2>
+                <p className="text-xl text-gray-200 mb-6">
+                  {gameOver.winner === 'white' ? 'White Wins!' : 'Black Wins!'}
+                </p>
+                <button
+                  onClick={handleRestart}
+                  className="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all transform hover:scale-105 shadow-lg"
+                >
+                  Start New Game
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       }
       chat={
         <ChatInterface

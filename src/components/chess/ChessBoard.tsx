@@ -3,12 +3,14 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess, Move, Square } from 'chess.js';
+import { getPieceName } from '@/lib/chess/pieceNames';
 
 interface ChessBoardProps {
   onMove: (move: Move) => void;
   position?: string;
   orientation?: 'white' | 'black';
   interactive?: boolean;
+  onCheckmate?: (winner: 'white' | 'black') => void;
 }
 
 export default function ChessBoard({
@@ -16,22 +18,24 @@ export default function ChessBoard({
   position,
   orientation = 'white',
   interactive = true,
+  onCheckmate,
 }: ChessBoardProps) {
   const [game, setGame] = useState(new Chess());
   const [boardWidth, setBoardWidth] = useState(400);
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
   const [possibleMoves, setPossibleMoves] = useState<Square[]>([]);
+  const [checkInfo, setCheckInfo] = useState<{king: Square, attacker: Square, path: Square[]} | null>(null);
 
   useEffect(() => {
     const updateBoardSize = () => {
       const viewportHeight = window.innerHeight;
       const viewportWidth = window.innerWidth;
       
-      // Mobile: optimize for available space in 50vh container
+      // Mobile: optimize for available space in 70vh container
       // Desktop: responsive to container width
       const isMobile = viewportWidth < 1024; // lg breakpoint
       const maxSize = isMobile 
-        ? Math.min(viewportWidth - 24, (viewportHeight * 0.50) - 48) // Account for padding
+        ? Math.min(viewportWidth - 8, (viewportHeight * 0.70) - 24) // Use 70vh with minimal padding
         : Math.min(viewportWidth * 0.55 - 48, viewportHeight - 120);
       
       setBoardWidth(Math.floor(maxSize));
@@ -47,7 +51,86 @@ export default function ChessBoard({
       const newGame = new Chess(position);
       setGame(newGame);
     }
-  }, [position, game]);
+  }, [position]);
+
+  // Find the path between two squares for sliding pieces
+  const getPathBetweenSquares = (from: Square, to: Square): Square[] => {
+    const path: Square[] = [];
+    const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+    const fromFile = files.indexOf(from[0]);
+    const fromRank = parseInt(from[1]);
+    const toFile = files.indexOf(to[0]);
+    const toRank = parseInt(to[1]);
+    
+    const fileStep = fromFile === toFile ? 0 : (toFile - fromFile) / Math.abs(toFile - fromFile);
+    const rankStep = fromRank === toRank ? 0 : (toRank - fromRank) / Math.abs(toRank - fromRank);
+    
+    let currentFile = fromFile + fileStep;
+    let currentRank = fromRank + rankStep;
+    
+    while (currentFile !== toFile || currentRank !== toRank) {
+      path.push(`${files[currentFile]}${currentRank}` as Square);
+      currentFile += fileStep;
+      currentRank += rankStep;
+    }
+    
+    return path;
+  };
+
+  // Check for check and checkmate state after every move
+  useEffect(() => {
+    // Check for checkmate
+    if (game.isCheckmate()) {
+      const winner = game.turn() === 'w' ? 'black' : 'white';
+      if (onCheckmate) {
+        onCheckmate(winner);
+      }
+    }
+    
+    // Check for check
+    if (game.inCheck()) {
+      const kingColor = game.turn();
+      const board = game.board();
+      let kingSquare: Square | null = null;
+      
+      // Find the king in check
+      for (let row = 0; row < 8; row++) {
+        for (let col = 0; col < 8; col++) {
+          const piece = board[row][col];
+          if (piece && piece.type === 'k' && piece.color === kingColor) {
+            const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+            kingSquare = `${files[col]}${8 - row}` as Square;
+            break;
+          }
+        }
+        if (kingSquare) break;
+      }
+      
+      if (kingSquare) {
+        // Find the attacking piece
+        const moves = game.moves({ verbose: true });
+        const gameCopy = new Chess(game.fen());
+        gameCopy.turn() === 'w' ? gameCopy.load(game.fen().replace(' w ', ' b ')) : gameCopy.load(game.fen().replace(' b ', ' w '));
+        
+        const attackingMoves = gameCopy.moves({ verbose: true }).filter(move => move.to === kingSquare);
+        
+        if (attackingMoves.length > 0) {
+          const attackMove = attackingMoves[0];
+          const attackerSquare = attackMove.from;
+          const attackingPiece = game.get(attackerSquare);
+          
+          let path: Square[] = [];
+          if (attackingPiece && (attackingPiece.type === 'q' || attackingPiece.type === 'r' || attackingPiece.type === 'b')) {
+            path = getPathBetweenSquares(attackerSquare, kingSquare);
+          }
+          
+          setCheckInfo({ king: kingSquare, attacker: attackerSquare, path });
+        }
+      }
+    } else {
+      setCheckInfo(null);
+    }
+  }, [game, onCheckmate]);
 
   const handleSquareClick = useCallback((square: string) => {
     if (!interactive) return;
@@ -132,6 +215,31 @@ export default function ChessBoard({
         boxShadow: '0 0 20px hsla(var(--chess-accent), 0.6), inset 0 0 0 2px hsla(var(--chess-accent), 0.8)',
       },
     }),
+    // Highlight check situation
+    ...(checkInfo && {
+      // King in check - intense red
+      [checkInfo.king]: {
+        backgroundColor: 'hsla(0, 100%, 50%, 0.7)',
+        background: 'radial-gradient(circle, hsla(0, 100%, 50%, 0.9), hsla(0, 100%, 40%, 0.5))',
+        boxShadow: '0 0 30px hsla(0, 100%, 50%, 1), inset 0 0 0 4px hsla(0, 100%, 50%, 1)',
+        animation: 'pulse 1s infinite',
+      },
+      // Attacking piece - red highlight
+      [checkInfo.attacker]: {
+        backgroundColor: 'hsla(0, 100%, 50%, 0.6)',
+        background: 'radial-gradient(circle, hsla(0, 100%, 50%, 0.7), hsla(0, 100%, 40%, 0.3))',
+        boxShadow: '0 0 25px hsla(0, 100%, 50%, 0.8), inset 0 0 0 3px hsla(0, 100%, 50%, 0.9)',
+      },
+      // Path squares - red line
+      ...checkInfo.path.reduce((acc, square) => {
+        acc[square] = {
+          backgroundColor: 'hsla(0, 100%, 50%, 0.4)',
+          background: 'linear-gradient(45deg, hsla(0, 100%, 50%, 0.5), hsla(0, 100%, 40%, 0.3))',
+          boxShadow: 'inset 0 0 0 2px hsla(0, 100%, 50%, 0.7)',
+        };
+        return acc;
+      }, {} as Record<string, any>),
+    }),
     // Highlight selected square
     ...(selectedSquare && {
       [selectedSquare]: {
@@ -142,8 +250,9 @@ export default function ChessBoard({
     // Highlight possible moves
     ...possibleMoves.reduce((acc, square) => {
       acc[square] = {
-        background: 'radial-gradient(circle, hsla(142, 76%, 55%, 0.3), transparent 70%)',
-        boxShadow: 'inset 0 0 0 2px hsla(142, 76%, 55%, 0.6)',
+        background: 'radial-gradient(circle, hsla(142, 76%, 55%, 0.7), hsla(142, 76%, 55%, 0.3) 50%, transparent 80%)',
+        boxShadow: '0 0 25px hsla(142, 76%, 55%, 0.8), inset 0 0 0 3px hsla(142, 76%, 55%, 0.9)',
+        border: '2px solid hsla(142, 76%, 55%, 0.8)',
       };
       return acc;
     }, {} as Record<string, any>),
@@ -196,11 +305,68 @@ export default function ChessBoard({
     return identifiers;
   };
 
+  const renderPieceNames = () => {
+    const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+    const ranks = ['8', '7', '6', '5', '4', '3', '2', '1'];
+    const pieceNames = [];
+    
+    for (let rank = 0; rank < 8; rank++) {
+      for (let file = 0; file < 8; file++) {
+        const square = `${files[file]}${ranks[rank]}` as Square;
+        const piece = game.get(square);
+        
+        if (piece) {
+          const squareSize = (boardWidth - 4) / 8;
+          const pieceKey = `${piece.color}${piece.type.toUpperCase()}`;
+          const pieceName = getPieceName(pieceKey, square);
+          
+          pieceNames.push(
+            <div
+              key={`name-${square}`}
+              className="absolute pointer-events-none transition-all duration-200"
+              style={{
+                left: `${2 + file * squareSize}px`,
+                top: `${2 + rank * squareSize + squareSize - 10}px`,
+                width: `${squareSize}px`,
+                height: '10px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <span className={`
+                text-[8px] font-black tracking-[0.15em] uppercase
+                ${piece.color === 'w' 
+                  ? 'text-white' 
+                  : 'text-white'
+                }
+              `}
+              style={{
+                transform: 'scale(0.6)',
+                transformOrigin: 'center',
+                textShadow: '0 0 3px #000, 0 0 5px #000, 0 1px 0 #000, 0 -1px 0 #000, 1px 0 0 #000, -1px 0 0 #000',
+                WebkitFontSmoothing: 'subpixel-antialiased',
+                MozOsxFontSmoothing: 'auto',
+                textRendering: 'geometricPrecision',
+                fontWeight: 900,
+                letterSpacing: '0.15em'
+              }}>
+                {pieceName.title}
+              </span>
+            </div>
+          );
+        }
+      }
+    }
+    
+    return pieceNames;
+  };
+
   return (
-    <div className="chess-board-container flex items-center justify-center p-3 lg:p-6 bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-indigo-900/20 min-h-0 h-full">
-      <div style={{ width: boardWidth, height: boardWidth }} className="relative group">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-2xl pointer-events-none group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-all duration-500" />
-        <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl opacity-0 group-hover:opacity-20 blur-sm transition-opacity duration-500 pointer-events-none" />
+    <div className="chess-board-container flex items-center justify-center p-1 lg:p-6 bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-indigo-900/20" style={{ height: `${boardWidth + 8}px` }}>
+      <div style={{ width: boardWidth, height: boardWidth }} className="relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-2xl pointer-events-none" />
+        <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl opacity-10 blur-sm pointer-events-none" />
         <Chessboard
           position={game.fen()}
           onPieceDrop={handleDrop}
@@ -233,8 +399,9 @@ export default function ChessBoard({
           {renderSquareIdentifiers()}
         </div>
         
-        <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 text-xs font-medium text-slate-600 dark:text-slate-400 opacity-60">
-          Chess Butler AI
+        {/* Piece names overlay */}
+        <div className="absolute inset-0 pointer-events-none z-10" style={{ borderRadius: '16px', overflow: 'hidden' }}>
+          {renderPieceNames()}
         </div>
       </div>
     </div>

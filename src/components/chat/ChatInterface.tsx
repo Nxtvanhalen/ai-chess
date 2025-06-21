@@ -37,15 +37,15 @@ export default function ChatInterface({
   };
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-b from-purple-950/80 to-slate-950/90 backdrop-blur-md">
-      <div className="flex-shrink-0 border-b border-purple-400/20 p-4 lg:p-6 bg-gradient-to-r from-purple-900/30 via-blue-900/30 to-purple-900/30 backdrop-blur-sm">
+    <div className="flex flex-col h-full bg-gradient-to-b from-purple-950/80 to-slate-950/90 backdrop-blur-md rounded-2xl overflow-hidden">
+      <div className="flex-shrink-0 border-b border-purple-400/20 p-2 lg:p-6 bg-gradient-to-r from-purple-900/30 via-blue-900/30 to-purple-900/30 backdrop-blur-sm rounded-t-2xl">
         <div className="flex items-center gap-3 lg:gap-4">
-          <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 flex items-center justify-center text-white font-bold text-sm lg:text-lg shadow-lg glow-effect">
-            CB
+          <div className="w-8 h-8 lg:w-12 lg:h-12 rounded-full bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 flex items-center justify-center text-white font-bold text-sm lg:text-xl shadow-lg glow-effect">
+            🤓
           </div>
           <div className="flex-1 min-w-0">
-            <h2 className="text-lg lg:text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent truncate">Chess Butler</h2>
-            <p className="text-xs lg:text-sm text-slate-300 font-medium truncate">
+            <h2 className="text-sm lg:text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent truncate">Chess Butler</h2>
+            <p className="text-xs lg:text-sm text-slate-300 font-medium truncate hidden lg:block">
               Your dignified AI chess companion
             </p>
           </div>
@@ -90,8 +90,6 @@ export default function ChatInterface({
         {messages.map((message) => (
           <ChatMessage key={message.id} message={message} />
         ))}
-
-        {isLoading && <LoadingIndicator />}
         
         <div ref={messagesEndRef} />
       </div>

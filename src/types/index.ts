@@ -9,6 +9,7 @@ export interface ChatMessage {
     moveContext?: string;
     gameState?: string;
     position?: string;
+    isThinking?: boolean;
   };
 }
 

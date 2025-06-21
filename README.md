@@ -18,17 +18,21 @@ A futuristic, AI-driven chess application featuring a sophisticated Chess Butler
 🎮 **Complete Chess Experience**
 - **Intelligent AI Opponent** - Advanced chess engine with minimax algorithm and proper evaluation
 - **Move Highlighting Teaching Tool** - Click any piece to see all possible moves highlighted
-- **Real-time Move Analysis** - GPT-4o provides concise strategic commentary
-- **Chess Butler Coaching** - Brief, focused insights and tactical advice
+- **Real-time Move Analysis** - GPT-4o provides concise strategic commentary with full game context
+- **Chess Butler Coaching** - Playing style analysis using complete move history
 - **Interactive Gameplay** - Drag pieces or click to move, with visual feedback
+- **Plain English Moves** - All moves displayed as "Knight to E6" instead of algebraic notation
+- **Highlighted Chess Moves** - Chess moves glow with blue highlights in chat for easy recognition
 - **Persistent Game Memory** - All games and conversations saved to Supabase
 
 🎨 **Futuristic Design**
 - **Dark Purple Aesthetic** - Sleek, modern OpenAI-inspired interface
 - **Enhanced Chess Board** - Individual square identifiers (a1, b2, etc.) for clarity
-- **Mobile-Optimized Layout** - 60/40 split for better screen utilization
-- **Smooth Typing Animation** - Character-by-character AI response rendering
-- **Visual Move Indicators** - Green highlights show legal moves for selected pieces
+- **Check Visualization** - Red highlighting for kings in check with attack path visualization
+- **Piece Name Labels** - Tiny labels under each piece showing their role
+- **Mobile-Optimized Layout** - 70/30 split on mobile, 55/45 on desktop for better screen utilization
+- **Smooth Slide Animations** - Elegant chat message transitions with duration controls
+- **Visual Move Indicators** - Enhanced green highlights with glow effects for legal moves
 
 🤖 **AI Integration**
 - **GPT-4o Powered** - Advanced language model with concise, tactical responses
@@ -39,8 +43,11 @@ A futuristic, AI-driven chess application featuring a sophisticated Chess Butler
 
 📱 **Mobile Experience**
 - **Touch-Optimized Controls** - Seamless piece movement on mobile devices
+- **Optimized Mobile Layout** - 70/30 chess/chat split with larger board size
 - **Keyboard-Smart Interface** - Chat input stays visible when mobile keyboard appears
-- **Responsive Sizing** - Optimized proportions for single-page mobile viewing
+- **Single-Page Mobile Design** - Everything fits on one screen without scrolling
+- **Smooth Animations** - Slower, more elegant slide-in effects for chat messages
+- **Compact Mobile UI** - Reduced padding and header sizes for maximum space efficiency
 - **Chrome Mobile Fixes** - Enhanced compatibility and rendering improvements
 
 ## Architecture

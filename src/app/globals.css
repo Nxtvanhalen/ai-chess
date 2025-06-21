@@ -158,17 +158,55 @@ select {
   -webkit-overflow-scrolling: touch;
 }
 
+/* Hide scrollbars */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Safari and Chrome */
+}
+
 /* Futuristic animations */
 @keyframes message-appear {
-  from {
+  0% {
     opacity: 0;
-    transform: translateY(20px) scale(0.95);
-    filter: blur(4px);
+    transform: translateY(40px) scale(0.9);
+    filter: blur(8px);
   }
-  to {
+  15% {
+    opacity: 0.1;
+    transform: translateY(30px) scale(0.93);
+    filter: blur(6px);
+  }
+  40% {
+    opacity: 0.4;
+    transform: translateY(15px) scale(0.96);
+    filter: blur(3px);
+  }
+  70% {
+    opacity: 0.7;
+    transform: translateY(5px) scale(0.985);
+    filter: blur(1px);
+  }
+  85% {
+    opacity: 0.9;
+    transform: translateY(1px) scale(0.995);
+    filter: blur(0.5px);
+  }
+  100% {
     opacity: 1;
     transform: translateY(0) scale(1);
     filter: blur(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 
@@ -191,7 +229,13 @@ select {
 }
 
 .message-animate {
-  animation: message-appear 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  animation: message-appear 1.2s cubic-bezier(0.05, 0.7, 0.1, 1) !important;
+  animation-fill-mode: both !important;
+}
+
+.animate-fade-in {
+  opacity: 0;
+  animation: fade-in 1s ease-in-out forwards;
 }
 
 .glow-effect {
@@ -315,22 +359,48 @@ select {
 
 /* Mobile keyboard fixes */
 @media screen and (max-width: 1024px) {
-  /* When keyboard appears, adjust layout */
-  .mobile-keyboard-active {
-    height: 50vh !important;
+  /* Smooth mobile layout transitions */
+  .chess-section,
+  .chat-section {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* When keyboard appears, adjust layout smoothly */
+  .mobile-keyboard-active .chess-section {
+    height: 45vh !important;
+  }
+  
+  .mobile-keyboard-active .chat-section {
+    height: 55vh !important;
   }
   
   /* Ensure chat input stays visible when keyboard opens */
   .chat-input-container {
     position: relative;
     z-index: 1000;
-    padding-bottom: env(keyboard-inset-height);
+    padding-bottom: env(keyboard-inset-height, 0);
   }
   
-  /* Reduce mobile chat size */
+  /* Reduce mobile chat size when keyboard active */
   .mobile-chat-container {
-    max-height: 40vh;
+    max-height: 35vh;
     overflow-y: auto;
+  }
+  
+  /* Prevent scroll bounce on iOS */
+  body {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+  }
+  
+  body.keyboard-open {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
   }
 }
 

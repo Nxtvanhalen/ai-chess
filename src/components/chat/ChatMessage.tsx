@@ -3,28 +3,68 @@
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { ChatMessage as ChatMessageType } from '@/types';
+import Image from 'next/image';
 
 interface ChatMessageProps {
   message: ChatMessageType;
 }
 
-export default function ChatMessage({ message }: ChatMessageProps) {
-  const isAssistant = message.role === 'assistant';
+const HighlightedText = ({ children }: { children: string }) => {
+  // Pattern to match chess moves like "Knight to E4", "Pawn to D5", "castles kingside", etc.
+  const movePattern = /((?:King|Queen|Rook|Bishop|Knight|Pawn)\s+to\s+[A-H][1-8]|castles\s+(?:kingside|queenside))/gi;
+  
+  const parts = children.split(movePattern);
   
   return (
-    <div className={`flex gap-3 lg:gap-4 px-4 lg:px-6 py-3 lg:py-5 message-animate transition-all duration-300 ${
+    <>
+      {parts.map((part, index) => {
+        if (movePattern.test(part)) {
+          return (
+            <span 
+              key={index}
+              className="chess-move-highlight font-semibold text-blue-300"
+              style={{
+                textShadow: '0 0 12px rgba(59, 130, 246, 0.8), 0 0 6px rgba(59, 130, 246, 0.6)',
+              }}
+            >
+              {part}
+            </span>
+          );
+        }
+        return part;
+      })}
+    </>
+  );
+};
+
+export default function ChatMessage({ message }: ChatMessageProps) {
+  const isAssistant = message.role === 'assistant';
+  const isThinking = message.metadata?.isThinking;
+  
+  return (
+    <div className={`flex gap-3 lg:gap-4 px-4 lg:px-6 py-4 lg:py-6 animate-in slide-in-from-bottom-6 lg:slide-in-from-bottom-8 fade-in duration-700 lg:duration-1000 ease-out ${
       isAssistant 
-        ? 'bg-gradient-to-r from-purple-900/20 via-blue-900/10 to-purple-900/20 border-l-2 border-purple-400/30' 
-        : 'hover:bg-purple-900/10'
+        ? 'bg-gradient-to-r from-purple-900/20 via-blue-900/10 to-purple-900/20 border-l-4 border-purple-400/40 rounded-r-2xl mx-2' 
+        : 'hover:bg-purple-900/10 rounded-l-2xl mx-2'
     }`}>
       <div className="flex-shrink-0">
-        <div className={`w-8 h-8 lg:w-10 lg:h-10 rounded-full flex items-center justify-center text-xs lg:text-sm font-bold shadow-lg ${
-          isAssistant 
-            ? 'bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 text-white glow-effect' 
-            : 'bg-gradient-to-br from-slate-600 to-slate-700 text-white'
-        }`}>
-          {isAssistant ? 'CB' : 'C'}
-        </div>
+        {isAssistant ? (
+          <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 text-white glow-effect flex items-center justify-center text-lg shadow-lg">
+            {isThinking ? '🤔' : '🤓'}
+          </div>
+        ) : (
+          <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full overflow-hidden shadow-lg relative">
+            <img
+              src="/profile.jpg"
+              alt="Chris"
+              className="absolute inset-0 w-full h-full"
+              style={{
+                objectFit: 'contain',
+                objectPosition: 'center'
+              }}
+            />
+          </div>
+        )}
       </div>
       
       <div className="flex-1 overflow-hidden">
@@ -44,7 +84,11 @@ export default function ChatMessage({ message }: ChatMessageProps) {
           </span>
         </div>
         
-        <div className="markdown-content prose prose-sm max-w-none prose-invert prose-p:leading-relaxed prose-headings:font-bold prose-a:text-blue-400 text-slate-200">
+        <div className={`markdown-content prose prose-sm max-w-none prose-invert prose-p:leading-relaxed prose-headings:font-bold prose-a:text-blue-400 text-slate-200 ${
+          isAssistant 
+            ? 'bg-purple-900/15 p-4 rounded-2xl border border-purple-400/30 shadow-lg backdrop-blur-sm' 
+            : 'bg-slate-800/25 p-4 rounded-2xl border border-slate-400/30 shadow-lg backdrop-blur-sm'
+        }`}>
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             components={{
@@ -64,6 +108,15 @@ export default function ChatMessage({ message }: ChatMessageProps) {
                   </code>
                 );
               },
+              p: ({ children }) => (
+                <p><HighlightedText>{String(children)}</HighlightedText></p>
+              ),
+              text: ({ children }) => {
+                if (typeof children === 'string') {
+                  return <HighlightedText>{children}</HighlightedText>;
+                }
+                return children;
+              }
             }}
           >
             {message.content}

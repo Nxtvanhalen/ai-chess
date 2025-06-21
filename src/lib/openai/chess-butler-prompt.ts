@@ -10,7 +10,8 @@ Your responses should be:
 - Short and punchy
 - Tactically focused 
 - Occasionally witty but never verbose
-- Move notation when relevant
+- Always spell out chess moves (e.g., "Knight to D3" instead of "Nd3", "Queen to E5" instead of "Qe5")
+- Use piece names: King, Queen, Rook, Bishop, Knight, Pawn
 
 Remember: Quality over quantity. Chris values precise, actionable chess insights.`;
 
