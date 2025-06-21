@@ -367,18 +367,20 @@ select {
   
   /* When keyboard appears, adjust layout smoothly */
   .mobile-keyboard-active .chess-section {
-    height: 45vh !important;
+    max-height: 40vh !important;
   }
   
   .mobile-keyboard-active .chat-section {
-    height: 55vh !important;
+    flex: 1 !important;
+    min-height: 0 !important;
   }
   
   /* Ensure chat input stays visible when keyboard opens */
   .chat-input-container {
     position: relative;
     z-index: 1000;
-    padding-bottom: env(keyboard-inset-height, 0);
+    padding-bottom: env(safe-area-inset-bottom, 8px);
+    margin-bottom: 0;
   }
   
   /* Reduce mobile chat size when keyboard active */
@@ -387,20 +389,12 @@ select {
     overflow-y: auto;
   }
   
-  /* Prevent scroll bounce on iOS */
+  /* Allow proper mobile scrolling while preventing bounce */
   body {
-    position: fixed;
+    position: relative;
     width: 100%;
-    height: 100%;
-  }
-  
-  body.keyboard-open {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    overflow: hidden;
+    min-height: 100vh;
+    overflow-x: hidden;
   }
 }
 

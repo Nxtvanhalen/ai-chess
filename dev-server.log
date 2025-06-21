@@ -295,3 +295,101 @@ Slow filesystem detected. If /Users/chrisbergstrom/CHESS/ai-chess/.next is a net
  ✓ Compiled in 52ms
  ✓ Compiled in 55ms
  ✓ Compiled in 36ms
+ ✓ Compiled in 182ms
+ ✓ Compiled in 108ms
+ ✓ Compiled in 91ms
+ ✓ Compiled in 185ms
+ ✓ Compiled in 43ms
+ ✓ Compiled in 35ms
+ ✓ Compiled in 44ms
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/chrisbergstrom/CHESS/ai-chess/.next/server/app/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/chrisbergstrom/CHESS/ai-chess/.next/server/app/page/app-build-manifest.json'
+}
+ ✓ Compiled /_error in 489ms
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/chrisbergstrom/CHESS/ai-chess/.next/static/development/_buildManifest.js.tmp.jzlnqykpltm'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/chrisbergstrom/CHESS/ai-chess/.next/static/development/_buildManifest.js.tmp.jzlnqykpltm'
+}
+[Error: ENOENT: no such file or directory, open '/Users/chrisbergstrom/CHESS/ai-chess/.next/server/app/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/chrisbergstrom/CHESS/ai-chess/.next/server/app/page/app-build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/chrisbergstrom/CHESS/ai-chess/.next/static/development/_buildManifest.js.tmp.2plywfh062t'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/chrisbergstrom/CHESS/ai-chess/.next/static/development/_buildManifest.js.tmp.2plywfh062t'
+}
+[Error: ENOENT: no such file or directory, open '/Users/chrisbergstrom/CHESS/ai-chess/.next/static/development/_buildManifest.js.tmp.3op7v18dpda'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/chrisbergstrom/CHESS/ai-chess/.next/static/development/_buildManifest.js.tmp.3op7v18dpda'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/chrisbergstrom/CHESS/ai-chess/.next/server/app/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/chrisbergstrom/CHESS/ai-chess/.next/server/app/page/app-build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/chrisbergstrom/CHESS/ai-chess/.next/static/development/_buildManifest.js.tmp.ah6thcwu12'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/chrisbergstrom/CHESS/ai-chess/.next/static/development/_buildManifest.js.tmp.ah6thcwu12'
+}
+[Error: ENOENT: no such file or directory, open '/Users/chrisbergstrom/CHESS/ai-chess/.next/server/app/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/chrisbergstrom/CHESS/ai-chess/.next/server/app/page/app-build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/chrisbergstrom/CHESS/ai-chess/.next/static/development/_buildManifest.js.tmp.x5y75j23v6o'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/chrisbergstrom/CHESS/ai-chess/.next/static/development/_buildManifest.js.tmp.x5y75j23v6o'
+}
+[Error: ENOENT: no such file or directory, open '/Users/chrisbergstrom/CHESS/ai-chess/.next/static/development/_buildManifest.js.tmp.8tbqw9y4vv5'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/chrisbergstrom/CHESS/ai-chess/.next/static/development/_buildManifest.js.tmp.8tbqw9y4vv5'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/chrisbergstrom/CHESS/ai-chess/.next/server/app/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/chrisbergstrom/CHESS/ai-chess/.next/server/app/page/app-build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/chrisbergstrom/CHESS/ai-chess/.next/static/development/_buildManifest.js.tmp.fxn2n5p9ixb'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/chrisbergstrom/CHESS/ai-chess/.next/static/development/_buildManifest.js.tmp.fxn2n5p9ixb'
+}
+[Error: ENOENT: no such file or directory, open '/Users/chrisbergstrom/CHESS/ai-chess/.next/server/app/page/app-build-manifest.json'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/chrisbergstrom/CHESS/ai-chess/.next/server/app/page/app-build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open '/Users/chrisbergstrom/CHESS/ai-chess/.next/static/development/_buildManifest.js.tmp.j5avs7rypp'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/chrisbergstrom/CHESS/ai-chess/.next/static/development/_buildManifest.js.tmp.j5avs7rypp'
+}
+[Error: ENOENT: no such file or directory, open '/Users/chrisbergstrom/CHESS/ai-chess/.next/static/development/_buildManifest.js.tmp.0u4mmf1difek'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/chrisbergstrom/CHESS/ai-chess/.next/static/development/_buildManifest.js.tmp.0u4mmf1difek'
+}
