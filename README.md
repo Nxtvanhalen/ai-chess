@@ -36,8 +36,11 @@ A futuristic, AI-driven chess application featuring Chester, a sophisticated AI 
 
 🤖 **AI Integration**
 - **GPT-4o Powered** - Advanced language model with concise, tactical responses
-- **Faster AI Moves** - Reduced thinking time for quicker gameplay
-- **Strategic Engine** - Proper position evaluation with mobility and center control
+- **Ruthless AI Opponent** - No random moves, always picks objectively best choice
+- **Aggressive Checkmate Pursuit** - AI actively seeks to finish games, never avoids winning
+- **Smart Thinking Time** - 2-10 second moves with visual "Analyzing position..." indicator
+- **Adaptive Search Depth** - Deeper analysis in endgames and critical positions (depth 1-4)
+- **Strategic Engine** - Enhanced evaluation with king safety, endgame patterns, and forcing moves
 - **Personality-Driven** - Sharp, confident Chester with minimal verbosity
 - **Full Memory Persistence** - AI remembers all previous games and conversations
 
@@ -49,9 +52,8 @@ A futuristic, AI-driven chess application featuring Chester, a sophisticated AI 
 - **Chrome Mobile Fixes** - Enhanced compatibility and rendering improvements
 
 ⚠️ **Known Mobile Issues (TO BE FIXED)**
-- **Keyboard Input Positioning** - Text input does not properly move above mobile keyboard when typing
-- **Chat-Input Gap** - Large empty space between chat messages and text input area on mobile
-- **Layout Responsiveness** - Mobile layout needs refinement for optimal screen space usage
+- **Chat Auto-Scrolling** - Occasionally stalls requiring manual scroll to see latest messages
+- **Layout Responsiveness** - Minor mobile layout optimizations still in progress
 
 ## Architecture
 

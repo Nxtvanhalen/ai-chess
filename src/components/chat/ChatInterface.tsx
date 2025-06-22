@@ -26,13 +26,17 @@ export default function ChatInterface({
 
   useEffect(() => {
     if (isAtBottom) {
-      scrollToBottom();
+      // Small delay to ensure DOM has updated before scrolling
+      setTimeout(() => {
+        scrollToBottom();
+      }, 10);
     }
   }, [messages, isAtBottom]);
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
-    const isScrolledToBottom = scrollHeight - scrollTop - clientHeight < 10;
+    // Increased threshold for more reliable detection
+    const isScrolledToBottom = scrollHeight - scrollTop - clientHeight < 20;
     setIsAtBottom(isScrolledToBottom);
   };
 
