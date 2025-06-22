@@ -4,7 +4,9 @@ import { Chess } from 'chess.js';
 export class ChessEngine {
   private evaluatePosition(chess: Chess): number {
     if (chess.isCheckmate()) {
-      return chess.turn() === 'w' ? -10000 : 10000;
+      // Prefer faster checkmates
+      const moveCount = chess.history().length;
+      return chess.turn() === 'w' ? -10000 + moveCount : 10000 - moveCount;
     }
     if (chess.isDraw()) return 0;
     
@@ -14,18 +16,29 @@ export class ChessEngine {
     
     let evaluation = 0;
     const board = chess.board();
+    let whiteKingPos = { row: -1, col: -1 };
+    let blackKingPos = { row: -1, col: -1 };
+    const pieceCount = { white: 0, black: 0 };
     
+    // First pass: count material and find kings
     for (let i = 0; i < 8; i++) {
       for (let j = 0; j < 8; j++) {
         const piece = board[i][j];
         if (piece) {
           let value = pieceValues[piece.type];
-          // Black pieces are positive (AI), white pieces are negative
-          evaluation += piece.color === 'b' ? value : -value;
+          if (piece.color === 'b') {
+            evaluation += value;
+            pieceCount.black++;
+            if (piece.type === 'k') blackKingPos = { row: i, col: j };
+          } else {
+            evaluation -= value;
+            pieceCount.white++;
+            if (piece.type === 'k') whiteKingPos = { row: i, col: j };
+          }
           
           // Add positional bonuses
           if (piece.type === 'p') {
-            // Pawns advance toward center
+            // Pawns advance toward promotion
             evaluation += piece.color === 'b' ? (7 - i) * 0.1 : i * 0.1;
           }
           if (piece.type === 'n' || piece.type === 'b') {
@@ -37,9 +50,44 @@ export class ChessEngine {
       }
     }
     
-    // Add mobility bonus
+    // Endgame adjustments
+    const totalPieces = pieceCount.white + pieceCount.black;
+    const isEndgame = totalPieces <= 16;
+    
+    if (isEndgame) {
+      // In endgame, king activity is crucial
+      const whiteKingCenterDist = Math.abs(3.5 - whiteKingPos.row) + Math.abs(3.5 - whiteKingPos.col);
+      const blackKingCenterDist = Math.abs(3.5 - blackKingPos.row) + Math.abs(3.5 - blackKingPos.col);
+      
+      // Active king bonus in endgame
+      evaluation += (whiteKingCenterDist - blackKingCenterDist) * 0.2;
+      
+      // When winning, push enemy king to edge
+      if (evaluation > 3) {
+        const whiteKingEdgeDist = Math.min(
+          whiteKingPos.row, 7 - whiteKingPos.row,
+          whiteKingPos.col, 7 - whiteKingPos.col
+        );
+        evaluation += (3 - whiteKingEdgeDist) * 0.5;
+      }
+    }
+    
+    // Check and attack bonuses
+    if (chess.inCheck()) {
+      evaluation += chess.turn() === 'w' ? 0.5 : -0.5;
+    }
+    
+    // Mobility with emphasis on opponent's limited moves
     const moves = chess.moves().length;
-    evaluation += chess.turn() === 'b' ? moves * 0.05 : -moves * 0.05;
+    if (chess.turn() === 'b') {
+      evaluation += moves * 0.05;
+      // Bonus for restricting opponent
+      if (moves < 10) evaluation -= 0.3;
+    } else {
+      evaluation -= moves * 0.05;
+      // Penalty when we have few moves
+      if (moves < 10) evaluation += 0.3;
+    }
     
     return evaluation;
   }
@@ -82,26 +130,70 @@ export class ChessEngine {
     
     if (moves.length === 0) return null;
     
-    // Reduced depth for faster moves
-    const depth = { easy: 1, medium: 2, hard: 3 }[difficulty];
+    // First check for immediate checkmate
+    for (const move of moves) {
+      chess.move(move);
+      if (chess.isCheckmate()) {
+        chess.undo();
+        return move;
+      }
+      chess.undo();
+    }
     
-    let bestMoves: string[] = [];
+    // Base depth with dynamic adjustment
+    let depth = { easy: 2, medium: 3, hard: 4 }[difficulty];
+    
+    // Increase depth in endgame or when winning
+    const evaluation = this.evaluatePosition(chess);
+    const pieceCount = chess.board().flat().filter(p => p !== null).length;
+    
+    // Deeper search in endgame
+    if (pieceCount <= 10) {
+      depth += 2;
+    } else if (pieceCount <= 16) {
+      depth += 1;
+    }
+    
+    // Deeper search when winning to find checkmate
+    if (evaluation > 5) {
+      depth += 1;
+    }
+    
+    let bestMove = null;
     let bestEval = -Infinity;
+    const moveEvaluations: { move: string; eval: number }[] = [];
     
     for (const move of moves) {
       chess.move(move);
       const evaluation = this.minimax(chess, depth - 1, false);
       chess.undo();
       
+      moveEvaluations.push({ move, eval: evaluation });
+      
       if (evaluation > bestEval) {
         bestEval = evaluation;
-        bestMoves = [move];
-      } else if (evaluation === bestEval) {
-        bestMoves.push(move);
+        bestMove = move;
       }
     }
     
-    // Add randomness by picking from equally good moves
-    return bestMoves[Math.floor(Math.random() * bestMoves.length)];
+    // Sort moves by evaluation to prioritize forcing moves
+    moveEvaluations.sort((a, b) => b.eval - a.eval);
+    
+    // If multiple moves have similar evaluations, prefer checks and captures
+    const topMoves = moveEvaluations.filter(m => m.eval >= bestEval - 0.1);
+    
+    for (const { move } of topMoves) {
+      chess.move(move);
+      const isCheck = chess.inCheck();
+      chess.undo();
+      
+      // Prefer checks when winning
+      if (isCheck && evaluation > 3) {
+        return move;
+      }
+    }
+    
+    // Return the objectively best move (no randomness)
+    return bestMove;
   }
 }
