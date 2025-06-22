@@ -99,9 +99,18 @@ export class ChessEngine {
     
     const moves = chess.moves();
     
+    // Move ordering for better pruning - prioritize captures and checks
+    const orderedMoves = moves.sort((a, b) => {
+      const aCapture = a.includes('x') ? 1 : 0;
+      const bCapture = b.includes('x') ? 1 : 0;
+      const aCheck = a.includes('+') ? 1 : 0;
+      const bCheck = b.includes('+') ? 1 : 0;
+      return (bCapture + bCheck) - (aCapture + aCheck);
+    });
+    
     if (isMaximizing) {
       let maxEval = -Infinity;
-      for (const move of moves) {
+      for (const move of orderedMoves) {
         chess.move(move);
         const evaluation = this.minimax(chess, depth - 1, false, alpha, beta);
         chess.undo();
@@ -112,7 +121,7 @@ export class ChessEngine {
       return maxEval;
     } else {
       let minEval = Infinity;
-      for (const move of moves) {
+      for (const move of orderedMoves) {
         chess.move(move);
         const evaluation = this.minimax(chess, depth - 1, true, alpha, beta);
         chess.undo();
@@ -140,24 +149,24 @@ export class ChessEngine {
       chess.undo();
     }
     
-    // Base depth with dynamic adjustment
-    let depth = { easy: 2, medium: 3, hard: 4 }[difficulty];
+    // Base depth - balanced for performance
+    let depth = { easy: 1, medium: 2, hard: 3 }[difficulty];
     
     // Increase depth in endgame or when winning
     const evaluation = this.evaluatePosition(chess);
     const pieceCount = chess.board().flat().filter(p => p !== null).length;
     
-    // Deeper search in endgame
-    if (pieceCount <= 10) {
-      depth += 2;
-    } else if (pieceCount <= 16) {
-      depth += 1;
+    // Moderate depth increase in critical positions
+    if (pieceCount <= 8) {
+      // Very late endgame - look deeper for checkmate
+      depth = Math.min(depth + 2, 4);
+    } else if (pieceCount <= 12 && Math.abs(evaluation) > 5) {
+      // Late endgame when winning/losing significantly
+      depth = Math.min(depth + 1, 4);
     }
     
-    // Deeper search when winning to find checkmate
-    if (evaluation > 5) {
-      depth += 1;
-    }
+    // Cap maximum depth to prevent extreme slowness
+    depth = Math.min(depth, 4);
     
     let bestMove = null;
     let bestEval = -Infinity;

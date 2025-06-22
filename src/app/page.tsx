@@ -189,6 +189,16 @@ export default function Home() {
         const isAiTurn = move.after.includes(' b '); // FEN notation: 'b' means black to move
         
         if (isAiTurn) {
+          // Show thinking indicator
+          const thinkingMessage: ChatMessage = {
+            id: uuidv4(),
+            role: 'assistant',
+            content: 'Analyzing position... ♟️',
+            timestamp: new Date(),
+            metadata: { isThinking: true }
+          };
+          setMessages(prev => [...prev, thinkingMessage]);
+          
           const aiMoveTimeout = setTimeout(async () => {
             try {
               const aiMoveResponse = await fetch('/api/chess/ai-move', {
@@ -223,7 +233,7 @@ export default function Home() {
               // Update game position with AI move
               await updateGamePosition(currentGameId!, aiMoveData.fen, '');
               
-              // Add AI move message
+              // Remove thinking message and add AI move message
               const aiMoveMessage: ChatMessage = {
                 id: uuidv4(),
                 role: 'assistant',
@@ -235,7 +245,7 @@ export default function Home() {
                 },
               };
               
-              setMessages(prev => [...prev, aiMoveMessage]);
+              setMessages(prev => prev.filter(msg => msg.id !== thinkingMessage.id).concat(aiMoveMessage));
               
               // Save AI move message to database
               await saveMessage(conversationId!, 'assistant', aiMoveMessage.content, aiMoveMessage.metadata);
