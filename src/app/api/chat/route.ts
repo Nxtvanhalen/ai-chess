@@ -1,16 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getOpenAIClient } from '@/lib/openai/client';
+import { createResponsesCompletion } from '@/lib/openai/client';
 import { CHESS_BUTLER_SYSTEM_PROMPT, formatMoveContext } from '@/lib/openai/chess-butler-prompt';
+import { checkRateLimit, getRateLimitHeaders, getClientIP } from '@/lib/middleware/rate-limit';
 
 export async function POST(request: NextRequest) {
   try {
+    // Check rate limit
+    const clientIP = getClientIP(request);
+    const rateLimitResult = checkRateLimit(clientIP);
+    
+    if (!rateLimitResult.allowed) {
+      return NextResponse.json(
+        { 
+          error: 'Rate limit exceeded. Please wait before sending another message.',
+          retryAfter: Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000)
+        }, 
+        { 
+          status: 429,
+          headers: getRateLimitHeaders(rateLimitResult)
+        }
+      );
+    }
+
     const { message, gameContext, moveHistory } = await request.json();
     
     if (!message) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
     }
-    
-    const openai = getOpenAIClient();
     
     // Check if this is a playing style analysis question
     const styleAnalysisKeywords = [
@@ -23,16 +39,11 @@ export async function POST(request: NextRequest) {
       message.toLowerCase().includes(keyword)
     );
     
-    // Build context message if game state is provided
-    const messages: any[] = [
-      { role: 'system', content: CHESS_BUTLER_SYSTEM_PROMPT }
-    ];
+    // Build comprehensive instructions for Responses API
+    let instructions = CHESS_BUTLER_SYSTEM_PROMPT;
     
     if (gameContext?.fen) {
-      messages.push({
-        role: 'system',
-        content: formatMoveContext(gameContext.fen, gameContext.lastMove)
-      });
+      instructions += `\n\n${formatMoveContext(gameContext.fen, gameContext.lastMove)}`;
     }
     
     // Add move history for style analysis questions
@@ -44,56 +55,41 @@ export async function POST(request: NextRequest) {
         .join(', ');
       
       if (moveSequence) {
-        messages.push({
-          role: 'system',
-          content: `Recent move history for style analysis (last ${recentMoves.length} moves): ${moveSequence}. 
-          
-          As Chester, analyze Chris's playing style based on these moves, looking for patterns in:
-          - Opening preferences and development
-          - Tactical vs positional approach  
-          - Risk-taking vs cautious play
-          - Piece coordination and planning
-          - Endgame tendencies
-          
-          Provide specific, actionable insights about their chess style in your characteristic Chester voice.`
-        });
+        instructions += `\n\nRecent move history for style analysis (last ${recentMoves.length} moves): ${moveSequence}. 
+        
+        As Chester, analyze Chris's playing style based on these moves, looking for patterns in:
+        - Opening preferences and development
+        - Tactical vs positional approach  
+        - Risk-taking vs cautious play
+        - Piece coordination and planning
+        - Endgame tendencies
+        
+        Provide specific, actionable insights about their chess style in your characteristic Chester voice.`;
       }
     }
     
-    messages.push({ role: 'user', content: message });
-    
-    // Use GPT-4o for the response
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages,
-      temperature: 0.7,
-      max_tokens: 1000,
-      stream: true,
-    });
-    
-    // Create a streaming response
-    const encoder = new TextEncoder();
-    const stream = new ReadableStream({
-      async start(controller) {
-        try {
-          for await (const chunk of completion) {
-            const content = chunk.choices[0]?.delta?.content || '';
-            if (content) {
-              controller.enqueue(encoder.encode(content));
-            }
-          }
-          controller.close();
-        } catch (error) {
-          controller.error(error);
-        }
+    // Use GPT-5 Responses API with reasoning control for faster responses
+    // No need for response chaining - GPT-5 handles turn-by-turn naturally
+    const completion = await createResponsesCompletion({
+      model: 'gpt-5',
+      input: message,
+      instructions: instructions,
+      reasoning: {
+        effort: 'minimal' // Fast responses for chat
       },
+      max_output_tokens: 1000,
     });
     
-    return new Response(stream, {
+    // Parse Responses API format
+    const messageOutput = completion.output.find((item: any) => item.type === 'message');
+    const textContent = messageOutput?.content.find((content: any) => content.type === 'output_text');
+    const content = textContent?.text || 'Sorry, I encountered an issue.';
+    
+    // Return simple response - GPT-5 handles conversation naturally
+    return new Response(content, {
       headers: {
-        'Content-Type': 'text/event-stream',
+        'Content-Type': 'text/plain',
         'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
       },
     });
   } catch (error) {

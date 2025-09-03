@@ -1,15 +1,79 @@
 import OpenAI from 'openai';
+import { withOpenAIRetry } from '@/lib/utils/retry';
 
 let openaiClient: OpenAI | null = null;
 
 export function getOpenAIClient() {
   if (!openaiClient) {
-    const apiKey = process.env.OPENAI_API_KEY || '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';
+    const apiKey = process.env.OPENAI_API_KEY;
+    
+    if (!apiKey) {
+      throw new Error('OPENAI_API_KEY environment variable is not set');
+    }
     
     openaiClient = new OpenAI({
       apiKey: apiKey,
+      timeout: 30000, // 30 second timeout
+      maxRetries: 0, // We'll handle retries ourselves
     });
   }
   
   return openaiClient;
+}
+
+// Wrapper for OpenAI chat completions with retry logic
+export async function createChatCompletion(params: OpenAI.Chat.Completions.ChatCompletionCreateParams) {
+  const client = getOpenAIClient();
+  
+  // For streaming requests, we need to handle them differently due to retry complexity
+  if (params.stream) {
+    // For streaming, we'll do a simple call with built-in OpenAI retry (set to 1)
+    const streamingClient = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY!,
+      timeout: 30000,
+      maxRetries: 1, // OpenAI built-in retry for streaming
+    });
+    return streamingClient.chat.completions.create(params);
+  }
+  
+  // For non-streaming, use our custom retry logic
+  return withOpenAIRetry(() => client.chat.completions.create(params));
+}
+
+// GPT-5 Responses API wrapper with reasoning controls
+export interface ResponsesAPIParams {
+  model: string;
+  input: string;
+  instructions: string;
+  reasoning?: {
+    effort: 'minimal' | 'medium' | 'high';
+  };
+  previous_response_id?: string;
+  max_output_tokens?: number;
+}
+
+export async function createResponsesCompletion(params: ResponsesAPIParams) {
+  const apiKey = process.env.OPENAI_API_KEY;
+  
+  if (!apiKey) {
+    throw new Error('OPENAI_API_KEY environment variable is not set');
+  }
+
+  return withOpenAIRetry(async () => {
+    const response = await fetch('https://api.openai.com/v1/responses', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(params),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(`Responses API error: ${response.status} ${response.statusText} - ${JSON.stringify(errorData)}`);
+    }
+
+    return response.json();
+  });
 }

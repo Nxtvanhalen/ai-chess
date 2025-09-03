@@ -349,53 +349,36 @@ export default function Home() {
         throw new Error('Failed to send message');
       }
       
-      // Handle streaming response
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-      let assistantMessage: ChatMessage = {
+      // Show thinking indicator immediately
+      const thinkingMessage: ChatMessage = {
         id: uuidv4(),
         role: 'assistant',
-        content: '🤔 thinking...',
+        content: 'Thinking...',
         timestamp: new Date(),
         metadata: { isThinking: true }
       };
       
-      setMessages(prev => [...prev, assistantMessage]);
+      setMessages(prev => [...prev, thinkingMessage]);
       
-      if (reader) {
-        try {
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            
-            const chunk = decoder.decode(value);
-            assistantMessage.content += chunk;
-          }
-          
-          // Add small delay before showing content to allow fade-in animation
-          const chatFadeTimeout = setTimeout(() => {
-            setMessages(prev => 
-              prev.map(msg => 
-                msg.id === assistantMessage.id 
-                  ? { ...msg, content: assistantMessage.content, metadata: { isThinking: false } }
-                  : msg
-              )
-            );
-            timeoutRefs.current.delete(chatFadeTimeout);
-          }, 300);
-          timeoutRefs.current.add(chatFadeTimeout);
-        } catch (streamError) {
-          console.error('Stream reading error:', streamError);
-          assistantMessage.content = "I encountered an error while generating my response. Please try again.";
-          setMessages(prev => 
-            prev.map(msg => 
-              msg.id === assistantMessage.id 
-                ? { ...msg, content: assistantMessage.content, metadata: { isThinking: false } }
-                : msg
-            )
-          );
-        }
-      }
+      // Handle non-streaming response (GPT-5 without verification)
+      const responseText = await response.text();
+      
+      // Replace thinking message with actual response
+      const assistantMessage: ChatMessage = {
+        id: thinkingMessage.id,
+        role: 'assistant',
+        content: responseText,
+        timestamp: new Date(),
+        metadata: { isThinking: false }
+      };
+      
+      setMessages(prev => 
+        prev.map(msg => 
+          msg.id === thinkingMessage.id 
+            ? assistantMessage
+            : msg
+        )
+      );
       
       // Save assistant response to database
       await saveMessage(conversationId, 'assistant', assistantMessage.content);
