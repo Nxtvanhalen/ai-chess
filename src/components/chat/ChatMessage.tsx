@@ -49,8 +49,20 @@ export default function ChatMessage({ message }: ChatMessageProps) {
     }`}>
       <div className="flex-shrink-0">
         {isAssistant ? (
-          <div className="w-5 h-5 lg:w-10 lg:h-10 rounded-full bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 text-white glow-effect flex items-center justify-center text-xs lg:text-lg shadow-lg">
-            {isThinking ? '🤔' : '🤓'}
+          <div className="w-5 h-5 lg:w-10 lg:h-10 rounded-full bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 glow-effect shadow-lg overflow-hidden relative">
+            <Image
+              src="/chester.png"
+              alt="Chester"
+              width={40}
+              height={40}
+              className={`absolute inset-0 w-full h-full object-cover ${isThinking ? 'opacity-50' : 'opacity-100'}`}
+              priority
+            />
+            {isThinking && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/20 text-white text-xs lg:text-sm">
+                🤔
+              </div>
+            )}
           </div>
         ) : (
           <div className="w-5 h-5 lg:w-10 lg:h-10 rounded-full overflow-hidden shadow-lg relative">
