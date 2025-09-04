@@ -139,7 +139,7 @@ export default function Home() {
         let aiResponse: ChatMessage = {
           id: uuidv4(),
           role: 'assistant',
-          content: '🤔 thinking...',
+          content: '',
           timestamp: new Date(),
           metadata: { isThinking: true }
         };
@@ -193,7 +193,7 @@ export default function Home() {
           const thinkingMessage: ChatMessage = {
             id: uuidv4(),
             role: 'assistant',
-            content: 'Analyzing position... ♟️',
+            content: '',
             timestamp: new Date(),
             metadata: { isThinking: true }
           };
@@ -353,7 +353,7 @@ export default function Home() {
       const thinkingMessage: ChatMessage = {
         id: uuidv4(),
         role: 'assistant',
-        content: 'Thinking...',
+        content: '',
         timestamp: new Date(),
         metadata: { isThinking: true }
       };

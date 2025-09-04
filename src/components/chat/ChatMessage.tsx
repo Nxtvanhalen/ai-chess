@@ -41,6 +41,35 @@ export default function ChatMessage({ message }: ChatMessageProps) {
   const isAssistant = message.role === 'assistant';
   const isThinking = message.metadata?.isThinking;
   
+  // Show thinking animation separately
+  if (isThinking) {
+    return (
+      <div className="flex gap-1 lg:gap-4 px-1 lg:px-6 py-1 lg:py-6 animate-in slide-in-from-bottom-6 lg:slide-in-from-bottom-8 fade-in duration-700 lg:duration-1000 ease-out bg-gradient-to-r from-purple-900/20 via-blue-900/10 to-purple-900/20 border-l-4 border-purple-400/40 rounded-r-2xl mx-2">
+        <div className="flex-shrink-0">
+          <div className="w-5 h-5 lg:w-10 lg:h-10 rounded-full bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 glow-effect shadow-lg overflow-hidden relative animate-pulse">
+            <Image
+              src="/chester.png"
+              alt="Chester"
+              width={40}
+              height={40}
+              className="absolute inset-0 w-full h-full object-cover opacity-60"
+              priority
+            />
+          </div>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <span className="text-xs lg:text-sm font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Chester</span>
+          <div className="flex items-center gap-1">
+            <div className="thinking-dot w-1.5 h-1.5 lg:w-2 lg:h-2 bg-purple-400 rounded-full"></div>
+            <div className="thinking-dot w-1.5 h-1.5 lg:w-2 lg:h-2 bg-purple-400 rounded-full"></div>
+            <div className="thinking-dot w-1.5 h-1.5 lg:w-2 lg:h-2 bg-purple-400 rounded-full"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
   return (
     <div className={`flex gap-1 lg:gap-4 px-1 lg:px-6 py-1 lg:py-6 animate-in slide-in-from-bottom-6 lg:slide-in-from-bottom-8 fade-in duration-700 lg:duration-1000 ease-out ${
       isAssistant 
@@ -55,14 +84,9 @@ export default function ChatMessage({ message }: ChatMessageProps) {
               alt="Chester"
               width={40}
               height={40}
-              className={`absolute inset-0 w-full h-full object-cover ${isThinking ? 'opacity-50' : 'opacity-100'}`}
+              className="absolute inset-0 w-full h-full object-cover opacity-100"
               priority
             />
-            {isThinking && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/20 text-white text-xs lg:text-sm">
-                🤔
-              </div>
-            )}
           </div>
         ) : (
           <div className="w-5 h-5 lg:w-10 lg:h-10 rounded-full overflow-hidden shadow-lg relative">

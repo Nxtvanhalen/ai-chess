@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createResponsesCompletion } from '@/lib/openai/client';
 import { CHESS_BUTLER_SYSTEM_PROMPT, formatMoveContext } from '@/lib/openai/chess-butler-prompt';
 import { checkRateLimit, getRateLimitHeaders, getClientIP } from '@/lib/middleware/rate-limit';
+import { extractMoveSuggestions, validateMoveSuggestion } from '@/lib/chess/board-validator';
 
 export async function POST(request: NextRequest) {
   try {
@@ -83,7 +84,27 @@ export async function POST(request: NextRequest) {
     // Parse Responses API format
     const messageOutput = completion.output.find((item: any) => item.type === 'message');
     const textContent = messageOutput?.content.find((content: any) => content.type === 'output_text');
-    const content = textContent?.text || 'Sorry, I encountered an issue.';
+    let content = textContent?.text || 'Sorry, I encountered an issue.';
+    
+    // Validate move suggestions if a game context exists
+    if (gameContext?.fen) {
+      const moveSuggestions = extractMoveSuggestions(content);
+      
+      // Check each move suggestion and add corrections if needed
+      for (const suggestion of moveSuggestions) {
+        const validation = validateMoveSuggestion(gameContext.fen, suggestion);
+        
+        if (!validation.isValid) {
+          // Log the error for debugging
+          console.log(`Chester move validation error: ${suggestion} - ${validation.error}`);
+          
+          // If Chester made an error, append a correction note
+          if (validation.correctedMove) {
+            content += `\n\n[Note: ${validation.correctedMove}]`;
+          }
+        }
+      }
+    }
     
     // Return simple response - GPT-5 handles conversation naturally
     return new Response(content, {
