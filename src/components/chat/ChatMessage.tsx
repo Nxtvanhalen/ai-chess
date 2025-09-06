@@ -4,6 +4,8 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { ChatMessage as ChatMessageType } from '@/types';
 import Image from 'next/image';
+import SuggestionBubble from './SuggestionBubble';
+import EngineMoveCard from './EngineMoveCard';
 
 interface ChatMessageProps {
   message: ChatMessageType;
@@ -39,7 +41,27 @@ const HighlightedText = ({ children }: { children: string }) => {
 
 export default function ChatMessage({ message }: ChatMessageProps) {
   const isAssistant = message.role === 'assistant';
+  const isEngine = message.role === 'engine';
   const isThinking = message.metadata?.isThinking;
+  
+  // Handle engine move display
+  if (isEngine || message.type === 'move' && message.metadata?.engineAnalysis) {
+    return (
+      <EngineMoveCard 
+        move={message.content}
+        analysis={message.metadata?.engineAnalysis}
+      />
+    );
+  }
+  
+  // Handle suggestion display
+  if (message.type === 'suggestion' && message.metadata?.suggestions) {
+    return (
+      <div className="animate-in slide-in-from-bottom-6 fade-in duration-700">
+        <SuggestionBubble suggestions={message.metadata.suggestions} />
+      </div>
+    );
+  }
   
   // Show thinking animation separately
   if (isThinking) {

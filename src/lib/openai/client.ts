@@ -21,6 +21,9 @@ export function getOpenAIClient() {
   return openaiClient;
 }
 
+// Export openai client for direct use
+export const openai = getOpenAIClient();
+
 // Wrapper for OpenAI chat completions with retry logic
 export async function createChatCompletion(params: OpenAI.Chat.Completions.ChatCompletionCreateParams) {
   const client = getOpenAIClient();

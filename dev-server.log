@@ -393,3 +393,4 @@ Slow filesystem detected. If /Users/chrisbergstrom/CHESS/ai-chess/.next is a net
   syscall: 'open',
   path: '/Users/chrisbergstrom/CHESS/ai-chess/.next/static/development/_buildManifest.js.tmp.0u4mmf1difek'
 }
+[?25h

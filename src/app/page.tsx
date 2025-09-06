@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import ChessBoard from '@/components/chess/ChessBoard';
 import ChatInterface from '@/components/chat/ChatInterface';
 import GameLayout from '@/components/layout/GameLayout';
-import { ChatMessage } from '@/types';
+import { ChatMessage, MoveSuggestion } from '@/types';
 import { 
   createGame, 
   updateGamePosition, 
@@ -27,6 +27,12 @@ export default function Home() {
   const [moveCount, setMoveCount] = useState(0);
   const [gameOver, setGameOver] = useState<{checkmate: boolean, winner?: 'white' | 'black'}>({checkmate: false});
   const timeoutRefs = useRef<Set<NodeJS.Timeout>>(new Set());
+  const messagesRef = useRef<ChatMessage[]>([]);
+  
+  // Keep messagesRef in sync
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
 
   // Cleanup timeouts on unmount
   useEffect(() => {
@@ -58,12 +64,17 @@ export default function Home() {
           const welcomeMessage: ChatMessage = {
             id: uuidv4(),
             role: 'assistant',
-            content: "Welcome back, Chris! I'm Chester, your chess companion, ready for our next game. I'll remember our entire journey together. Make your opening move when you're ready!",
+            content: "Hey Chris! Ready for another game? I'll be here watching and giving you some tips. You're playing white against the engine. Good luck!",
             timestamp: new Date(),
           };
           
           setMessages([welcomeMessage]);
           await saveMessage(conversation.id, 'assistant', welcomeMessage.content);
+          
+          // Get initial suggestions
+          setTimeout(() => {
+            getAISuggestions(newGame.fen);
+          }, 500);
         }
       } catch (error) {
         console.error('Error initializing game:', error);
@@ -73,6 +84,50 @@ export default function Home() {
     initializeGame();
   }, []);
 
+  // Get AI suggestions when it's user's turn
+  const getAISuggestions = useCallback(async (fen: string) => {
+    if (!conversationId) return;
+    
+    try {
+      const response = await fetch('/api/chess/pre-move-analysis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fen,
+          moveHistory: messagesRef.current.filter(m => m.metadata?.moveContext).map(m => m.metadata?.moveContext),
+          gamePhase: detectGamePhase(fen)
+        })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Add suggestion message
+        const suggestionMessage: ChatMessage = {
+          id: uuidv4(),
+          role: 'assistant',
+          type: 'suggestion',
+          content: data.comment || "Your move!",
+          timestamp: new Date(),
+          metadata: {
+            suggestions: data.suggestions
+          }
+        };
+        
+        setMessages(prev => [...prev, suggestionMessage]);
+      }
+    } catch (error) {
+      console.error('Error getting AI suggestions:', error);
+    }
+  }, [conversationId]);
+  
+  const detectGamePhase = (fen: string) => {
+    const moves = messagesRef.current.filter(m => m.metadata?.moveContext).length;
+    if (moves < 10) return 'opening';
+    if (moves < 30) return 'middlegame';
+    return 'endgame';
+  };
+  
   const handleMove = useCallback(async (move: Move) => {
     if (!currentGameId || !conversationId) return;
     
@@ -189,15 +244,16 @@ export default function Home() {
         const isAiTurn = move.after.includes(' b '); // FEN notation: 'b' means black to move
         
         if (isAiTurn) {
-          // Show thinking indicator
-          const thinkingMessage: ChatMessage = {
+          // First show engine move
+          const engineMoveMessage: ChatMessage = {
             id: uuidv4(),
-            role: 'assistant',
+            role: 'engine',
+            type: 'move',
             content: '',
             timestamp: new Date(),
             metadata: { isThinking: true }
           };
-          setMessages(prev => [...prev, thinkingMessage]);
+          setMessages(prev => [...prev, engineMoveMessage]);
           
           const aiMoveTimeout = setTimeout(async () => {
             try {
@@ -233,22 +289,57 @@ export default function Home() {
               // Update game position with AI move
               await updateGamePosition(currentGameId!, aiMoveData.fen, '');
               
-              // Remove thinking message and add AI move message
-              const aiMoveMessage: ChatMessage = {
-                id: uuidv4(),
-                role: 'assistant',
-                content: `I respond with ${convertMoveToPlainEnglish(aiMoveData.san)}. ${getRandomMoveComment()}`,
-                timestamp: new Date(),
+              // Update engine move message
+              const updatedEngineMessage: ChatMessage = {
+                ...engineMoveMessage,
+                content: convertMoveToPlainEnglish(aiMoveData.san),
                 metadata: {
+                  isThinking: false,
                   moveContext: aiMoveData.san,
                   position: aiMoveData.fen,
-                },
+                  engineAnalysis: {
+                    move: aiMoveData.san,
+                    evaluation: 0, // You could calculate this
+                    depth: 10
+                  }
+                }
               };
               
-              setMessages(prev => prev.filter(msg => msg.id !== thinkingMessage.id).concat(aiMoveMessage));
+              setMessages(prev => prev.map(msg => 
+                msg.id === engineMoveMessage.id ? updatedEngineMessage : msg
+              ));
               
-              // Save AI move message to database
-              await saveMessage(conversationId!, 'assistant', aiMoveMessage.content, aiMoveMessage.metadata);
+              // Get Chester's analysis of the engine move
+              const analysisResponse = await fetch('/api/chess/engine-move-analysis', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  engineMove: aiMoveData,
+                  fen: aiMoveData.fen,
+                  engineEvaluation: 0
+                })
+              });
+              
+              if (analysisResponse.ok) {
+                const analysisData = await analysisResponse.json();
+                
+                // Add Chester's commentary on engine move
+                const analysisMessage: ChatMessage = {
+                  id: uuidv4(),
+                  role: 'assistant',
+                  type: 'analysis',
+                  content: analysisData.commentary,
+                  timestamp: new Date()
+                };
+                
+                setMessages(prev => [...prev, analysisMessage]);
+                await saveMessage(conversationId!, 'assistant', analysisMessage.content);
+              }
+              
+              // After engine move, get suggestions for user's next move
+              setTimeout(() => {
+                getAISuggestions(aiMoveData.fen);
+              }, 1000);
             }
           } catch (error) {
             console.error('Error getting AI move:', error);
@@ -264,7 +355,7 @@ export default function Home() {
     } finally {
       setIsLoading(false);
     }
-  }, [messages, moveCount, currentGameId, conversationId]);
+  }, [moveCount, currentGameId, conversationId, getAISuggestions]);
 
   const convertMoveToPlainEnglish = (san: string) => {
     // Convert algebraic notation to plain English
@@ -299,14 +390,14 @@ export default function Home() {
 
   const getRandomMoveComment = () => {
     const comments = [
-      "Let's see how you handle this.",
-      "Your move, Chris.",
-      "I'm curious about your response.",
-      "The position grows more interesting.",
-      "What's your plan here?",
-      "The game continues to evolve.",
-      "I await your next strategic decision.",
-      "Let's keep this engaging."
+      "Your turn!",
+      "What you got?",
+      "Over to you.",
+      "Let's see what you do.",
+      "Your move, buddy.",
+      "Ball's in your court.",
+      "Show me what you got.",
+      "Interesting position now."
     ];
     return comments[Math.floor(Math.random() * comments.length)];
   };

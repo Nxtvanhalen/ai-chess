@@ -2,7 +2,8 @@ import { Move as ChessMove } from 'chess.js';
 
 export interface ChatMessage {
   id: string;
-  role: 'user' | 'assistant' | 'system';
+  role: 'user' | 'assistant' | 'system' | 'engine';
+  type?: 'move' | 'suggestion' | 'analysis' | 'commentary' | 'conversation';
   content: string;
   timestamp: Date;
   metadata?: {
@@ -10,7 +11,22 @@ export interface ChatMessage {
     gameState?: string;
     position?: string;
     isThinking?: boolean;
+    suggestions?: MoveSuggestion[];
+    engineAnalysis?: EngineAnalysis;
+    evaluation?: number;
   };
+}
+
+export interface MoveSuggestion {
+  move: string;
+  reasoning: string;
+  casual?: boolean;
+}
+
+export interface EngineAnalysis {
+  move: string;
+  evaluation: number;
+  depth: number;
 }
 
 export interface Game {
