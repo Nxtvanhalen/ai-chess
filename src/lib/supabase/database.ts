@@ -111,10 +111,26 @@ export async function saveMessage(
 
   if (error) throw error;
 
-  // Update message count
-  await supabase.rpc('increment_message_count', { 
-    conversation_id: conversationId 
-  });
+  // Update message count (gracefully handle if RPC function doesn't exist)
+  try {
+    await supabase.rpc('increment_message_count', { 
+      conversation_id: conversationId 
+    });
+  } catch (rpcError) {
+    console.warn('Failed to increment message count via RPC, using direct update:', rpcError);
+    // Fallback to direct update if RPC function isn't available
+    try {
+      await supabase
+        .from('conversations')
+        .update({ 
+          message_count: supabase.sql`message_count + 1`,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', conversationId);
+    } catch (fallbackError) {
+      console.warn('Message count update failed, continuing without it:', fallbackError);
+    }
+  }
 
   return data;
 }

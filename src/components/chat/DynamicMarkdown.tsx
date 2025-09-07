@@ -74,13 +74,15 @@ export default function DynamicMarkdown({ children, className }: DynamicMarkdown
         ]);
 
         if (mounted) {
-          setReactMarkdown(markdownModule.default);
-          setRemarkGfm(gfmModule.default);
+          setReactMarkdown(() => markdownModule.default);
+          setRemarkGfm(() => gfmModule.default);
           setIsLoading(false);
         }
       } catch (error) {
         console.warn('Failed to load markdown renderer, using fallback:', error);
         if (mounted) {
+          setReactMarkdown(null);
+          setRemarkGfm(null);
           setIsLoading(false);
         }
       }
@@ -99,11 +101,12 @@ export default function DynamicMarkdown({ children, className }: DynamicMarkdown
   }
 
   // Use full ReactMarkdown once loaded
-  return (
-    <ReactMarkdown
-      remarkPlugins={remarkGfm ? [remarkGfm] : []}
-      className={className}
-      components={{
+  try {
+    return (
+      <ReactMarkdown
+        remarkPlugins={remarkGfm ? [remarkGfm] : undefined}
+        className={className}
+        components={{
         pre: ({ children }: any) => (
           <pre className="bg-slate-900 p-3 rounded-lg overflow-x-auto my-3 border border-slate-700">
             <code className="text-green-400 text-sm font-mono">{children}</code>
@@ -152,9 +155,13 @@ export default function DynamicMarkdown({ children, className }: DynamicMarkdown
             {children}
           </blockquote>
         ),
-      }}
-    >
-      {children}
-    </ReactMarkdown>
-  );
+        }}
+      >
+        {children}
+      </ReactMarkdown>
+    );
+  } catch (error) {
+    console.warn('ReactMarkdown rendering failed, using fallback:', error);
+    return <SimpleMarkdown className={className}>{children}</SimpleMarkdown>;
+  }
 }
