@@ -1,11 +1,10 @@
 'use client';
 
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import { ChatMessage as ChatMessageType } from '@/types';
 import Image from 'next/image';
 import SuggestionBubble from './SuggestionBubble';
 import EngineMoveCard from './EngineMoveCard';
+import DynamicMarkdown from './DynamicMarkdown';
 
 interface ChatMessageProps {
   message: ChatMessageType;
@@ -147,38 +146,9 @@ export default function ChatMessage({ message }: ChatMessageProps) {
             ? 'bg-purple-900/15 px-1 py-0.5 lg:p-4 rounded-md lg:rounded-2xl border border-purple-400/30 shadow-lg backdrop-blur-sm' 
             : 'bg-slate-800/25 px-1 py-0.5 lg:p-4 rounded-md lg:rounded-2xl border border-slate-400/30 shadow-lg backdrop-blur-sm'
         }`}>
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            components={{
-              pre: ({ children }) => (
-                <pre className="overflow-x-auto">{children}</pre>
-              ),
-              code: ({ className, children, ...props }: any) => {
-                const match = /language-(\w+)/.exec(className || '');
-                const isInline = !className || !match;
-                return isInline ? (
-                  <code className="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-sm" {...props}>
-                    {children}
-                  </code>
-                ) : (
-                  <code className={className} {...props}>
-                    {children}
-                  </code>
-                );
-              },
-              p: ({ children }) => (
-                <p><HighlightedText>{String(children)}</HighlightedText></p>
-              ),
-              text: ({ children }) => {
-                if (typeof children === 'string') {
-                  return <HighlightedText>{children}</HighlightedText>;
-                }
-                return children;
-              }
-            }}
-          >
+          <DynamicMarkdown>
             {message.content}
-          </ReactMarkdown>
+          </DynamicMarkdown>
         </div>
       </div>
     </div>

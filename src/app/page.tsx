@@ -2,10 +2,11 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { Move } from 'chess.js';
-import { v4 as uuidv4 } from 'uuid';
-import ChessBoard from '@/components/chess/ChessBoard';
-import ChatInterface from '@/components/chat/ChatInterface';
+import ChessBoardLazy from '@/components/chess/ChessBoardLazy';
+import ChatInterfaceLazy from '@/components/chat/ChatInterfaceLazy';
 import GameLayout from '@/components/layout/GameLayout';
+import { preloadCriticalLibraries } from '@/lib/utils/dynamicImports';
+import { generateId, generateSimpleId } from '@/lib/utils/uuid';
 import { ChatMessage, MoveSuggestion } from '@/types';
 import { PerformanceMonitor, debounce } from '@/lib/utils/performance';
 import { haptics } from '@/lib/utils/haptics';
@@ -37,10 +38,13 @@ export default function Home() {
     messagesRef.current = messages;
   }, [messages]);
 
-  // Initialize performance monitoring
+  // Initialize performance monitoring and preload libraries
   useEffect(() => {
     performanceMonitor.current = PerformanceMonitor.getInstance();
     performanceMonitor.current.startFPSMonitoring();
+    
+    // Preload critical libraries on user interaction
+    preloadCriticalLibraries();
     
     // Log performance report every 30 seconds in development
     const reportInterval = setInterval(() => {
@@ -83,7 +87,7 @@ export default function Home() {
           
           // Add welcome message
           const welcomeMessage: ChatMessage = {
-            id: uuidv4(),
+            id: await generateId(),
             role: 'assistant',
             content: "Hey Chris! Ready for another game? I'll be here watching and giving you some tips. You're playing white against the engine. Good luck!",
             timestamp: new Date(),
@@ -125,7 +129,7 @@ export default function Home() {
         
         // Add suggestion message
         const suggestionMessage: ChatMessage = {
-          id: uuidv4(),
+          id: generateSimpleId(),
           role: 'assistant',
           type: 'suggestion',
           content: data.comment || "Your move!",
@@ -176,7 +180,7 @@ export default function Home() {
       
       // Add user move message
       const moveMessage: ChatMessage = {
-        id: uuidv4(),
+        id: generateSimpleId(),
         role: 'user',
         content: `I played ${convertMoveToPlainEnglish(move.san)}`,
         timestamp: new Date(),
@@ -216,7 +220,7 @@ export default function Home() {
         const reader = response.body?.getReader();
         const decoder = new TextDecoder();
         let aiResponse: ChatMessage = {
-          id: uuidv4(),
+          id: generateSimpleId(),
           role: 'assistant',
           content: '',
           timestamp: new Date(),
@@ -270,7 +274,7 @@ export default function Home() {
         if (isAiTurn) {
           // First show engine move
           const engineMoveMessage: ChatMessage = {
-            id: uuidv4(),
+            id: generateSimpleId(),
             role: 'engine',
             type: 'move',
             content: '',
@@ -349,7 +353,7 @@ export default function Home() {
                 
                 // Add Chester's commentary on engine move
                 const analysisMessage: ChatMessage = {
-                  id: uuidv4(),
+                  id: generateSimpleId(),
                   role: 'assistant',
                   type: 'analysis',
                   content: analysisData.commentary,
@@ -431,7 +435,7 @@ export default function Home() {
     
     // Add user message
     const userMessage: ChatMessage = {
-      id: uuidv4(),
+      id: generateSimpleId(),
       role: 'user',
       content,
       timestamp: new Date(),
@@ -467,7 +471,7 @@ export default function Home() {
       
       // Show thinking indicator immediately
       const thinkingMessage: ChatMessage = {
-        id: uuidv4(),
+        id: generateSimpleId(),
         role: 'assistant',
         content: '',
         timestamp: new Date(),
@@ -501,7 +505,7 @@ export default function Home() {
     } catch (error) {
       console.error('Error sending message:', error);
       const errorMessage: ChatMessage = {
-        id: uuidv4(),
+        id: generateSimpleId(),
         role: 'assistant',
         content: "I apologize, but I'm having trouble connecting to my services. Please ensure the OpenAI API key is configured.",
         timestamp: new Date(),
@@ -517,7 +521,7 @@ export default function Home() {
     
     // Add checkmate message
     const checkmateMessage: ChatMessage = {
-      id: uuidv4(),
+      id: generateSimpleId(),
       role: 'assistant',
       content: winner === 'white' 
         ? "Checkmate! Well played, Chris. You've secured victory. Would you like to play again?"
@@ -545,7 +549,7 @@ export default function Home() {
       
       // Add new game message
       const newGameMessage: ChatMessage = {
-        id: uuidv4(),
+        id: await generateId(),
         role: 'assistant',
         content: "New game! The board is reset and Chester's ready for another match. Your move, Chris!",
         timestamp: new Date(),
@@ -562,7 +566,7 @@ export default function Home() {
     <GameLayout
       chessBoard={
         <div className="relative h-full">
-          <ChessBoard
+          <ChessBoardLazy
             onMove={handleMove}
             position={currentPosition}
             orientation="white"
@@ -590,7 +594,7 @@ export default function Home() {
         </div>
       }
       chat={
-        <ChatInterface
+        <ChatInterfaceLazy
           messages={messages}
           onSendMessage={handleSendMessage}
           isLoading={isLoading}
