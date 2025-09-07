@@ -47,7 +47,7 @@ export function useKeyboardManager(options: KeyboardManagerOptions = {}) {
   const [isLandscape, setIsLandscape] = useState(false);
   
   // Refs for cleanup and debouncing
-  const debounceTimeoutRef = useRef<NodeJS.Timeout>();
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const initialViewportHeight = useRef<number>(0);
   const lastKnownHeight = useRef<number>(0);
   
