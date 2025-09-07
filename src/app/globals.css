@@ -587,6 +587,14 @@ select {
     padding-top: 0.5rem !important;
   }
   
+  /* Remove any width constraints for full screen usage */
+  .chat-input-container {
+    width: 100vw !important;
+    max-width: none !important;
+    left: 0 !important;
+    right: 0 !important;
+  }
+  
   /* Optimize chat for landscape - full height and proper overflow */
   .mobile-chat-container {
     height: 100vh !important;
@@ -622,6 +630,8 @@ select {
   /* Prevent overflow and ensure proper scrolling */
   .layout-container {
     overflow: hidden !important;
+    width: 100vw !important;
+    max-width: none !important;
   }
   
   /* Make sure the chat messages container fills available space */

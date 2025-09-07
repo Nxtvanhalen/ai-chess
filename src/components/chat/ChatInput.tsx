@@ -17,6 +17,7 @@ export default function ChatInput({
   const [message, setMessage] = useState('');
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [isLandscape, setIsLandscape] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const initialViewportHeight = useRef<number>(0);
 
@@ -26,6 +27,26 @@ export default function ChatInput({
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
     }
   }, [message]);
+
+  // Orientation detection for responsive width
+  useEffect(() => {
+    const updateOrientation = () => {
+      const mobile = window.innerWidth < 1024;
+      const landscape = window.innerWidth > window.innerHeight;
+      setIsLandscape(mobile && landscape);
+    };
+
+    updateOrientation();
+    window.addEventListener('resize', updateOrientation);
+    window.addEventListener('orientationchange', () => {
+      setTimeout(updateOrientation, 100);
+    });
+
+    return () => {
+      window.removeEventListener('resize', updateOrientation);
+      window.removeEventListener('orientationchange', updateOrientation);
+    };
+  }, []);
 
   // Enhanced mobile keyboard detection with Visual Viewport API
   useEffect(() => {
@@ -125,7 +146,11 @@ export default function ChatInput({
           : 'translateY(0)',
         willChange: 'transform',
       }}>
-      <div className="max-w-3xl mx-auto relative">
+      <div className={`relative ${
+        isLandscape 
+          ? 'w-full px-4' // Full width in landscape with padding
+          : 'max-w-3xl mx-auto' // Centered and constrained in portrait/desktop
+      }`}>
         <textarea
           ref={textareaRef}
           value={message}
