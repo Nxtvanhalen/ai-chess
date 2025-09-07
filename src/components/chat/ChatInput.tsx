@@ -15,105 +15,39 @@ export default function ChatInput({
   placeholder = "Message Chester..."
 }: ChatInputProps) {
   const [message, setMessage] = useState('');
-  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [isLandscape, setIsLandscape] = useState(false);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const initialViewportHeight = useRef<number>(0);
+  const textareaRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
-    }
-  }, [message]);
+  // Input doesn't need auto-resize like textarea did
+  // useEffect(() => {
+  //   if (textareaRef.current) {
+  //     textareaRef.current.style.height = 'auto';
+  //     textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+  //   }
+  // }, [message]);
 
-  // Orientation detection for responsive width
+  // Simple orientation detection for responsive width
   useEffect(() => {
     const updateOrientation = () => {
+      if (typeof window === 'undefined') return;
       const mobile = window.innerWidth < 1024;
       const landscape = window.innerWidth > window.innerHeight;
       setIsLandscape(mobile && landscape);
     };
 
     updateOrientation();
-    window.addEventListener('resize', updateOrientation);
-    window.addEventListener('orientationchange', () => {
-      setTimeout(updateOrientation, 100);
-    });
-
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', updateOrientation);
+    }
+    
     return () => {
-      window.removeEventListener('resize', updateOrientation);
-      window.removeEventListener('orientationchange', updateOrientation);
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', updateOrientation);
+      }
     };
   }, []);
 
-  // Enhanced mobile keyboard detection with Visual Viewport API
-  useEffect(() => {
-    // Store initial viewport height
-    initialViewportHeight.current = window.innerHeight;
-    
-    const isMobile = window.innerWidth < 1024;
-    if (!isMobile) return;
-    
-    // Use Visual Viewport API when available (modern browsers)
-    if (window.visualViewport) {
-      const handleViewportChange = () => {
-        const currentHeight = window.visualViewport!.height;
-        const heightDifference = initialViewportHeight.current - currentHeight;
-        const threshold = 150; // Minimum keyboard height to consider
-        
-        if (heightDifference > threshold) {
-          setIsKeyboardOpen(true);
-          setKeyboardHeight(heightDifference);
-          window.dispatchEvent(new CustomEvent('keyboard-open', { 
-            detail: { height: heightDifference } 
-          }));
-        } else {
-          setIsKeyboardOpen(false);
-          setKeyboardHeight(0);
-          window.dispatchEvent(new Event('keyboard-close'));
-        }
-      };
-      
-      window.visualViewport.addEventListener('resize', handleViewportChange);
-      return () => {
-        window.visualViewport?.removeEventListener('resize', handleViewportChange);
-      };
-    } else {
-      // Fallback for older browsers - use window resize
-      const handleResize = () => {
-        const currentHeight = window.innerHeight;
-        const heightDifference = initialViewportHeight.current - currentHeight;
-        const threshold = 150;
-        
-        if (heightDifference > threshold) {
-          setIsKeyboardOpen(true);
-          setKeyboardHeight(heightDifference);
-          window.dispatchEvent(new CustomEvent('keyboard-open', { 
-            detail: { height: heightDifference } 
-          }));
-        } else {
-          setIsKeyboardOpen(false);
-          setKeyboardHeight(0);
-          window.dispatchEvent(new Event('keyboard-close'));
-        }
-      };
-      
-      // Add debouncing to prevent excessive calls
-      let timeoutId: NodeJS.Timeout;
-      const debouncedResize = () => {
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(handleResize, 100);
-      };
-      
-      window.addEventListener('resize', debouncedResize);
-      return () => {
-        window.removeEventListener('resize', debouncedResize);
-        clearTimeout(timeoutId);
-      };
-    }
-  }, []);
+  // Removed old keyboard detection - now handled by KeyboardManager
 
   const handleSubmit = async () => {
     if (message.trim() && !disabled) {
@@ -123,8 +57,8 @@ export default function ChatInput({
       onSendMessage(message.trim());
       setMessage('');
       
-      // Auto-blur on mobile after sending to hide keyboard
-      if (window.innerWidth < 1024 && textareaRef.current) {
+      // Auto-blur on mobile after sending
+      if (typeof window !== 'undefined' && window.innerWidth < 1024 && textareaRef.current) {
         textareaRef.current.blur();
       }
     }
@@ -139,34 +73,45 @@ export default function ChatInput({
 
   return (
     <div 
-      className={`border-t border-purple-400/20 bg-gradient-to-r from-purple-900/30 via-blue-900/30 to-purple-900/30 backdrop-blur-sm chat-input-container lg:rounded-b-2xl transition-all duration-300 ease-out mobile-chat-input-container ${
+      id="mobile-chat-input-fix"
+      className={`bg-gradient-to-r from-purple-900 via-blue-900 to-purple-900 backdrop-blur-sm transition-all duration-300 ease-out ${
         isLandscape 
           ? 'p-2' // Minimal padding in landscape
-          : 'p-2 lg:p-6 mobile-safe-area-bottom' // Normal padding in portrait/desktop with safe area
-      } ${isKeyboardOpen ? 'mobile-keyboard-active' : ''}`}
-      style={{
-        transform: isKeyboardOpen && keyboardHeight > 0 
-          ? `translateY(${Math.max(-20, -keyboardHeight * 0.05)}px)` // Minimal gap, stay close to keyboard
-          : 'translateY(0)',
-        willChange: 'transform',
-      }}>
+          : 'p-2 lg:p-6' // Minimal padding on mobile, standard on desktop
+      }`}>
       <div className={`relative ${
         isLandscape 
           ? 'w-full px-2' // Full width in landscape with minimal padding
-          : 'max-w-3xl mx-auto' // Centered and constrained in portrait/desktop
-      }`}>
-        <textarea
-          ref={textareaRef}
+          : 'max-w-3xl mx-auto px-2' // Centered and constrained in portrait/desktop with padding
+      }`} style={{ margin: 0 }}>
+        <input
+          ref={textareaRef as any}
+          type="text"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
           disabled={disabled}
           placeholder={placeholder}
-          rows={1}
-          className="w-full resize-none rounded-xl lg:rounded-2xl border-2 border-purple-400/30 bg-slate-900/80 backdrop-blur-sm px-3 lg:px-6 py-3 lg:py-6 pr-12 lg:pr-18 text-sm lg:text-lg text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400 disabled:opacity-50 disabled:cursor-not-allowed smooth-transitions shadow-lg hover:shadow-xl font-medium scrollbar-hide overflow-hidden touch-optimized"
+          inputMode="text"
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck="false"
+          data-form-type="other"
+          enterKeyHint="send"
+          // Critical iOS attributes to minimize accessory bar
+          data-testid="chat-input"
+          role="textbox"
+          aria-label="Chat message input"
+          x-webkit-speech=""
+          webkit-appearance="none"
+          className="w-full rounded-xl lg:rounded-2xl border-2 border-purple-400/30 bg-slate-900/80 backdrop-blur-sm px-3 lg:px-6 py-3 lg:py-6 pr-12 lg:pr-18 text-sm lg:text-lg text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400 disabled:opacity-50 disabled:cursor-not-allowed smooth-transitions shadow-lg hover:shadow-xl font-medium touch-optimized"
           style={{ 
-            maxHeight: '200px', 
             minHeight: '44px', // Accessibility touch target minimum
+            WebkitAppearance: 'none',
+            appearance: 'none',
+            WebkitUserSelect: 'text',
+            userSelect: 'text'
           }}
         />
         

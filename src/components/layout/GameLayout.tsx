@@ -1,6 +1,7 @@
 'use client';
 
-import { ReactNode, useState, useEffect } from 'react';
+import { ReactNode } from 'react';
+import { useKeyboardManager } from '@/hooks/useKeyboardManager';
 
 interface GameLayoutProps {
   chessBoard: ReactNode;
@@ -8,115 +9,86 @@ interface GameLayoutProps {
 }
 
 export default function GameLayout({ chessBoard, chat }: GameLayoutProps) {
-  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
-  const [isLandscape, setIsLandscape] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const {
+    keyboardState,
+    isMobile,
+    isLandscape,
+    layoutDimensions,
+    dismissKeyboard,
+    isKeyboardSupported
+  } = useKeyboardManager({ verbose: true });
 
-  // Orientation and device detection
-  useEffect(() => {
-    const updateLayout = () => {
-      const mobile = window.innerWidth < 1024;
-      const landscape = window.innerWidth > window.innerHeight;
-      
-      setIsMobile(mobile);
-      setIsLandscape(landscape);
-    };
+  // Extract keyboard state for cleaner code
+  const { isOpen: isKeyboardOpen, height: keyboardHeight } = keyboardState;
 
-    // Initial check
-    updateLayout();
-
-    // Listen for resize and orientation changes
-    window.addEventListener('resize', updateLayout);
-    window.addEventListener('orientationchange', () => {
-      // Delay to allow orientation change to complete
-      setTimeout(updateLayout, 100);
-    });
-
-    return () => {
-      window.removeEventListener('resize', updateLayout);
-      window.removeEventListener('orientationchange', updateLayout);
-    };
-  }, []);
-
-  useEffect(() => {
-    const handleKeyboardOpen = (event: Event) => {
-      setIsKeyboardOpen(true);
-      const customEvent = event as CustomEvent;
-      if (customEvent.detail?.height) {
-        setKeyboardHeight(customEvent.detail.height);
-      }
-    };
-    
-    const handleKeyboardClose = () => {
-      setIsKeyboardOpen(false);
-      setKeyboardHeight(0);
-    };
-
-    // Listen for enhanced custom events from ChatInput
-    window.addEventListener('keyboard-open', handleKeyboardOpen);
-    window.addEventListener('keyboard-close', handleKeyboardClose);
-
-    return () => {
-      window.removeEventListener('keyboard-open', handleKeyboardOpen);
-      window.removeEventListener('keyboard-close', handleKeyboardClose);
-    };
-  }, []);
+  // Handle keyboard dismissal via touch outside
+  const handleDismissTouch = (e: React.TouchEvent | React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isKeyboardSupported && isKeyboardOpen) {
+      dismissKeyboard();
+    }
+  };
 
   return (
-    <div className="h-screen w-screen overflow-hidden relative p-0 m-0" style={{ height: '100dvh' }}>
-      {/* Mobile Portrait Layout: Stacked with smooth keyboard handling */}
+    <div className="h-screen w-screen overflow-hidden relative p-0 m-0" 
+         style={{ height: 'calc(var(--vh, 1vh) * 100)' }}>
+      {/* Mobile Portrait Layout: Fixed positioning system */}
       {isMobile && !isLandscape && (
-        <div className="flex flex-col h-full w-full">
-          {/* Chess Board Section - Fixed height, positioned at top */}
+        <>
+          {/* Chess Board Section - Fixed top position */}
           <div 
-            className="chess-section shadow-2xl relative orientation-transition"
-            style={{ 
-              height: isKeyboardOpen ? '35vh' : '50vh',
-              minHeight: '280px',
+            className={`fixed top-0 left-0 right-0 z-20 shadow-2xl orientation-transition ${
+              isKeyboardOpen ? 'h-[30vh]' : 'h-[50vh]'
+            }`}
+            style={{
               display: 'flex',
               alignItems: 'flex-start',
               justifyContent: 'center',
-              paddingTop: '1rem'
+              paddingTop: '0.5rem',
+              transition: `height ${keyboardState.transitionDuration}ms ease-out`,
+              backgroundColor: 'transparent'
             }}>
             <div style={{ 
-              transform: isKeyboardOpen ? 'scale(0.85)' : 'scale(1)',
+              transform: isKeyboardOpen ? 'scale(0.75)' : 'scale(1)',
               transformOrigin: 'center top',
-              transition: 'transform 0.3s ease-out'
+              transition: `transform ${keyboardState.transitionDuration}ms ease-out`,
+              willChange: 'transform'
             }}>
               {chessBoard}
             </div>
           </div>
           
-          {/* Chat Section - Takes remaining space, adjusts for keyboard */}
+          {/* Chat Section - Positioned to fill space above keyboard/input */}
           <div 
-            className="chat-section flex-1 shadow-2xl backdrop-blur-sm orientation-transition border-t border-purple-400/30"
+            className={`absolute left-0 right-0 z-10 overflow-hidden ${
+              isKeyboardOpen ? 'top-[30vh]' : 'top-[50vh]'
+            }`}
             style={{
-              minHeight: '200px',
-              maxHeight: isKeyboardOpen ? `calc(100vh - ${keyboardHeight + 200}px)` : 'none',
-              overflow: 'hidden',
-              paddingBottom: isKeyboardOpen ? '1rem' : '0rem',
-              willChange: 'max-height, padding-bottom'
+              transition: `top ${keyboardState.transitionDuration}ms ease-out`,
+              backgroundColor: 'rgb(2, 6, 23)', // Solid dark background to prevent gap
+              bottom: 0,
+              margin: 0,
+              padding: 0
             }}>
             {chat}
           </div>
-        </div>
+        </>
       )}
 
-      {/* Keyboard dismiss overlay */}
-      {isMobile && !isLandscape && isKeyboardOpen && (
+      {/* Enhanced keyboard dismiss overlay */}
+      {isKeyboardSupported && isKeyboardOpen && (
         <div 
-          className="fixed inset-0 z-40"
+          className="fixed inset-0 z-15"
           style={{ 
             background: 'transparent',
-            pointerEvents: keyboardHeight > 0 ? 'auto' : 'none'
+            pointerEvents: 'auto',
+            top: 0,
+            bottom: '5rem', // Don't cover input area - adjusted for no gap
+            transition: `bottom ${keyboardState.transitionDuration}ms ease-out`
           }}
-          onClick={() => {
-            // Blur any focused input to dismiss keyboard
-            if (document.activeElement && document.activeElement instanceof HTMLElement) {
-              document.activeElement.blur();
-            }
-          }}
+          onClick={handleDismissTouch}
+          onTouchStart={handleDismissTouch}
         />
       )}
 

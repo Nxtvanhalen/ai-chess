@@ -97,8 +97,10 @@ export default function ChatInterface({
   };
   
   // Orientation detection
+  // Simplified orientation detection - main logic now in KeyboardManager
   useEffect(() => {
     const updateOrientation = () => {
+      if (typeof window === 'undefined') return;
       const mobile = window.innerWidth < 1024;
       const landscape = window.innerWidth > window.innerHeight;
       setIsLandscape(mobile && landscape);
@@ -106,17 +108,13 @@ export default function ChatInterface({
 
     updateOrientation();
     window.addEventListener('resize', updateOrientation);
-    window.addEventListener('orientationchange', () => {
-      setTimeout(updateOrientation, 100);
-    });
-
+    
     return () => {
       window.removeEventListener('resize', updateOrientation);
-      window.removeEventListener('orientationchange', updateOrientation);
     };
   }, []);
 
-  // Resize observer to track container height
+  // Track container height for scroll calculations
   useEffect(() => {
     const messagesContainer = messagesEndRef.current?.parentElement;
     if (!messagesContainer) return;
@@ -139,13 +137,13 @@ export default function ChatInterface({
   }, [messages]);
 
   return (
-    <div className={`flex flex-col h-full bg-gradient-to-b from-purple-950/80 to-slate-950/90 backdrop-blur-md rounded-t-2xl lg:rounded-2xl overflow-hidden relative ${
+    <div className={`flex flex-col h-full bg-gradient-to-b from-purple-950 to-slate-950 backdrop-blur-md lg:rounded-2xl overflow-hidden relative chat-interface-mobile-fix ${
       isLandscape ? 'chat-interface-landscape' : ''
-    }`}>
+    }`} style={{ margin: 0, padding: 0, minHeight: '100%' }}>
 
       <div 
         ref={scrollContainerRef}
-        className="flex-1 overflow-y-auto chat-messages mobile-chat-container momentum-scroll gpu-accelerated"
+        className="flex-1 min-h-0 overflow-y-auto chat-messages mobile-chat-container momentum-scroll gpu-accelerated"
         onScroll={handleScroll}
         style={{ 
           minHeight: 0,
@@ -225,7 +223,16 @@ export default function ChatInterface({
         </button>
       )}
 
-      <ChatInput onSendMessage={onSendMessage} disabled={isLoading} />
+      {/* Input - Use relative positioning in landscape to prevent hard stops */}
+      <div className={`z-30 bg-gradient-to-r from-purple-900 via-blue-900 to-purple-900 ${
+        isLandscape ? 'relative' : 'absolute bottom-0 left-0 right-0'
+      }`} style={{ 
+        margin: 0,
+        padding: 0,
+        border: 'none'
+      }}>
+        <ChatInput onSendMessage={onSendMessage} disabled={isLoading} />
+      </div>
     </div>
   );
 }
