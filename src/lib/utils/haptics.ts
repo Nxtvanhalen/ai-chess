@@ -28,12 +28,25 @@ class HapticManager {
   }
 
   private detectPlatform(): void {
+    // Check if we're in a browser environment
+    if (typeof window === 'undefined' || typeof navigator === 'undefined') {
+      this.isIOS = false;
+      this.isAndroid = false;
+      return;
+    }
+
     const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
     this.isIOS = /iPad|iPhone|iPod/.test(userAgent) && !(window as any).MSStream;
     this.isAndroid = /android/i.test(userAgent);
   }
 
   private checkSupport(): void {
+    // Check if we're in a browser environment
+    if (typeof window === 'undefined' || typeof navigator === 'undefined') {
+      this.isSupported = false;
+      return;
+    }
+
     // Check for Vibration API support
     if ('vibrate' in navigator) {
       this.isSupported = true;
@@ -47,7 +60,7 @@ class HapticManager {
     }
 
     // Check for Web Vibration API
-    if ('vibrate' in Navigator.prototype) {
+    if (typeof Navigator !== 'undefined' && 'vibrate' in Navigator.prototype) {
       this.isSupported = true;
       return;
     }
@@ -98,7 +111,7 @@ class HapticManager {
       }
 
       // Android/Web Vibration API
-      if ('vibrate' in navigator) {
+      if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
         const result = navigator.vibrate(vibrationPattern);
         return Promise.resolve(result !== false);
       }
@@ -128,7 +141,7 @@ class HapticManager {
     // Try iOS-specific patterns
     try {
       // Check for iOS Haptic Feedback
-      if ('vibrate' in navigator) {
+      if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
         // iOS Safari supports some haptic patterns
         const result = navigator.vibrate(vibrationPattern);
         return result !== false;
@@ -142,7 +155,7 @@ class HapticManager {
   }
 
   private fallbackToVibration(pattern: number | number[]): boolean {
-    if ('vibrate' in navigator) {
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
       try {
         const result = navigator.vibrate(pattern);
         return result !== false;
