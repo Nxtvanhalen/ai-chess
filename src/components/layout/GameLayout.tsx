@@ -9,12 +9,51 @@ interface GameLayoutProps {
 
 export default function GameLayout({ chessBoard, chat }: GameLayoutProps) {
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [isLandscape, setIsLandscape] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Orientation and device detection
+  useEffect(() => {
+    const updateLayout = () => {
+      const mobile = window.innerWidth < 1024;
+      const landscape = window.innerWidth > window.innerHeight;
+      
+      setIsMobile(mobile);
+      setIsLandscape(landscape);
+    };
+
+    // Initial check
+    updateLayout();
+
+    // Listen for resize and orientation changes
+    window.addEventListener('resize', updateLayout);
+    window.addEventListener('orientationchange', () => {
+      // Delay to allow orientation change to complete
+      setTimeout(updateLayout, 100);
+    });
+
+    return () => {
+      window.removeEventListener('resize', updateLayout);
+      window.removeEventListener('orientationchange', updateLayout);
+    };
+  }, []);
 
   useEffect(() => {
-    const handleKeyboardOpen = () => setIsKeyboardOpen(true);
-    const handleKeyboardClose = () => setIsKeyboardOpen(false);
+    const handleKeyboardOpen = (event: Event) => {
+      setIsKeyboardOpen(true);
+      const customEvent = event as CustomEvent;
+      if (customEvent.detail?.height) {
+        setKeyboardHeight(customEvent.detail.height);
+      }
+    };
+    
+    const handleKeyboardClose = () => {
+      setIsKeyboardOpen(false);
+      setKeyboardHeight(0);
+    };
 
-    // Listen for custom events from ChatInput
+    // Listen for enhanced custom events from ChatInput
     window.addEventListener('keyboard-open', handleKeyboardOpen);
     window.addEventListener('keyboard-close', handleKeyboardClose);
 
@@ -26,25 +65,54 @@ export default function GameLayout({ chessBoard, chat }: GameLayoutProps) {
 
   return (
     <div className="h-screen w-screen overflow-auto lg:overflow-hidden relative">
-      {/* Mobile Layout: Stacked with keyboard handling */}
-      <div className={`flex flex-col h-screen lg:hidden ${isKeyboardOpen ? 'mobile-keyboard-active' : ''}`}>
-        <div className={`chess-section flex-shrink-0 shadow-2xl relative transition-all duration-300 ease-in-out`} style={{ height: 'auto', maxHeight: isKeyboardOpen ? '45vh' : '70vh' }}>
-          {chessBoard}
+      {/* Mobile Portrait Layout: Stacked with smooth keyboard handling */}
+      {isMobile && !isLandscape && (
+        <div className={`flex flex-col h-screen layout-container ${isKeyboardOpen ? 'mobile-keyboard-active' : ''}`}>
+          <div 
+            className={`chess-section flex-shrink-0 shadow-2xl relative orientation-transition`} 
+            style={{ 
+              height: 'auto', 
+              maxHeight: isKeyboardOpen ? '45vh' : '70vh',
+              transform: isKeyboardOpen ? 'scale(0.85)' : 'scale(1)',
+              transformOrigin: 'center top',
+              willChange: 'transform, max-height',
+            }}>
+            {chessBoard}
+          </div>
+          <div 
+            className={`chat-section flex-1 shadow-2xl backdrop-blur-sm overflow-visible orientation-transition border-t border-purple-400/30 mt-28`}
+            style={{
+              marginBottom: isKeyboardOpen ? `${Math.max(keyboardHeight - 100, 0)}px` : '0px',
+              willChange: 'margin-bottom',
+            }}>
+            {chat}
+          </div>
         </div>
-        <div className={`chat-section flex-1 shadow-2xl backdrop-blur-sm overflow-visible transition-all duration-300 ease-in-out border-t border-purple-400/30 mt-28 lg:mt-0`}>
-          {chat}
-        </div>
-      </div>
+      )}
 
-      {/* Desktop Layout: Side by side - no changes needed */}
-      <div className="hidden lg:flex h-full">
-        <div className="flex-shrink-0 w-[55%] border-r border-purple-400/30 shadow-2xl">
-          {chessBoard}
+      {/* Mobile Landscape Layout: Side by side like desktop */}
+      {isMobile && isLandscape && (
+        <div className="flex h-full layout-container">
+          <div className="flex-shrink-0 w-[55%] border-r border-purple-400/30 shadow-2xl orientation-transition">
+            {chessBoard}
+          </div>
+          <div className="flex-1 min-w-0 shadow-2xl backdrop-blur-sm orientation-transition">
+            {chat}
+          </div>
         </div>
-        <div className="flex-1 min-w-0 shadow-2xl backdrop-blur-sm">
-          {chat}
+      )}
+
+      {/* Desktop Layout: Side by side */}
+      {!isMobile && (
+        <div className="flex h-full">
+          <div className="flex-shrink-0 w-[55%] border-r border-purple-400/30 shadow-2xl">
+            {chessBoard}
+          </div>
+          <div className="flex-1 min-w-0 shadow-2xl backdrop-blur-sm">
+            {chat}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

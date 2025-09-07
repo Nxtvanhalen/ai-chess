@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
 import LoadingIndicator from './LoadingIndicator';
@@ -18,35 +18,133 @@ export default function ChatInterface({
   isLoading = false 
 }: ChatInterfaceProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isAtBottom, setIsAtBottom] = useState(true);
+  const [showScrollButton, setShowScrollButton] = useState(false);
+  const [scrollTop, setScrollTop] = useState(0);
+  const [containerHeight, setContainerHeight] = useState(0);
+  const intersectionObserverRef = useRef<IntersectionObserver | null>(null);
+  
+  // Virtual scrolling constants
+  const ITEM_HEIGHT = 120; // Approximate height per message
+  const BUFFER_SIZE = 5; // Render extra items for smooth scrolling
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  const scrollToBottom = (force: boolean = false) => {
+    const container = scrollContainerRef.current;
+    const endElement = messagesEndRef.current;
+    
+    if (container && endElement) {
+      // Force immediate scroll for new messages
+      if (force) {
+        container.scrollTop = container.scrollHeight;
+      } else {
+        // Smooth scroll for user-initiated scrolling
+        endElement.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'end',
+          inline: 'nearest'
+        });
+      }
+    }
   };
 
+  // Enhanced auto-scroll with IntersectionObserver
   useEffect(() => {
-    if (isAtBottom) {
-      // Small delay to ensure DOM has updated before scrolling
-      setTimeout(() => {
-        scrollToBottom();
-      }, 10);
-    }
-  }, [messages, isAtBottom]);
+    // Always force scroll to bottom when new messages arrive
+    // Increased delay for virtual scrolling DOM updates
+    const scrollTimeout = setTimeout(() => {
+      scrollToBottom(true); // Force scroll
+    }, 50);
+    
+    return () => clearTimeout(scrollTimeout);
+  }, [messages]);
+  
+  // Setup IntersectionObserver for scroll button visibility
+  useEffect(() => {
+    const endElement = messagesEndRef.current;
+    const container = scrollContainerRef.current;
+    
+    if (!endElement || !container) return;
+    
+    intersectionObserverRef.current = new IntersectionObserver(
+      ([entry]) => {
+        const isVisible = entry.isIntersecting;
+        setIsAtBottom(isVisible);
+        setShowScrollButton(!isVisible && messages.length > 3);
+      },
+      {
+        root: container,
+        rootMargin: '0px 0px -20px 0px', // Trigger slightly before fully visible
+        threshold: 0.1
+      }
+    );
+    
+    intersectionObserverRef.current.observe(endElement);
+    
+    return () => {
+      intersectionObserverRef.current?.disconnect();
+    };
+  }, [messages.length]);
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
-    // Increased threshold for more reliable detection
-    const isScrolledToBottom = scrollHeight - scrollTop - clientHeight < 20;
-    setIsAtBottom(isScrolledToBottom);
+    setScrollTop(scrollTop);
+    
+    // Update scroll button visibility based on scroll position
+    const isScrolledToBottom = scrollHeight - scrollTop - clientHeight < 50;
+    setShowScrollButton(!isScrolledToBottom && messages.length > 3);
   };
+  
+  const handleScrollToBottomClick = () => {
+    scrollToBottom(false); // Smooth scroll on manual click
+  };
+  
+  // Resize observer to track container height
+  useEffect(() => {
+    const messagesContainer = messagesEndRef.current?.parentElement;
+    if (!messagesContainer) return;
+    
+    const resizeObserver = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        setContainerHeight(entry.contentRect.height);
+      }
+    });
+    
+    resizeObserver.observe(messagesContainer);
+    return () => resizeObserver.disconnect();
+  }, []);
+  
+  // Virtual scrolling calculation - only render visible messages
+  const visibleMessages = useMemo(() => {
+    if (messages.length <= 20) {
+      // For short lists, render everything
+      return messages;
+    }
+    
+    const startIndex = Math.max(0, Math.floor(scrollTop / ITEM_HEIGHT) - BUFFER_SIZE);
+    const endIndex = Math.min(
+      messages.length, 
+      Math.ceil((scrollTop + containerHeight) / ITEM_HEIGHT) + BUFFER_SIZE
+    );
+    
+    return messages.slice(startIndex, endIndex).map((message, index) => ({
+      ...message,
+      virtualIndex: startIndex + index
+    }));
+  }, [messages, scrollTop, containerHeight]);
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-b from-purple-950/80 to-slate-950/90 backdrop-blur-md rounded-t-2xl lg:rounded-2xl overflow-hidden">
+    <div className="flex flex-col h-full bg-gradient-to-b from-purple-950/80 to-slate-950/90 backdrop-blur-md rounded-t-2xl lg:rounded-2xl overflow-hidden relative">
 
       <div 
-        className="flex-1 overflow-y-auto chat-messages mobile-chat-container"
+        ref={scrollContainerRef}
+        className="flex-1 overflow-y-auto chat-messages mobile-chat-container momentum-scroll gpu-accelerated"
         onScroll={handleScroll}
-        style={{ minHeight: 0 }}
+        style={{ 
+          minHeight: 0,
+          overscrollBehavior: 'contain',
+          scrollBehavior: 'smooth',
+        }}
       >
         {messages.length === 0 && (
           <div className="flex items-center justify-center h-full p-8 text-center">
@@ -76,12 +174,66 @@ export default function ChatInterface({
           </div>
         )}
 
-        {messages.map((message) => (
-          <ChatMessage key={message.id} message={message} />
-        ))}
+        {/* Virtual scrolling container */}
+        <div 
+          style={{
+            height: messages.length > 20 ? `${messages.length * ITEM_HEIGHT}px` : 'auto',
+            position: 'relative'
+          }}
+        >
+          {visibleMessages.map((message) => (
+            <div
+              key={message.id}
+              style={{
+                position: messages.length > 20 ? 'absolute' : 'relative',
+                top: messages.length > 20 && 'virtualIndex' in message 
+                  ? `${(message as any).virtualIndex * ITEM_HEIGHT}px` 
+                  : 'auto',
+                width: '100%',
+                minHeight: messages.length > 20 ? `${ITEM_HEIGHT}px` : 'auto'
+              }}
+            >
+              <ChatMessage message={message} />
+            </div>
+          ))}
+        </div>
         
-        <div ref={messagesEndRef} />
+        <div 
+          ref={messagesEndRef} 
+          style={{ 
+            height: '1px',
+            position: messages.length > 20 ? 'absolute' : 'relative',
+            bottom: 0,
+            width: '100%'
+          }} 
+        />
       </div>
+      
+      {/* Scroll to bottom button */}
+      {showScrollButton && (
+        <button
+          onClick={handleScrollToBottomClick}
+          className="absolute bottom-20 right-4 z-10 p-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 smooth-transitions gpu-accelerated touch-optimized"
+          style={{ minWidth: '48px', minHeight: '48px' }}
+          aria-label="Scroll to bottom"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            className="text-current"
+          >
+            <path
+              d="M7 13L12 18L17 13M12 6V17"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+      )}
 
       <ChatInput onSendMessage={onSendMessage} disabled={isLoading} />
     </div>

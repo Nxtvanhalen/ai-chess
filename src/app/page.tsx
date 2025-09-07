@@ -7,6 +7,8 @@ import ChessBoard from '@/components/chess/ChessBoard';
 import ChatInterface from '@/components/chat/ChatInterface';
 import GameLayout from '@/components/layout/GameLayout';
 import { ChatMessage, MoveSuggestion } from '@/types';
+import { PerformanceMonitor, debounce } from '@/lib/utils/performance';
+import { haptics } from '@/lib/utils/haptics';
 import { 
   createGame, 
   updateGamePosition, 
@@ -28,11 +30,30 @@ export default function Home() {
   const [gameOver, setGameOver] = useState<{checkmate: boolean, winner?: 'white' | 'black'}>({checkmate: false});
   const timeoutRefs = useRef<Set<NodeJS.Timeout>>(new Set());
   const messagesRef = useRef<ChatMessage[]>([]);
+  const performanceMonitor = useRef<PerformanceMonitor>();
   
   // Keep messagesRef in sync
   useEffect(() => {
     messagesRef.current = messages;
   }, [messages]);
+
+  // Initialize performance monitoring
+  useEffect(() => {
+    performanceMonitor.current = PerformanceMonitor.getInstance();
+    performanceMonitor.current.startFPSMonitoring();
+    
+    // Log performance report every 30 seconds in development
+    const reportInterval = setInterval(() => {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Performance Report:', performanceMonitor.current?.getReport());
+      }
+    }, 30000);
+
+    return () => {
+      performanceMonitor.current?.cleanup();
+      clearInterval(reportInterval);
+    };
+  }, []);
 
   // Cleanup timeouts on unmount
   useEffect(() => {
@@ -130,6 +151,9 @@ export default function Home() {
   
   const handleMove = useCallback(async (move: Move) => {
     if (!currentGameId || !conversationId) return;
+    
+    // Haptic feedback for user move
+    await haptics.moveMade();
     
     // Update position after move
     setCurrentPosition(move.after);
