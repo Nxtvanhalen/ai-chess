@@ -770,18 +770,18 @@ select {
 /* Mobile Portrait Layout - ChatGPT Style Fixed Viewport */
 @media screen and (max-width: 1023px) and (orientation: portrait) {
   
-  /* Chess Board Section - Fixed at top */
+  /* Chess Board Section - Fixed at top with proper safe area handling */
   .chess-board-section {
     position: fixed;
-    top: 0;
+    top: env(safe-area-inset-top);
     left: 0;
     right: 0;
-    height: 50vh; /* Always 50% of viewport */
+    height: 45vh; /* Reduced from 50vh to prevent overlap */
     z-index: 20;
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    padding-top: 0.5rem;
+    padding: 1rem 0.5rem;
     background: transparent;
     
     /* Smooth transitions when keyboard appears */
@@ -789,15 +789,11 @@ select {
                 transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
-  /* When keyboard is active, shrink board */
-  .mobile.portrait input:focus ~ .chess-board-section,
-  .mobile.portrait textarea:focus ~ .chess-board-section,
-  .chess-board-section:has(~ .chat-section .chat-interface input:focus) {
-    height: 30vh; /* Shrink to 30% when keyboard is open */
-  }
-  
-  /* Board container scaling */
+  /* Board container - responsive sizing */
   .chess-board-container {
+    width: 100%;
+    max-width: min(90vw, 45vh); /* Square aspect ratio within available space */
+    aspect-ratio: 1;
     transform: scale(1);
     transform-origin: center top;
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -809,17 +805,11 @@ select {
     user-select: none;
   }
   
-  /* Scale down board when keyboard is active */
-  .mobile.portrait input:focus ~ .chess-board-section .chess-board-container,
-  .chess-board-section:has(~ .chat-section .chat-interface input:focus) .chess-board-container {
-    transform: scale(0.75);
-  }
-  
-  /* Chat Section - Fixed positioning above keyboard/input */
+  /* Chat Section - Fixed positioning below chess board */
   .chat-section {
     position: fixed;
-    top: 50vh; /* Start below chess board */
-    bottom: 0;
+    top: calc(45vh + env(safe-area-inset-top)); /* Start after chess board */
+    bottom: env(safe-area-inset-bottom);
     left: 0;
     right: 0;
     z-index: 10;
@@ -829,15 +819,25 @@ select {
     transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     margin: 0;
     padding: 0;
+    
+    /* Ensure no overlap */
+    border-top: 1px solid rgba(147, 51, 234, 0.3);
   }
   
-  /* When keyboard is active, move chat up */
-  .mobile.portrait input:focus ~ .chat-section,
-  .chat-section:has(.chat-interface input:focus) {
-    top: 30vh; /* Move up when keyboard appears */
+  /* Simplified keyboard handling - when any input is focused */
+  .game-layout:focus-within .chess-board-section {
+    height: 30vh; /* Shrink chess board */
   }
   
-  /* Keyboard Dismiss Overlay */
+  .game-layout:focus-within .chess-board-container {
+    transform: scale(0.8); /* Scale down board slightly */
+  }
+  
+  .game-layout:focus-within .chat-section {
+    top: calc(30vh + env(safe-area-inset-top)); /* Move chat up accordingly */
+  }
+  
+  /* Keyboard Dismiss Overlay - Simplified */
   .keyboard-dismiss-overlay {
     position: fixed;
     top: 0;
@@ -851,9 +851,8 @@ select {
     transition: pointer-events 0.1s ease;
   }
   
-  /* Make overlay active when input is focused */
-  .mobile.portrait input:focus ~ .keyboard-dismiss-overlay,
-  .keyboard-dismiss-overlay:has(~ .chat-section .chat-interface input:focus) {
+  /* Make overlay active when any input in game layout is focused */
+  .game-layout:focus-within .keyboard-dismiss-overlay {
     pointer-events: auto;
   }
 }
