@@ -721,7 +721,12 @@ select {
   position: relative;
   margin: 0;
   padding: 0;
+  
+  /* Default to flex for desktop/landscape */
+  display: flex;
 }
+
+/* Mobile portrait will override with grid */
 
 /* Desktop Layout */
 .layout-desktop {
@@ -767,32 +772,40 @@ select {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Mobile Portrait Layout - ChatGPT Style Fixed Viewport */
+/* Mobile Portrait Layout - Modern CSS Grid with Dynamic Viewport */
 @media screen and (max-width: 1023px) and (orientation: portrait) {
   
-  /* Chess Board Section - Fixed at top with proper safe area handling */
+  /* Use CSS Grid for reliable, overlap-free layout */
+  .game-layout {
+    display: grid;
+    grid-template-rows: 45svh 1fr; /* Chess board: 45% small viewport, Chat: remaining space */
+    gap: 0;
+    width: 100vw;
+    height: 100svh; /* Small viewport height - accounts for mobile UI */
+    overflow: hidden;
+  }
+  
+  /* Chess Board Section - Grid item 1 */
   .chess-board-section {
-    position: fixed;
-    top: env(safe-area-inset-top);
-    left: 0;
-    right: 0;
-    height: 45vh; /* Reduced from 50vh to prevent overlap */
+    /* Remove fixed positioning - use grid instead */
+    position: relative;
+    width: 100%;
+    height: 100%;
     z-index: 20;
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    padding: 1rem 0.5rem;
+    padding: max(1rem, env(safe-area-inset-top)) 0.5rem 0.5rem;
     background: transparent;
     
     /* Smooth transitions when keyboard appears */
-    transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-                transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
-  /* Board container - responsive sizing */
+  /* Board container - responsive sizing with dynamic viewport units */
   .chess-board-container {
     width: 100%;
-    max-width: min(90vw, 45vh); /* Square aspect ratio within available space */
+    max-width: min(90vw, 40svh); /* Use small viewport height for consistent sizing */
     aspect-ratio: 1;
     transform: scale(1);
     transform-origin: center top;
@@ -805,36 +818,34 @@ select {
     user-select: none;
   }
   
-  /* Chat Section - Fixed positioning below chess board */
+  /* Chat Section - Grid item 2 */
   .chat-section {
-    position: fixed;
-    top: calc(45vh + env(safe-area-inset-top)); /* Start after chess board */
-    bottom: env(safe-area-inset-bottom);
-    left: 0;
-    right: 0;
+    /* Remove fixed positioning - use grid instead */
+    position: relative;
+    width: 100%;
+    height: 100%;
     z-index: 10;
     background: linear-gradient(135deg, #1a0d2e, #2d1b4e, #4c2a7e);
     
     /* Smooth transitions */
-    transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     margin: 0;
     padding: 0;
     
-    /* Ensure no overlap */
+    /* Ensure no overlap with visual separator */
     border-top: 1px solid rgba(147, 51, 234, 0.3);
+    
+    /* Proper safe area handling at bottom */
+    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
   }
   
-  /* Simplified keyboard handling - when any input is focused */
-  .game-layout:focus-within .chess-board-section {
-    height: 30vh; /* Shrink chess board */
+  /* Keyboard handling - adjust grid rows dynamically */
+  .game-layout:focus-within {
+    grid-template-rows: 30svh 1fr; /* Shrink chess board, expand chat */
   }
   
   .game-layout:focus-within .chess-board-container {
     transform: scale(0.8); /* Scale down board slightly */
-  }
-  
-  .game-layout:focus-within .chat-section {
-    top: calc(30vh + env(safe-area-inset-top)); /* Move chat up accordingly */
   }
   
   /* Keyboard Dismiss Overlay - Simplified */
