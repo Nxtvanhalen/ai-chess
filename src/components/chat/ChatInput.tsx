@@ -146,7 +146,7 @@ export default function ChatInput({
       } ${isKeyboardOpen ? 'mobile-keyboard-active' : ''}`}
       style={{
         transform: isKeyboardOpen && keyboardHeight > 0 
-          ? `translateY(${Math.min(-keyboardHeight + 20, -100)}px)` 
+          ? `translateY(${Math.max(-50, -keyboardHeight * 0.1)}px)` // Minimal adjustment, just above keyboard
           : 'translateY(0)',
         willChange: 'transform',
       }}>
