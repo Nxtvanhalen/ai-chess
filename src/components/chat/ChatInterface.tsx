@@ -24,6 +24,7 @@ export default function ChatInterface({
   const [scrollTop, setScrollTop] = useState(0);
   const [containerHeight, setContainerHeight] = useState(0);
   const intersectionObserverRef = useRef<IntersectionObserver | null>(null);
+  const [isLandscape, setIsLandscape] = useState(false);
   
   // Virtual scrolling constants
   const ITEM_HEIGHT = 120; // Approximate height per message
@@ -99,6 +100,26 @@ export default function ChatInterface({
     scrollToBottom(false); // Smooth scroll on manual click
   };
   
+  // Orientation detection
+  useEffect(() => {
+    const updateOrientation = () => {
+      const mobile = window.innerWidth < 1024;
+      const landscape = window.innerWidth > window.innerHeight;
+      setIsLandscape(mobile && landscape);
+    };
+
+    updateOrientation();
+    window.addEventListener('resize', updateOrientation);
+    window.addEventListener('orientationchange', () => {
+      setTimeout(updateOrientation, 100);
+    });
+
+    return () => {
+      window.removeEventListener('resize', updateOrientation);
+      window.removeEventListener('orientationchange', updateOrientation);
+    };
+  }, []);
+
   // Resize observer to track container height
   useEffect(() => {
     const messagesContainer = messagesEndRef.current?.parentElement;
@@ -134,7 +155,9 @@ export default function ChatInterface({
   }, [messages, scrollTop, containerHeight]);
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-b from-purple-950/80 to-slate-950/90 backdrop-blur-md rounded-t-2xl lg:rounded-2xl overflow-hidden relative">
+    <div className={`flex flex-col h-full bg-gradient-to-b from-purple-950/80 to-slate-950/90 backdrop-blur-md rounded-t-2xl lg:rounded-2xl overflow-hidden relative ${
+      isLandscape ? 'chat-interface-landscape' : ''
+    }`}>
 
       <div 
         ref={scrollContainerRef}

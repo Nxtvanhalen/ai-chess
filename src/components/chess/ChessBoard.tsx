@@ -25,20 +25,34 @@ export default function ChessBoard({
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
   const [possibleMoves, setPossibleMoves] = useState<Square[]>([]);
   const [checkInfo, setCheckInfo] = useState<{king: Square, attacker: Square, path: Square[]} | null>(null);
+  const [isLandscape, setIsLandscape] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const updateBoardSize = () => {
       const viewportHeight = window.innerHeight;
       const viewportWidth = window.innerWidth;
       
-      // Mobile: optimize for available space in 70vh container
-      // Desktop: responsive to container width
-      const isMobile = viewportWidth < 1024; // lg breakpoint
-      const maxSize = isMobile 
-        ? Math.min(viewportWidth - 20, (viewportHeight * 0.55) - 36) // Slightly bigger board
-        : Math.min(viewportWidth * 0.55 - 48, viewportHeight - 120);
+      const mobile = viewportWidth < 1024; // lg breakpoint
+      const landscape = viewportWidth > viewportHeight;
       
-      setBoardWidth(Math.floor(maxSize));
+      setIsMobile(mobile);
+      setIsLandscape(landscape);
+      
+      let maxSize;
+      
+      if (mobile && landscape) {
+        // Mobile landscape: use available height minus some padding
+        maxSize = Math.min(viewportHeight - 40, viewportWidth * 0.55 - 40);
+      } else if (mobile && !landscape) {
+        // Mobile portrait: optimize for available space in container
+        maxSize = Math.min(viewportWidth - 20, (viewportHeight * 0.55) - 36);
+      } else {
+        // Desktop: responsive to container width
+        maxSize = Math.min(viewportWidth * 0.55 - 48, viewportHeight - 120);
+      }
+      
+      setBoardWidth(Math.floor(Math.max(maxSize, 300))); // Minimum size of 300px
     };
 
     updateBoardSize();
@@ -363,7 +377,16 @@ export default function ChessBoard({
   };
 
   return (
-    <div className="chess-board-container flex items-center justify-center p-1 lg:p-6 pt-56 lg:pt-6 bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-indigo-900/20" style={{ height: `${boardWidth + 8}px` }}>
+    <div 
+      className={`chess-board-container flex items-center justify-center bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-indigo-900/20 ${
+        isMobile && isLandscape 
+          ? 'p-2 h-full' 
+          : 'p-1 lg:p-6 pt-56 lg:pt-6'
+      }`} 
+      style={{ 
+        height: isMobile && isLandscape ? '100vh' : `${boardWidth + 8}px`,
+        minHeight: isMobile && isLandscape ? '100vh' : 'auto'
+      }}>
       <div style={{ width: boardWidth, height: boardWidth }} className="relative">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-2xl pointer-events-none" />
         <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl opacity-10 blur-sm pointer-events-none" />
