@@ -221,12 +221,12 @@ export class PositionAnalyzer {
     return 'opening';
   }
 
-  private determineUrgency(threats: ThreatInfo[], kingSafety: PositionAnalysis['kingSafety'], materialCount: MaterialCount): 'emergency' | 'tactical' | 'strategic' {
+  private determineUrgency(threats: ThreatInfo[], kingSafetyParam: PositionAnalysis['kingSafety'], materialCount: MaterialCount): 'emergency' | 'tactical' | 'strategic' {
     // Emergency: King in danger or major material loss imminent
     const currentColor = this.chess.turn();
-    const kingSafety = currentColor === 'w' ? kingSafety.white : kingSafety.black;
+    const kingSafetyStatus = currentColor === 'w' ? kingSafetyParam.white : kingSafetyParam.black;
     
-    if (!kingSafety.safe || this.chess.inCheck()) {
+    if (!kingSafetyStatus.safe || this.chess.inCheck()) {
       return 'emergency';
     }
 
@@ -246,7 +246,7 @@ export class PositionAnalyzer {
   private generateRecommendations(
     materialCount: MaterialCount, 
     threats: ThreatInfo[], 
-    kingSafety: PositionAnalysis['kingSafety'],
+    kingSafetyParam: PositionAnalysis['kingSafety'],
     urgencyLevel: 'emergency' | 'tactical' | 'strategic'
   ): string[] {
     const recommendations: string[] = [];
@@ -260,10 +260,10 @@ export class PositionAnalyzer {
     }
 
     // King safety recommendations  
-    const kingSafety = currentColor === 'w' ? kingSafety.white : kingSafety.black;
-    if (!kingSafety.safe) {
+    const kingStatus = currentColor === 'w' ? kingSafetyParam.white : kingSafetyParam.black;
+    if (!kingStatus.safe) {
       recommendations.push('Your king is under attack - prioritize king safety');
-    } else if (kingSafety.castlingAvailable) {
+    } else if (kingStatus.castlingAvailable) {
       recommendations.push('Consider castling for king safety');
     }
 
