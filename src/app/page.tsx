@@ -30,7 +30,7 @@ export default function Home() {
   const [gameOver, setGameOver] = useState<{checkmate: boolean, winner?: 'white' | 'black'}>({checkmate: false});
   const timeoutRefs = useRef<Set<NodeJS.Timeout>>(new Set());
   const messagesRef = useRef<ChatMessage[]>([]);
-  const performanceMonitor = useRef<PerformanceMonitor>();
+  const performanceMonitor = useRef<PerformanceMonitor>(PerformanceMonitor.getInstance());
   
   // Keep messagesRef in sync
   useEffect(() => {
