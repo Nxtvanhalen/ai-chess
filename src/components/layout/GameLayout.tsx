@@ -2,6 +2,7 @@
 
 import { ReactNode } from 'react';
 import { useDeviceDetection } from '@/hooks/useKeyboardManager';
+import { PWAManager } from '@/components/pwa';
 
 interface GameLayoutProps {
   chessBoard: ReactNode;
@@ -22,6 +23,15 @@ export default function GameLayout({ chessBoard, chat }: GameLayoutProps) {
 
   return (
     <div className="game-layout">
+      {/* PWA Installation Management */}
+      <PWAManager
+        showFloatingButton={true}
+        showInstallBanner={true}
+        showWelcomeMessage={true}
+        floatingButtonPosition={isMobile ? 'bottom-left' : 'bottom-right'}
+        bannerPosition={isMobile ? 'bottom' : 'top-right'}
+      />
+
       {/* Mobile Portrait Layout: CSS-controlled fixed positioning */}
       {isMobile && !isLandscape && (
         <>
