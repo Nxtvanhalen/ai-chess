@@ -59,9 +59,9 @@ export const viewport: Viewport = {
   userScalable: false,
   viewportFit: "cover",
   themeColor: "#1a0d2e",
-  // Critical iOS Safari optimizations
+  // Critical iOS Safari optimizations for fixed viewport approach
   minimumScale: 1,
-  interactiveWidget: "resizes-content"
+  interactiveWidget: "resizes-visual", // Use visual viewport instead of content
 };
 
 export default function RootLayout({

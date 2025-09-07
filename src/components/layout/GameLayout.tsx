@@ -1,7 +1,7 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { useKeyboardManager } from '@/hooks/useKeyboardManager';
+import { useDeviceDetection } from '@/hooks/useKeyboardManager';
 
 interface GameLayoutProps {
   chessBoard: ReactNode;
@@ -9,96 +9,50 @@ interface GameLayoutProps {
 }
 
 export default function GameLayout({ chessBoard, chat }: GameLayoutProps) {
-  const {
-    keyboardState,
-    isMobile,
-    isLandscape,
-    layoutDimensions,
-    dismissKeyboard,
-    isKeyboardSupported
-  } = useKeyboardManager({ verbose: true });
+  const { isMobile, isLandscape, dismissKeyboard } = useDeviceDetection();
 
-  // Extract keyboard state for cleaner code
-  const { isOpen: isKeyboardOpen, height: keyboardHeight } = keyboardState;
-
-  // Handle keyboard dismissal via touch outside
+  // Handle keyboard dismissal via touch outside (mobile portrait only)
   const handleDismissTouch = (e: React.TouchEvent | React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (isKeyboardSupported && isKeyboardOpen) {
+    if (isMobile && !isLandscape) {
+      e.preventDefault();
+      e.stopPropagation();
       dismissKeyboard();
     }
   };
 
   return (
-    <div className="h-screen w-screen overflow-hidden relative p-0 m-0" 
-         style={{ height: 'calc(var(--vh, 1vh) * 100)' }}>
-      {/* Mobile Portrait Layout: Fixed positioning system */}
+    <div className="game-layout">
+      {/* Mobile Portrait Layout: CSS-controlled fixed positioning */}
       {isMobile && !isLandscape && (
         <>
-          {/* Chess Board Section - Fixed top position */}
-          <div 
-            className={`fixed top-0 left-0 right-0 z-20 shadow-2xl orientation-transition ${
-              isKeyboardOpen ? 'h-[30vh]' : 'h-[50vh]'
-            }`}
-            style={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              justifyContent: 'center',
-              paddingTop: '0.5rem',
-              transition: `height ${keyboardState.transitionDuration}ms ease-out`,
-              backgroundColor: 'transparent'
-            }}>
-            <div style={{ 
-              transform: isKeyboardOpen ? 'scale(0.75)' : 'scale(1)',
-              transformOrigin: 'center top',
-              transition: `transform ${keyboardState.transitionDuration}ms ease-out`,
-              willChange: 'transform'
-            }}>
+          {/* Chess Board Section - Pure CSS positioning */}
+          <div className="chess-board-section">
+            <div className="chess-board-container">
               {chessBoard}
             </div>
           </div>
           
-          {/* Chat Section - Positioned to fill space above keyboard/input */}
-          <div 
-            className={`absolute left-0 right-0 z-10 overflow-hidden ${
-              isKeyboardOpen ? 'top-[30vh]' : 'top-[50vh]'
-            }`}
-            style={{
-              transition: `top ${keyboardState.transitionDuration}ms ease-out`,
-              backgroundColor: 'rgb(2, 6, 23)', // Solid dark background to prevent gap
-              bottom: 0,
-              margin: 0,
-              padding: 0
-            }}>
+          {/* Chat Section - CSS controlled positioning above input */}
+          <div className="chat-section">
             {chat}
           </div>
+
+          {/* Keyboard dismiss overlay - only visible when input is focused */}
+          <div 
+            className="keyboard-dismiss-overlay"
+            onClick={handleDismissTouch}
+            onTouchStart={handleDismissTouch}
+          />
         </>
       )}
 
-      {/* Enhanced keyboard dismiss overlay */}
-      {isKeyboardSupported && isKeyboardOpen && (
-        <div 
-          className="fixed inset-0 z-15"
-          style={{ 
-            background: 'transparent',
-            pointerEvents: 'auto',
-            top: 0,
-            bottom: '5rem', // Don't cover input area - adjusted for no gap
-            transition: `bottom ${keyboardState.transitionDuration}ms ease-out`
-          }}
-          onClick={handleDismissTouch}
-          onTouchStart={handleDismissTouch}
-        />
-      )}
-
-      {/* Mobile Landscape Layout: Side by side like desktop */}
+      {/* Mobile Landscape Layout: Side by side */}
       {isMobile && isLandscape && (
-        <div className="flex h-full layout-container">
-          <div className="flex-shrink-0 w-[55%] border-r border-purple-400/30 shadow-2xl orientation-transition">
+        <div className="layout-landscape">
+          <div className="board-landscape">
             {chessBoard}
           </div>
-          <div className="flex-1 min-w-0 shadow-2xl backdrop-blur-sm orientation-transition">
+          <div className="chat-landscape">
             {chat}
           </div>
         </div>
@@ -106,11 +60,11 @@ export default function GameLayout({ chessBoard, chat }: GameLayoutProps) {
 
       {/* Desktop Layout: Side by side */}
       {!isMobile && (
-        <div className="flex h-full">
-          <div className="flex-shrink-0 w-[55%] border-r border-purple-400/30 shadow-2xl">
+        <div className="layout-desktop">
+          <div className="board-desktop">
             {chessBoard}
           </div>
-          <div className="flex-1 min-w-0 shadow-2xl backdrop-blur-sm">
+          <div className="chat-desktop">
             {chat}
           </div>
         </div>

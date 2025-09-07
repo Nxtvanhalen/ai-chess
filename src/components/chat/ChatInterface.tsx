@@ -96,8 +96,7 @@ export default function ChatInterface({
     scrollToBottom(false); // Smooth scroll on manual click
   };
   
-  // Orientation detection
-  // Simplified orientation detection - main logic now in KeyboardManager
+  // Simplified orientation detection for CSS classes only
   useEffect(() => {
     const updateOrientation = () => {
       if (typeof window === 'undefined') return;
@@ -137,19 +136,11 @@ export default function ChatInterface({
   }, [messages]);
 
   return (
-    <div className={`flex flex-col h-full bg-gradient-to-b from-purple-950 to-slate-950 backdrop-blur-md lg:rounded-2xl overflow-hidden relative chat-interface-mobile-fix ${
-      isLandscape ? 'chat-interface-landscape' : ''
-    }`} style={{ margin: 0, padding: 0, minHeight: '100%' }}>
-
+    <div className={`chat-interface ${isLandscape ? 'landscape' : 'portrait'}`}>
       <div 
         ref={scrollContainerRef}
-        className="flex-1 min-h-0 overflow-y-auto chat-messages mobile-chat-container momentum-scroll gpu-accelerated"
+        className="chat-messages-container"
         onScroll={handleScroll}
-        style={{ 
-          minHeight: 0,
-          overscrollBehavior: 'contain',
-          scrollBehavior: 'smooth',
-        }}
       >
         {messages.length === 0 && (
           <div className="flex items-center justify-center h-full p-8 text-center">
@@ -223,14 +214,8 @@ export default function ChatInterface({
         </button>
       )}
 
-      {/* Input - Use relative positioning in landscape to prevent hard stops */}
-      <div className={`z-30 bg-gradient-to-r from-purple-900 via-blue-900 to-purple-900 ${
-        isLandscape ? 'relative' : 'absolute bottom-0 left-0 right-0'
-      }`} style={{ 
-        margin: 0,
-        padding: 0,
-        border: 'none'
-      }}>
+      {/* Input - CSS-only positioning */}
+      <div className="chat-input-container">
         <ChatInput onSendMessage={onSendMessage} disabled={isLoading} />
       </div>
     </div>
