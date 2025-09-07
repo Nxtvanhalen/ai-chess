@@ -25,10 +25,6 @@ export default function ChatInterface({
   const [containerHeight, setContainerHeight] = useState(0);
   const intersectionObserverRef = useRef<IntersectionObserver | null>(null);
   const [isLandscape, setIsLandscape] = useState(false);
-  
-  // Virtual scrolling constants
-  const ITEM_HEIGHT = 120; // Approximate height per message
-  const BUFFER_SIZE = 5; // Render extra items for smooth scrolling
 
   const scrollToBottom = (force: boolean = false) => {
     const container = scrollContainerRef.current;
@@ -135,24 +131,12 @@ export default function ChatInterface({
     return () => resizeObserver.disconnect();
   }, []);
   
-  // Virtual scrolling calculation - only render visible messages
+  // Simple message rendering - disabled virtual scrolling to prevent overlaps
   const visibleMessages = useMemo(() => {
-    if (messages.length <= 20) {
-      // For short lists, render everything
-      return messages;
-    }
-    
-    const startIndex = Math.max(0, Math.floor(scrollTop / ITEM_HEIGHT) - BUFFER_SIZE);
-    const endIndex = Math.min(
-      messages.length, 
-      Math.ceil((scrollTop + containerHeight) / ITEM_HEIGHT) + BUFFER_SIZE
-    );
-    
-    return messages.slice(startIndex, endIndex).map((message, index) => ({
-      ...message,
-      virtualIndex: startIndex + index
-    }));
-  }, [messages, scrollTop, containerHeight]);
+    // Always render all messages to prevent height calculation issues
+    // Chess chat typically has manageable message counts
+    return messages;
+  }, [messages]);
 
   return (
     <div className={`flex flex-col h-full bg-gradient-to-b from-purple-950/80 to-slate-950/90 backdrop-blur-md rounded-t-2xl lg:rounded-2xl overflow-hidden relative ${
@@ -197,25 +181,10 @@ export default function ChatInterface({
           </div>
         )}
 
-        {/* Virtual scrolling container */}
-        <div 
-          style={{
-            height: messages.length > 20 ? `${messages.length * ITEM_HEIGHT}px` : 'auto',
-            position: 'relative'
-          }}
-        >
+        {/* Simple message container - no virtual scrolling */}
+        <div className="space-y-1">
           {visibleMessages.map((message) => (
-            <div
-              key={message.id}
-              style={{
-                position: messages.length > 20 ? 'absolute' : 'relative',
-                top: messages.length > 20 && 'virtualIndex' in message 
-                  ? `${(message as any).virtualIndex * ITEM_HEIGHT}px` 
-                  : 'auto',
-                width: '100%',
-                minHeight: messages.length > 20 ? `${ITEM_HEIGHT}px` : 'auto'
-              }}
-            >
+            <div key={message.id} className="w-full">
               <ChatMessage message={message} />
             </div>
           ))}
@@ -225,8 +194,6 @@ export default function ChatInterface({
           ref={messagesEndRef} 
           style={{ 
             height: '1px',
-            position: messages.length > 20 ? 'absolute' : 'relative',
-            bottom: 0,
             width: '100%'
           }} 
         />
