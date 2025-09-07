@@ -88,16 +88,36 @@ export default function GameLayout({ chessBoard, chat }: GameLayoutProps) {
             </div>
           </div>
           
-          {/* Chat Section - Takes remaining space */}
+          {/* Chat Section - Takes remaining space, adjusts for keyboard */}
           <div 
             className="chat-section flex-1 shadow-2xl backdrop-blur-sm orientation-transition border-t border-purple-400/30"
             style={{
-              minHeight: '250px',
-              overflow: 'hidden'
+              minHeight: '200px',
+              maxHeight: isKeyboardOpen ? `calc(100vh - ${keyboardHeight + 200}px)` : 'none',
+              overflow: 'hidden',
+              paddingBottom: isKeyboardOpen ? '1rem' : '0rem',
+              willChange: 'max-height, padding-bottom'
             }}>
             {chat}
           </div>
         </div>
+      )}
+
+      {/* Keyboard dismiss overlay */}
+      {isMobile && !isLandscape && isKeyboardOpen && (
+        <div 
+          className="fixed inset-0 z-40"
+          style={{ 
+            background: 'transparent',
+            pointerEvents: keyboardHeight > 0 ? 'auto' : 'none'
+          }}
+          onClick={() => {
+            // Blur any focused input to dismiss keyboard
+            if (document.activeElement && document.activeElement instanceof HTMLElement) {
+              document.activeElement.blur();
+            }
+          }}
+        />
       )}
 
       {/* Mobile Landscape Layout: Side by side like desktop */}
