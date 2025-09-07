@@ -118,15 +118,23 @@ export async function saveMessage(
     });
   } catch (rpcError) {
     console.warn('Failed to increment message count via RPC, using direct update:', rpcError);
-    // Fallback to direct update if RPC function isn't available
+    // Fallback: get current count and increment it
     try {
-      await supabase
+      const { data: currentConv } = await supabase
         .from('conversations')
-        .update({ 
-          message_count: supabase.sql`message_count + 1`,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', conversationId);
+        .select('message_count')
+        .eq('id', conversationId)
+        .single();
+      
+      if (currentConv) {
+        await supabase
+          .from('conversations')
+          .update({ 
+            message_count: (currentConv.message_count || 0) + 1,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', conversationId);
+      }
     } catch (fallbackError) {
       console.warn('Message count update failed, continuing without it:', fallbackError);
     }

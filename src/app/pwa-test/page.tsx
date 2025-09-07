@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { PWAManager, PWAInstallButton, PWAInstallBanner, usePWAInstall } from '@/components/pwa';
+import { useInteractiveWidgetSupport, useBrowserInfo } from '@/hooks/useInteractiveWidgetSupport';
 
 /**
  * PWA Installation Test Page
@@ -16,6 +17,8 @@ export default function PWATestPage() {
   const [buttonVariant, setButtonVariant] = useState<'primary' | 'secondary' | 'minimal' | 'floating'>('primary');
 
   const pwaState = usePWAInstall();
+  const supportsInteractiveWidget = useInteractiveWidgetSupport();
+  const browserInfo = useBrowserInfo();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 p-8">
@@ -83,6 +86,40 @@ export default function PWATestPage() {
                 <span className={`font-mono ${pwaState.hasInstallPromptDismissed ? 'text-red-400' : 'text-green-400'}`}>
                   {String(pwaState.hasInstallPromptDismissed)}
                 </span>
+              </div>
+            </div>
+
+            {/* Interactive Widget & Browser Status */}
+            <div className="mt-6 pt-4 border-t border-purple-500/20">
+              <h4 className="text-lg font-semibold text-white mb-3">Interactive Widget Support</h4>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-purple-300">Browser:</span>
+                  <span className="font-mono text-blue-300">
+                    {browserInfo ? `${browserInfo.name} ${browserInfo.version}` : 'Detecting...'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-purple-300">Interactive Widget:</span>
+                  <span className={`font-mono ${supportsInteractiveWidget ? 'text-green-400' : 'text-yellow-400'}`}>
+                    {supportsInteractiveWidget ? 'Supported' : 'CSS-only fallback'}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-purple-300">Viewport Mode:</span>
+                  <span className="font-mono text-blue-300">
+                    {supportsInteractiveWidget ? 'resizes-visual' : 'fixed viewport + CSS'}
+                  </span>
+                </div>
+              </div>
+              
+              <div className="mt-4 p-3 bg-black/40 rounded-lg text-sm text-purple-200">
+                <p className="font-semibold mb-2">What this means:</p>
+                {supportsInteractiveWidget ? (
+                  <p>✅ Your browser supports the cutting-edge <code className="bg-purple-900/50 px-1 rounded">interactive-widget</code> viewport property! Virtual keyboards will resize only the visual viewport, providing the smoothest keyboard experience.</p>
+                ) : (
+                  <p>🎨 Your browser uses our elegant CSS-only solution with <code className="bg-purple-900/50 px-1 rounded">100dvh</code> and <code className="bg-purple-900/50 px-1 rounded">env(keyboard-height)</code> for ChatGPT-style keyboard handling.</p>
+                )}
               </div>
             </div>
           </div>
