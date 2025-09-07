@@ -2,7 +2,7 @@
 
 export default function LoadingIndicator() {
   return (
-    <div className="flex gap-3 lg:gap-4 px-4 lg:px-6 py-4 lg:py-6 bg-gradient-to-r from-purple-900/20 via-blue-900/10 to-purple-900/20 border-l-4 border-purple-400/40 rounded-r-2xl mx-2">
+    <div className="flex gap-3 lg:gap-4 px-4 lg:px-6 py-4 lg:py-6 bg-gradient-to-r from-purple-900/20 via-blue-900/10 to-purple-900/20 border-l-4 border-purple-400/40 rounded-r-2xl mx-0 lg:mx-2">
       <div className="flex-shrink-0">
         <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 text-white glow-effect flex items-center justify-center text-lg shadow-lg">
           🤔

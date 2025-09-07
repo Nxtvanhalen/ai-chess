@@ -64,7 +64,7 @@ export default function GameLayout({ chessBoard, chat }: GameLayoutProps) {
   }, []);
 
   return (
-    <div className="h-screen w-screen overflow-auto lg:overflow-hidden relative">
+    <div className="h-screen w-screen overflow-auto lg:overflow-hidden relative p-0 m-0">
       {/* Mobile Portrait Layout: Stacked with smooth keyboard handling */}
       {isMobile && !isLandscape && (
         <div className={`flex flex-col h-screen layout-container ${isKeyboardOpen ? 'mobile-keyboard-active' : ''}`}>
