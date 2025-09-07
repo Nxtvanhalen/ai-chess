@@ -454,7 +454,8 @@ export default function Home() {
           message: content,
           gameContext: currentPosition ? {
             fen: currentPosition,
-            lastMove: messages.filter(m => m.role === 'system').slice(-1)[0]?.metadata?.moveContext
+            lastMove: messages.slice(-5).find(m => m.metadata?.moveContext)?.metadata?.moveContext,
+            totalMoves: messages.filter(m => m.metadata?.moveContext).length
           } : undefined,
           moveHistory: messages,
         }),

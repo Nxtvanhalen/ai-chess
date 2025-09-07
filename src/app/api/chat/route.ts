@@ -25,6 +25,15 @@ export async function POST(request: NextRequest) {
 
     const { message, gameContext, moveHistory } = await request.json();
     
+    // Debug: Log game context to help troubleshoot Chester's board visibility
+    console.log('Chester Chat API - Game Context:', {
+      hasGameContext: !!gameContext,
+      fen: gameContext?.fen,
+      lastMove: gameContext?.lastMove,
+      totalMoves: gameContext?.totalMoves,
+      messageLength: message.length
+    });
+    
     if (!message) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
     }
@@ -44,7 +53,13 @@ export async function POST(request: NextRequest) {
     let instructions = CHESS_BUTLER_SYSTEM_PROMPT;
     
     if (gameContext?.fen) {
-      instructions += `\n\n${formatMoveContext(gameContext.fen, gameContext.lastMove)}`;
+      instructions += `\n\nCURRENT BOARD STATE - You CAN see the board clearly:\n${formatMoveContext(gameContext.fen, gameContext.lastMove)}`;
+      
+      if (gameContext.totalMoves) {
+        instructions += `\n\nGame Progress: ${gameContext.totalMoves} moves have been played.`;
+      }
+    } else {
+      instructions += `\n\nNote: No current board state available. Ask Chris to make a move if you need to see the position.`;
     }
     
     // Add move history for style analysis questions

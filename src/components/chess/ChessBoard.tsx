@@ -381,7 +381,7 @@ export default function ChessBoard({
       className={`chess-board-container flex items-center justify-center bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-indigo-900/20 ${
         isMobile && isLandscape 
           ? 'p-2 h-full' 
-          : 'p-1 lg:p-6 pt-56 lg:pt-6'
+          : 'p-1 lg:p-6 pt-2 lg:pt-6'
       }`} 
       style={{ 
         height: isMobile && isLandscape ? '100vh' : `${boardWidth + 8}px`,

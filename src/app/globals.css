@@ -208,6 +208,40 @@ select {
   -webkit-overflow-scrolling: touch;
 }
 
+/* Safari viewport fix - use dynamic viewport height */
+.h-screen {
+  height: 100vh;
+  height: 100dvh; /* Dynamic viewport height for Safari */
+}
+
+/* Safe area support for modern mobile devices */
+@supports (padding: max(0px)) {
+  .mobile-safe-area-bottom {
+    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+  }
+  
+  .mobile-safe-area-top {
+    padding-top: max(0.5rem, env(safe-area-inset-top));
+  }
+}
+
+/* Ensure proper flexbox behavior on mobile */
+.layout-container {
+  height: 100%;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* Enhanced mobile layout improvements */
+.mobile-chat-input-container {
+  position: sticky;
+  bottom: 0;
+  background: linear-gradient(to bottom, transparent, rgba(15, 23, 42, 0.95) 20%, rgba(15, 23, 42, 1));
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 50;
+}
+
 /* Hide scrollbars */
 .scrollbar-hide {
   -ms-overflow-style: none;  /* Internet Explorer 10+ */

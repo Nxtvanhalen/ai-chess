@@ -139,10 +139,10 @@ export default function ChatInput({
 
   return (
     <div 
-      className={`border-t border-purple-400/20 bg-gradient-to-r from-purple-900/30 via-blue-900/30 to-purple-900/30 backdrop-blur-sm chat-input-container lg:rounded-b-2xl transition-all duration-300 ease-out ${
+      className={`border-t border-purple-400/20 bg-gradient-to-r from-purple-900/30 via-blue-900/30 to-purple-900/30 backdrop-blur-sm chat-input-container lg:rounded-b-2xl transition-all duration-300 ease-out mobile-chat-input-container ${
         isLandscape 
           ? 'p-2' // Minimal padding in landscape
-          : 'p-2 lg:p-6' // Normal padding in portrait/desktop
+          : 'p-2 lg:p-6 mobile-safe-area-bottom' // Normal padding in portrait/desktop with safe area
       } ${isKeyboardOpen ? 'mobile-keyboard-active' : ''}`}
       style={{
         transform: isKeyboardOpen && keyboardHeight > 0 

@@ -64,26 +64,36 @@ export default function GameLayout({ chessBoard, chat }: GameLayoutProps) {
   }, []);
 
   return (
-    <div className="h-screen w-screen overflow-auto lg:overflow-hidden relative p-0 m-0">
+    <div className="h-screen w-screen overflow-hidden relative p-0 m-0" style={{ height: '100dvh' }}>
       {/* Mobile Portrait Layout: Stacked with smooth keyboard handling */}
       {isMobile && !isLandscape && (
-        <div className={`flex flex-col h-screen layout-container ${isKeyboardOpen ? 'mobile-keyboard-active' : ''}`}>
+        <div className="flex flex-col h-full w-full">
+          {/* Chess Board Section - Fixed height, positioned at top */}
           <div 
-            className={`chess-section flex-shrink-0 shadow-2xl relative orientation-transition`} 
+            className="chess-section shadow-2xl relative orientation-transition"
             style={{ 
-              height: 'auto', 
-              maxHeight: isKeyboardOpen ? '45vh' : '70vh',
+              height: isKeyboardOpen ? '35vh' : '50vh',
+              minHeight: '280px',
+              display: 'flex',
+              alignItems: 'flex-start',
+              justifyContent: 'center',
+              paddingTop: '1rem'
+            }}>
+            <div style={{ 
               transform: isKeyboardOpen ? 'scale(0.85)' : 'scale(1)',
               transformOrigin: 'center top',
-              willChange: 'transform, max-height',
+              transition: 'transform 0.3s ease-out'
             }}>
-            {chessBoard}
+              {chessBoard}
+            </div>
           </div>
+          
+          {/* Chat Section - Takes remaining space */}
           <div 
-            className={`chat-section flex-1 shadow-2xl backdrop-blur-sm overflow-visible orientation-transition border-t border-purple-400/30 mt-28`}
+            className="chat-section flex-1 shadow-2xl backdrop-blur-sm orientation-transition border-t border-purple-400/30"
             style={{
-              marginBottom: isKeyboardOpen ? `${Math.max(keyboardHeight - 100, 0)}px` : '0px',
-              willChange: 'margin-bottom',
+              minHeight: '250px',
+              overflow: 'hidden'
             }}>
             {chat}
           </div>
