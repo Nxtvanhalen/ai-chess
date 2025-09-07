@@ -166,8 +166,7 @@ export default function ChatInput({
           className="w-full resize-none rounded-xl lg:rounded-2xl border-2 border-purple-400/30 bg-slate-900/80 backdrop-blur-sm px-3 lg:px-6 py-3 lg:py-6 pr-12 lg:pr-18 text-sm lg:text-lg text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400 disabled:opacity-50 disabled:cursor-not-allowed smooth-transitions shadow-lg hover:shadow-xl font-medium scrollbar-hide overflow-hidden touch-optimized"
           style={{ 
             maxHeight: '200px', 
-            minHeight: '40px',
-            minTouchTarget: '44px', // Accessibility touch target
+            minHeight: '44px', // Accessibility touch target minimum
           }}
         />
         
