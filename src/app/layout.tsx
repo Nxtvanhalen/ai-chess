@@ -13,15 +13,6 @@ export const metadata: Metadata = {
     "apple-mobile-web-app-capable": "yes",
     "apple-mobile-web-app-status-bar-style": "black-translucent",
     "format-detection": "telephone=no",
-    // iOS keyboard accessory bar minimization
-    "apple-touch-fullscreen": "yes",
-    "apple-mobile-web-app-orientations": "portrait-any landscape-any",
-    // Disable iOS input assistance features that create tall accessory bars
-    "webkit-touch-callout": "no",
-    "webkit-user-select": "none",
-    "webkit-tap-highlight-color": "transparent",
-    // Force minimal Safari UI
-    "apple-mobile-web-app-capable": "yes",
     "HandheldFriendly": "True",
   },
 };
