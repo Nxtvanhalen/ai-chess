@@ -35,6 +35,12 @@ export default function EngineMoveCard({ move, analysis }: EngineMoveCardProps) 
             <span className={`${analysis.evaluation > 0 ? 'text-green-400' : analysis.evaluation < 0 ? 'text-red-400' : 'text-gray-400'}`}>
               Eval: {analysis.evaluation > 0 ? '+' : ''}{analysis.evaluation.toFixed(2)}
             </span>
+            {analysis.evaluation > 2 && (
+              <span className="text-green-300 text-xs">Advantage</span>
+            )}
+            {analysis.evaluation < -2 && (
+              <span className="text-red-300 text-xs">Losing</span>
+            )}
           </div>
         )}
       </div>

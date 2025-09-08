@@ -1,9 +1,11 @@
 'use client';
 
 import { ChatMessage as ChatMessageType } from '@/types';
+import { motion } from 'framer-motion';
 import Image from 'next/image';
 import SuggestionBubble from './SuggestionBubble';
 import EngineMoveCard from './EngineMoveCard';
+import LoadingIndicator from './LoadingIndicator';
 import DynamicMarkdown from './DynamicMarkdown';
 
 interface ChatMessageProps {
@@ -45,6 +47,33 @@ export default function ChatMessage({ message }: ChatMessageProps) {
   
   // Handle engine move display
   if (isEngine || message.type === 'move' && message.metadata?.engineAnalysis) {
+    // Show thinking indicator if engine is thinking
+    if (isThinking) {
+      return (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3 }}
+          className="bg-gradient-to-r from-red-500/10 to-orange-500/10 
+                     border-l-4 border-red-500 rounded-lg p-4 my-3"
+        >
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-red-400 text-xl">🤖</span>
+            <span className="text-sm text-red-300 font-medium">Engine is thinking</span>
+          </div>
+          
+          <div className="bg-black/30 rounded p-3">
+            <div className="flex items-center gap-2">
+              <LoadingIndicator />
+              <span className="text-gray-300 text-sm italic">
+                {message.metadata?.analysis || 'Analyzing position...'}
+              </span>
+            </div>
+          </div>
+        </motion.div>
+      );
+    }
+    
     return (
       <EngineMoveCard 
         move={message.content}

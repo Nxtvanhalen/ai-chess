@@ -133,18 +133,33 @@ export class ChessEngine {
     }
   }
   
-  getBestMove(fen: string, difficulty: 'easy' | 'medium' | 'hard' = 'medium'): string | null {
+  getBestMove(fen: string, difficulty: 'easy' | 'medium' | 'hard' = 'medium', playerMoveHistory: string[] = []): { 
+    move: string; 
+    evaluation: number; 
+    depth: number; 
+    thinkingTime: number;
+    analysis: string;
+  } | null {
     const chess = new Chess(fen);
     const moves = chess.moves();
     
     if (moves.length === 0) return null;
+    
+    // Analyze player unpredictability
+    const playerUnpredictability = this.analyzePlayerStyle(playerMoveHistory);
     
     // First check for immediate checkmate
     for (const move of moves) {
       chess.move(move);
       if (chess.isCheckmate()) {
         chess.undo();
-        return move;
+        return {
+          move,
+          evaluation: 1000,
+          depth: 1,
+          thinkingTime: 500, // Quick checkmate
+          analysis: "Checkmate found"
+        };
       }
       chess.undo();
     }
@@ -159,19 +174,25 @@ export class ChessEngine {
     // Moderate depth increase in critical positions
     if (pieceCount <= 8) {
       // Very late endgame - look deeper for checkmate
-      depth = Math.min(depth + 2, 4);
+      depth = Math.min(depth + 2, 5);
     } else if (pieceCount <= 12 && Math.abs(evaluation) > 5) {
       // Late endgame when winning/losing significantly
       depth = Math.min(depth + 1, 4);
     }
     
+    // Adaptive depth based on player unpredictability
+    if (playerUnpredictability > 0.6) {
+      depth = Math.min(depth + 1, 5); // Think deeper against creative players
+    }
+    
     // Cap maximum depth to prevent extreme slowness
-    depth = Math.min(depth, 4);
+    depth = Math.min(depth, 5);
     
     let bestMove = null;
     let bestEval = -Infinity;
     const moveEvaluations: { move: string; eval: number }[] = [];
     
+    // Evaluate all moves
     for (const move of moves) {
       chess.move(move);
       const evaluation = this.minimax(chess, depth - 1, false);
@@ -188,21 +209,129 @@ export class ChessEngine {
     // Sort moves by evaluation to prioritize forcing moves
     moveEvaluations.sort((a, b) => b.eval - a.eval);
     
-    // If multiple moves have similar evaluations, prefer checks and captures
-    const topMoves = moveEvaluations.filter(m => m.eval >= bestEval - 0.1);
+    // Smart move selection with randomness
+    const selectedMove = this.selectMoveWithVariation(
+      moveEvaluations, 
+      chess, 
+      playerUnpredictability, 
+      evaluation
+    );
     
-    for (const { move } of topMoves) {
+    // Calculate realistic thinking time
+    const thinkingTime = this.calculateThinkingTime(pieceCount, depth, Math.abs(evaluation), playerUnpredictability);
+    
+    // Generate analysis description
+    const analysis = this.generateAnalysis(pieceCount, evaluation, depth, selectedMove.move);
+    
+    return {
+      move: selectedMove.move,
+      evaluation: selectedMove.eval,
+      depth,
+      thinkingTime,
+      analysis
+    };
+  }
+
+  private analyzePlayerStyle(moveHistory: string[]): number {
+    if (moveHistory.length < 6) return 0.3; // Default for new games
+    
+    let unpredictabilityScore = 0;
+    const recentMoves = moveHistory.slice(-10); // Look at last 10 moves
+    
+    // Check for unusual moves (captures, checks, piece sacrifices)
+    for (const move of recentMoves) {
+      if (move.includes('x')) unpredictabilityScore += 0.1; // Captures
+      if (move.includes('+')) unpredictabilityScore += 0.15; // Checks  
+      if (move.includes('!') || move.includes('?')) unpredictabilityScore += 0.2; // Tactical moves
+      if (move.length > 4) unpredictabilityScore += 0.05; // Complex notation
+    }
+    
+    // Normalize score between 0 and 1
+    return Math.min(unpredictabilityScore, 1.0);
+  }
+
+  private selectMoveWithVariation(
+    moveEvaluations: { move: string; eval: number }[], 
+    chess: Chess,
+    unpredictability: number,
+    positionEval: number
+  ): { move: string; eval: number } {
+    const bestEval = moveEvaluations[0].eval;
+    
+    // Determine candidate pool based on position and player style
+    let tolerance = 0.2; // Base tolerance for move selection
+    
+    if (unpredictability > 0.5) {
+      tolerance += 0.3; // Wider selection against creative players
+    }
+    
+    if (Math.abs(positionEval) < 1.0) {
+      tolerance += 0.2; // More variation in equal positions
+    }
+    
+    // Get candidate moves within tolerance
+    const candidates = moveEvaluations.filter(m => m.eval >= bestEval - tolerance);
+    
+    // Prefer forcing moves (checks, captures) among candidates
+    const forcingMoves = candidates.filter(({ move }) => {
       chess.move(move);
       const isCheck = chess.inCheck();
+      const isCapture = move.includes('x');
       chess.undo();
-      
-      // Prefer checks when winning
-      if (isCheck && evaluation > 3) {
-        return move;
+      return isCheck || isCapture;
+    });
+    
+    // Use forcing moves if available and we're in a tactical position
+    const finalCandidates = (forcingMoves.length > 0 && Math.abs(positionEval) > 2.0) 
+      ? forcingMoves 
+      : candidates;
+    
+    // Weighted random selection (prefer better moves)
+    const weights = finalCandidates.map((_, i) => Math.pow(2, finalCandidates.length - i - 1));
+    const totalWeight = weights.reduce((sum, w) => sum + w, 0);
+    const random = Math.random() * totalWeight;
+    
+    let weightSum = 0;
+    for (let i = 0; i < finalCandidates.length; i++) {
+      weightSum += weights[i];
+      if (random <= weightSum) {
+        return finalCandidates[i];
       }
     }
     
-    // Return the objectively best move (no randomness)
-    return bestMove;
+    // Fallback to best move
+    return finalCandidates[0] || moveEvaluations[0];
+  }
+
+  private calculateThinkingTime(pieceCount: number, depth: number, evalMagnitude: number, unpredictability: number): number {
+    let baseTime = 1500; // 1.5 seconds base
+    
+    // Complexity factors
+    const complexityFactor = (32 - pieceCount) * 30; // More pieces = more thinking
+    const depthFactor = depth * 200; // Deeper search = more time
+    const criticalFactor = evalMagnitude > 3 ? 500 : 0; // Critical positions need more time
+    const creativeFactor = unpredictability * 300; // Think longer against creative players
+    
+    const totalTime = baseTime + complexityFactor + depthFactor + criticalFactor + creativeFactor;
+    
+    // Clamp between 800ms and 4000ms for good UX
+    return Math.max(800, Math.min(4000, Math.floor(totalTime)));
+  }
+
+  private generateAnalysis(pieceCount: number, evaluation: number, depth: number, move: string): string {
+    const isEndgame = pieceCount <= 12;
+    const isTactical = Math.abs(evaluation) > 2;
+    const isCheck = move.includes('+');
+    const isCapture = move.includes('x');
+    
+    if (isEndgame && isTactical) return "Calculating endgame sequences...";
+    if (isCheck && isCapture) return "Analyzing tactical combination...";
+    if (isCapture) return "Evaluating material exchange...";
+    if (isCheck) return "Considering forcing moves...";
+    if (isTactical) return "Looking for tactical opportunities...";
+    if (isEndgame) return "Planning endgame technique...";
+    if (depth >= 4) return "Deep positional analysis...";
+    
+    return "Evaluating candidate moves...";
   }
 }

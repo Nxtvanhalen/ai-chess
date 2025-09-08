@@ -272,110 +272,139 @@ export default function Home() {
         const isAiTurn = move.after.includes(' b '); // FEN notation: 'b' means black to move
         
         if (isAiTurn) {
-          // First show engine move
+          // Get player move history for engine adaptation
+          const playerMoveHistory = messages.filter(m => 
+            m.role === 'user' && m.metadata?.moveContext
+          ).map(m => m.metadata?.moveContext || '').slice(-10);
+          
+          // First show engine move with thinking indicator
           const engineMoveMessage: ChatMessage = {
             id: generateSimpleId(),
             role: 'engine',
             type: 'move',
             content: '',
             timestamp: new Date(),
-            metadata: { isThinking: true }
+            metadata: { 
+              isThinking: true,
+              analysis: 'Engine is thinking...'
+            }
           };
           setMessages(prev => [...prev, engineMoveMessage]);
           
-          const aiMoveTimeout = setTimeout(async () => {
-            try {
-              const aiMoveResponse = await fetch('/api/chess/ai-move', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                  fen: move.after,
-                  difficulty: 'medium',
-                }),
-              });
-            
+          // Get engine analysis first
+          try {
+            const aiMoveResponse = await fetch('/api/chess/ai-move', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                fen: move.after,
+                difficulty: 'medium',
+                playerMoveHistory
+              }),
+            });
+          
             if (aiMoveResponse.ok) {
               const aiMoveData = await aiMoveResponse.json();
               
-              // Update the board with AI's move
-              setCurrentPosition(aiMoveData.fen);
-              const newAiMoveCount = moveCount + 2;
-              setMoveCount(newAiMoveCount);
-              
-              // Save AI move to database
-              await saveMove(
-                currentGameId!,
-                Math.ceil(newAiMoveCount / 2),
-                aiMoveData.san,
-                move.after, // Previous position before AI move
-                aiMoveData.fen,
-                'ai'
-              );
-              
-              // Update game position with AI move
-              await updateGamePosition(currentGameId!, aiMoveData.fen, '');
-              
-              // Update engine move message
-              const updatedEngineMessage: ChatMessage = {
-                ...engineMoveMessage,
-                content: convertMoveToPlainEnglish(aiMoveData.san),
-                metadata: {
-                  isThinking: false,
-                  moveContext: aiMoveData.san,
-                  position: aiMoveData.fen,
-                  engineAnalysis: {
-                    move: aiMoveData.san,
-                    evaluation: 0, // You could calculate this
-                    depth: 10
-                  }
-                }
-              };
-              
-              setMessages(prev => prev.map(msg => 
-                msg.id === engineMoveMessage.id ? updatedEngineMessage : msg
-              ));
-              
-              // Get Chester's analysis of the engine move
-              const analysisResponse = await fetch('/api/chess/engine-move-analysis', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  engineMove: aiMoveData,
-                  fen: aiMoveData.fen,
-                  engineEvaluation: 0
-                })
-              });
-              
-              if (analysisResponse.ok) {
-                const analysisData = await analysisResponse.json();
-                
-                // Add Chester's commentary on engine move
-                const analysisMessage: ChatMessage = {
-                  id: generateSimpleId(),
-                  role: 'assistant',
-                  type: 'analysis',
-                  content: analysisData.commentary,
-                  timestamp: new Date()
-                };
-                
-                setMessages(prev => [...prev, analysisMessage]);
-                await saveMessage(conversationId!, 'assistant', analysisMessage.content);
+              // Show realistic thinking process
+              if (aiMoveData.analysis?.analysis) {
+                setMessages(prev => prev.map(msg => 
+                  msg.id === engineMoveMessage.id 
+                    ? { ...msg, metadata: { ...msg.metadata, analysis: aiMoveData.analysis.analysis } }
+                    : msg
+                ));
               }
               
-              // After engine move, get suggestions for user's next move
-              setTimeout(() => {
-                getAISuggestions(aiMoveData.fen);
-              }, 1000);
+              // Wait for realistic thinking time
+              const thinkingTime = aiMoveData.analysis?.thinkingTime || 1500;
+              
+              const aiMoveTimeout = setTimeout(async () => {
+                try {
+                  // Update the board with AI's move
+                  setCurrentPosition(aiMoveData.fen);
+                  const newAiMoveCount = moveCount + 2;
+                  setMoveCount(newAiMoveCount);
+                  
+                  // Save AI move to database
+                  await saveMove(
+                    currentGameId!,
+                    Math.ceil(newAiMoveCount / 2),
+                    aiMoveData.san,
+                    move.after, // Previous position before AI move
+                    aiMoveData.fen,
+                    'ai'
+                  );
+                  
+                  // Update game position with AI move
+                  await updateGamePosition(currentGameId!, aiMoveData.fen, '');
+                  
+                  // Update engine move message with real analysis
+                  const updatedEngineMessage: ChatMessage = {
+                    ...engineMoveMessage,
+                    content: convertMoveToPlainEnglish(aiMoveData.san),
+                    metadata: {
+                      isThinking: false,
+                      moveContext: aiMoveData.san,
+                      position: aiMoveData.fen,
+                      engineAnalysis: {
+                        move: aiMoveData.san,
+                        evaluation: aiMoveData.analysis?.evaluation || 0,
+                        depth: aiMoveData.analysis?.depth || 2
+                      }
+                    }
+                  };
+                  
+                  setMessages(prev => prev.map(msg => 
+                    msg.id === engineMoveMessage.id ? updatedEngineMessage : msg
+                  ));
+                  
+                  // Get Chester's analysis of the engine move
+                  const analysisResponse = await fetch('/api/chess/engine-move-analysis', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      engineMove: aiMoveData,
+                      fen: aiMoveData.fen,
+                      engineEvaluation: aiMoveData.analysis?.evaluation || 0
+                    })
+                  });
+                  
+                  if (analysisResponse.ok) {
+                    const analysisData = await analysisResponse.json();
+                    
+                    // Add Chester's commentary on engine move
+                    const analysisMessage: ChatMessage = {
+                      id: generateSimpleId(),
+                      role: 'assistant',
+                      type: 'analysis',
+                      content: analysisData.commentary,
+                      timestamp: new Date()
+                    };
+                    
+                    setMessages(prev => [...prev, analysisMessage]);
+                    await saveMessage(conversationId!, 'assistant', analysisMessage.content);
+                  }
+                  
+                  // After engine move, get suggestions for user's next move
+                  setTimeout(() => {
+                    getAISuggestions(aiMoveData.fen);
+                  }, 1000);
+                  
+                } catch (moveError) {
+                  console.error('Error processing AI move:', moveError);
+                } finally {
+                  timeoutRefs.current.delete(aiMoveTimeout);
+                }
+              }, thinkingTime);
+              timeoutRefs.current.add(aiMoveTimeout);
+            } else {
+              console.error('Failed to get AI move');
             }
           } catch (error) {
             console.error('Error getting AI move:', error);
-          } finally {
-            timeoutRefs.current.delete(aiMoveTimeout);
           }
-        }, 800); // Wait 0.8 seconds after commentary
-        timeoutRefs.current.add(aiMoveTimeout);
         }
       }
     } catch (error) {

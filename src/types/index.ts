@@ -14,6 +14,7 @@ export interface ChatMessage {
     suggestions?: MoveSuggestion[];
     engineAnalysis?: EngineAnalysis;
     evaluation?: number;
+    analysis?: string;
   };
 }
 
