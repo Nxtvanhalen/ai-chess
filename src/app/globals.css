@@ -716,17 +716,23 @@ select {
 /* Game Layout - Main Container */
 .game-layout {
   width: 100vw;
-  height: 100dvh; /* Dynamic viewport height */
+  height: 100dvh; /* Dynamic viewport height with fallback */
+  height: 100vh; /* Fallback for older browsers */
   overflow: hidden;
   position: relative;
   margin: 0;
   padding: 0;
   
-  /* Default to flex for desktop/landscape */
+  /* Default to flex for all layouts - consistent model */
   display: flex;
+  
+  /* Smooth transitions for responsive behavior */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* GPU acceleration for smooth performance */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
-
-/* Mobile portrait will override with grid */
 
 /* Desktop Layout */
 .layout-desktop {
@@ -772,25 +778,49 @@ select {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Mobile Portrait Layout - Modern CSS Grid with Dynamic Viewport */
-@media screen and (max-width: 1023px) and (orientation: portrait) {
-  
-  /* Use CSS Grid for reliable, overlap-free layout */
+/* Transition Zone - Ensure smooth layout transitions */
+@media screen and (min-width: 1023px) and (max-width: 1025px) {
   .game-layout {
-    display: grid;
-    grid-template-rows: 45svh 1fr; /* Chess board: 45% small viewport, Chat: remaining space */
-    gap: 0;
-    width: 100vw;
-    height: 100svh; /* Small viewport height - accounts for mobile UI */
-    overflow: hidden;
+    /* Force consistent behavior during transition */
+    min-height: 100vh;
+    max-height: 100vh;
   }
   
-  /* Chess Board Section - Grid item 1 */
+  .board-desktop,
+  .board-landscape {
+    min-width: 50%;
+    max-width: 60%;
+  }
+  
+  .chat-desktop,
+  .chat-landscape {
+    min-width: 40%;
+    flex: 1;
+  }
+}
+
+/* Mobile Portrait Layout - Consistent Flexbox Approach */
+@media screen and (max-width: 1023px) and (orientation: portrait) {
+  
+  /* Use Flexbox for consistent layout model across all breakpoints */
+  .game-layout {
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+    height: 100dvh; /* Dynamic viewport height with fallback */
+    height: 100vh; /* Fallback for older browsers */
+    overflow: hidden;
+    
+    /* Smooth transitions during resize */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* Chess Board Section - Flexbox item with fixed proportion */
   .chess-board-section {
-    /* Remove fixed positioning - use grid instead */
     position: relative;
     width: 100%;
-    height: 100%;
+    height: 45%; /* Fixed percentage instead of vh units */
+    flex-shrink: 0; /* Prevent shrinking */
     z-index: 20;
     display: flex;
     align-items: flex-start;
@@ -799,13 +829,14 @@ select {
     background: transparent;
     
     /* Smooth transitions when keyboard appears */
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
-  /* Board container - responsive sizing with dynamic viewport units */
+  /* Board container - responsive sizing with consistent units */
   .chess-board-container {
     width: 100%;
-    max-width: min(90vw, 40svh); /* Use small viewport height for consistent sizing */
+    max-width: min(90vw, 40vh); /* Use consistent vh units */
     aspect-ratio: 1;
     transform: scale(1);
     transform-origin: center top;
@@ -818,12 +849,12 @@ select {
     user-select: none;
   }
   
-  /* Chat Section - Grid item 2 */
+  /* Chat Section - Flexible item taking remaining space */
   .chat-section {
-    /* Remove fixed positioning - use grid instead */
     position: relative;
     width: 100%;
-    height: 100%;
+    flex: 1; /* Take remaining space */
+    min-height: 0; /* Allow shrinking */
     z-index: 10;
     background: linear-gradient(135deg, #1a0d2e, #2d1b4e, #4c2a7e);
     
@@ -839,9 +870,9 @@ select {
     padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
   }
   
-  /* Keyboard handling - adjust grid rows dynamically */
-  .game-layout:focus-within {
-    grid-template-rows: 30svh 1fr; /* Shrink chess board, expand chat */
+  /* Keyboard handling - adjust proportions dynamically */
+  .game-layout:focus-within .chess-board-section {
+    height: 30%; /* Shrink chess board section */
   }
   
   .game-layout:focus-within .chess-board-container {
@@ -1148,13 +1179,14 @@ select {
   /* iOS Safari specific optimizations */
   @media screen and (max-width: 1023px) and (orientation: portrait) {
     
-    /* Fixed viewport approach for iOS */
+    /* Consistent viewport approach for iOS */
     .game-layout {
-      height: 100vh;
-      height: -webkit-fill-available;
+      height: 100dvh; /* Use dynamic viewport height */
+      height: 100vh; /* Fallback */
+      min-height: 100vh; /* Ensure minimum height */
     }
     
-    /* Prevent iOS Safari from changing layout on keyboard */
+    /* Prevent iOS Safari layout shifts */
     .chat-input-container {
       position: fixed;
       bottom: env(safe-area-inset-bottom);
@@ -1165,8 +1197,7 @@ select {
     
     /* Ensure proper safe area handling */
     .chess-board-section {
-      top: env(safe-area-inset-top);
-      padding-top: calc(0.5rem + env(safe-area-inset-top));
+      padding-top: max(1rem, env(safe-area-inset-top));
     }
   }
 }

@@ -14,7 +14,7 @@ export function useDeviceDetection() {
   const detectDevice = useCallback(() => {
     if (typeof window === 'undefined') return;
     
-    const isMobileDevice = window.innerWidth < 1024;
+    const isMobileDevice = window.innerWidth <= 1023;
     const isLandscapeMode = window.innerWidth > window.innerHeight;
     
     setIsMobile(isMobileDevice);
