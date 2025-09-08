@@ -60,9 +60,8 @@ export const viewport: Viewport = {
   viewportFit: "cover",
   themeColor: "#1a0d2e",
   minimumScale: 1,
-  // Progressive enhancement: Use interactive-widget for Chrome 108+ and Firefox 132+
-  // Falls back to CSS-only solution for Safari/iOS
-  interactiveWidget: "resizes-visual" as any, // TypeScript doesn't know about this yet
+  // Note: interactive-widget removed to fix Render deployment warnings
+  // CSS-based keyboard handling works universally across all platforms
 };
 
 export default function RootLayout({
