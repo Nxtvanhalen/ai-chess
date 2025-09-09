@@ -103,10 +103,10 @@ export default function DynamicMarkdown({ children, className }: DynamicMarkdown
   // Use full ReactMarkdown once loaded
   try {
     return (
-      <ReactMarkdown
-        remarkPlugins={remarkGfm ? [remarkGfm] : undefined}
-        className={className}
-        components={{
+      <div className={className}>
+        <ReactMarkdown
+          remarkPlugins={remarkGfm ? [remarkGfm] : undefined}
+          components={{
         pre: ({ children }: any) => (
           <pre className="bg-slate-900 p-3 rounded-lg overflow-x-auto my-3 border border-slate-700">
             <code className="text-green-400 text-sm font-mono">{children}</code>
@@ -158,7 +158,8 @@ export default function DynamicMarkdown({ children, className }: DynamicMarkdown
         }}
       >
         {children}
-      </ReactMarkdown>
+        </ReactMarkdown>
+      </div>
     );
   } catch (error) {
     console.warn('ReactMarkdown rendering failed, using fallback:', error);

@@ -25,7 +25,7 @@ export default function GameLayout({ chessBoard, chat }: GameLayoutProps) {
     <div className="game-layout">
       {/* PWA Installation Management */}
       <PWAManager
-        showFloatingButton={true}
+        showFloatingButton={false}
         showInstallBanner={true}
         showWelcomeMessage={true}
         floatingButtonPosition={isMobile ? 'bottom-left' : 'bottom-right'}

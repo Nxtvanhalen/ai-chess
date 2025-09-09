@@ -819,7 +819,7 @@ select {
   .chess-board-section {
     position: relative;
     width: 100%;
-    height: 45%; /* Fixed percentage instead of vh units */
+    height: 52.5%; /* Increased from 45% for better chess board visibility */
     flex-shrink: 0; /* Prevent shrinking */
     z-index: 20;
     display: flex;
@@ -871,13 +871,21 @@ select {
     padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
   }
   
-  /* Keyboard handling - adjust proportions dynamically */
+  /* Keyboard handling - optimize space usage */
   .game-layout:focus-within .chess-board-section {
-    height: 30%; /* Shrink chess board section */
+    height: 50%; /* Keep board visible when typing (was 30%) */
   }
   
-  .game-layout:focus-within .chess-board-container {
-    transform: scale(0.8); /* Scale down board slightly */
+  /* Removed scale transform - keep board at full size when typing */
+  
+  /* Limit chat messages height when keyboard is active */
+  .game-layout:focus-within .chat-messages-container {
+    max-height: 8rem; /* Show only recent messages */
+    overflow-y: auto;
+  }
+  
+  .game-layout:focus-within .chat-section {
+    padding-top: 0.25rem; /* Reduce padding to minimize empty space */
   }
   
   /* Keyboard Dismiss Overlay - Simplified */
@@ -916,7 +924,10 @@ select {
 }
 
 /* Desktop and landscape chat interface */
-.chat-interface.landscape,
+.chat-interface.landscape {
+  border-radius: 1rem;
+}
+
 @media screen and (min-width: 1024px) {
   .chat-interface {
     border-radius: 1rem;
