@@ -837,7 +837,7 @@ select {
   /* Board container - responsive sizing with consistent units */
   .chess-board-container {
     width: 100%;
-    max-width: min(90vw, 40vh); /* Use consistent vh units */
+    max-width: min(90vw, 55vh); /* Testing larger size to maximize space utilization */
     aspect-ratio: 1;
     transform: scale(1);
     transform-origin: center top;

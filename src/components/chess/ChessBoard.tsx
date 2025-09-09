@@ -28,6 +28,7 @@ export default function ChessBoard({
   const [checkInfo, setCheckInfo] = useState<{king: Square, attacker: Square, path: Square[]} | null>(null);
   const [isLandscape, setIsLandscape] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [overlayKey, setOverlayKey] = useState(0);
 
   useEffect(() => {
     const updateBoardSize = () => {
@@ -60,6 +61,16 @@ export default function ChessBoard({
     window.addEventListener('resize', updateBoardSize);
     return () => window.removeEventListener('resize', updateBoardSize);
   }, []);
+
+  // Handle orientation changes - wait for CSS transitions to complete
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      // Force overlay re-positioning after CSS transitions complete
+      setOverlayKey(prev => prev + 1);
+    }, 350); // 300ms transition + 50ms buffer
+
+    return () => clearTimeout(timer);
+  }, [isMobile, isLandscape]);
 
   useEffect(() => {
     if (position && position !== game.fen()) {
@@ -436,7 +447,7 @@ export default function ChessBoard({
         />
         
         {/* Square identifiers overlay - sized to match actual rendered board */}
-        <div className="absolute pointer-events-none" style={{ 
+        <div key={`identifiers-${overlayKey}`} className="absolute pointer-events-none" style={{ 
           top: 0,
           left: 0,
           width: '100%',
@@ -448,7 +459,7 @@ export default function ChessBoard({
         </div>
         
         {/* Piece names overlay - sized to match actual rendered board */}
-        <div className="absolute pointer-events-none z-10" style={{ 
+        <div key={`pieces-${overlayKey}`} className="absolute pointer-events-none z-10" style={{ 
           top: 0,
           left: 0,
           width: '100%',
