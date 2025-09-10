@@ -987,6 +987,7 @@ select {
     
     background: linear-gradient(135deg, #4c2a7e, #2d1b4e, #1a0d2e);
     padding: 0.25rem;
+    min-height: 4rem; /* Define consistent height */
   }
   
   /* Alternative approach using :focus-within for broader support */
@@ -1003,10 +1004,6 @@ select {
   .chat-messages {
     padding-bottom: 6rem; /* Increased from 5rem */
     margin-bottom: 0;
-  }
-  
-  .chat-input-container {
-    min-height: 4rem; /* Define consistent height */
   }
 }
 
