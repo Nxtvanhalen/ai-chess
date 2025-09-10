@@ -77,10 +77,10 @@ export default function ChatInput({
           disabled={disabled}
           placeholder={placeholder}
           inputMode="text"
-          autoComplete="off"
-          autoCorrect="off"
-          autoCapitalize="off"
-          spellCheck="false"
+          autoComplete="on"
+          autoCorrect="on"
+          autoCapitalize="sentences"
+          spellCheck="true"
           data-form-type="other"
           enterKeyHint="send"
           // Critical iOS attributes to minimize accessory bar
