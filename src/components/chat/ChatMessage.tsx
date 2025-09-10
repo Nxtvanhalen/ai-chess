@@ -1,10 +1,10 @@
 'use client';
 
 import { ChatMessage as ChatMessageType } from '@/types';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import SuggestionBubble from './SuggestionBubble';
-import EngineMoveCard from './EngineMoveCard';
+import CompactEngineMove from './CompactEngineMove';
+import ThinkingIndicator from './ThinkingIndicator';
 import LoadingIndicator from './LoadingIndicator';
 import DynamicMarkdown from './DynamicMarkdown';
 
@@ -40,6 +40,56 @@ const HighlightedText = ({ children }: { children: string }) => {
   );
 };
 
+const TypingDots = () => (
+  <div className="flex items-center gap-1">
+    <span className="text-purple-300 text-sm italic">Chester is thinking</span>
+    <div className="flex gap-0.5 ml-2">
+      {[0, 1, 2].map((i) => (
+        <motion.div
+          key={i}
+          className="w-1.5 h-1.5 bg-purple-400 rounded-full"
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.5, 1, 0.5],
+          }}
+          transition={{
+            duration: 1.2,
+            repeat: Infinity,
+            delay: i * 0.2,
+            ease: "easeInOut",
+          }}
+        />
+      ))}
+    </div>
+  </div>
+);
+
+const SuggestionContent = ({ suggestions }: { suggestions: any[] }) => (
+  <div className="space-y-3">
+    <div className="flex items-center gap-2">
+      <span className="text-purple-300 text-sm italic">Here's what I'm thinking:</span>
+    </div>
+    <div className="space-y-2">
+      {suggestions.map((suggestion, i) => (
+        <motion.div
+          key={i}
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: i * 0.1 }}
+          className="bg-purple-500/10 border border-purple-400/20 rounded-lg p-3"
+        >
+          <div className="font-medium text-purple-200 text-sm mb-1">
+            {suggestion.move}
+          </div>
+          <div className="text-xs text-purple-300/80">
+            {suggestion.reasoning}
+          </div>
+        </motion.div>
+      ))}
+    </div>
+  </div>
+);
+
 export default function ChatMessage({ message }: ChatMessageProps) {
   const isAssistant = message.role === 'assistant';
   const isEngine = message.role === 'engine';
@@ -50,73 +100,32 @@ export default function ChatMessage({ message }: ChatMessageProps) {
     // Show thinking indicator if engine is thinking
     if (isThinking) {
       return (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.3 }}
-          className="bg-gradient-to-r from-red-500/10 to-orange-500/10 
-                     border-l-4 border-red-500 rounded-lg p-4 my-3"
-        >
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-red-400 text-xl">🤖</span>
-            <span className="text-sm text-red-300 font-medium">Engine is thinking</span>
-          </div>
-          
-          <div className="bg-black/30 rounded p-3">
-            <div className="flex items-center gap-2">
-              <LoadingIndicator />
-              <span className="text-gray-300 text-sm italic">
-                {message.metadata?.analysis || 'Analyzing position...'}
-              </span>
-            </div>
-          </div>
-        </motion.div>
+        <ThinkingIndicator 
+          name="Engine" 
+          message={message.metadata?.analysis || 'Engine is thinking'}
+        />
       );
     }
     
     return (
-      <EngineMoveCard 
+      <CompactEngineMove 
         move={message.content}
         analysis={message.metadata?.engineAnalysis}
+        commentary={message.metadata?.commentary}
       />
     );
   }
   
-  // Handle suggestion display
-  if (message.type === 'suggestion' && message.metadata?.suggestions) {
-    return (
-      <div className="animate-in slide-in-from-bottom-6 fade-in duration-700">
-        <SuggestionBubble suggestions={message.metadata.suggestions} />
-      </div>
-    );
-  }
+  // Handle suggestion display - now integrated into regular message flow
+  // (Suggestions will be handled in the main message content below)
   
-  // Show thinking animation separately
-  if (isThinking) {
+  // Show thinking animation separately (only for engine, not Chester)
+  if (isThinking && isEngine) {
     return (
-      <div className="flex gap-1 lg:gap-4 px-1 lg:px-6 py-1 lg:py-6 animate-in slide-in-from-bottom-6 lg:slide-in-from-bottom-8 fade-in duration-700 lg:duration-1000 ease-out bg-gradient-to-r from-purple-900/20 via-blue-900/10 to-purple-900/20 border-l-4 border-purple-400/40 rounded-r-2xl mx-0 lg:mx-2">
-        <div className="flex-shrink-0">
-          <div className="w-5 h-5 lg:w-10 lg:h-10 rounded-full bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 glow-effect shadow-lg overflow-hidden relative animate-pulse">
-            <Image
-              src="/chester.png"
-              alt="Chester"
-              width={40}
-              height={40}
-              className="absolute inset-0 w-full h-full object-cover opacity-60"
-              priority
-            />
-          </div>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <span className="text-xs lg:text-sm font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Chester</span>
-          <div className="flex items-center gap-1">
-            <div className="thinking-dot w-1.5 h-1.5 lg:w-2 lg:h-2 bg-purple-400 rounded-full"></div>
-            <div className="thinking-dot w-1.5 h-1.5 lg:w-2 lg:h-2 bg-purple-400 rounded-full"></div>
-            <div className="thinking-dot w-1.5 h-1.5 lg:w-2 lg:h-2 bg-purple-400 rounded-full"></div>
-          </div>
-        </div>
-      </div>
+      <ThinkingIndicator 
+        name="Engine" 
+        message={message.metadata?.analysis || 'Engine is thinking'}
+      />
     );
   }
   
@@ -175,9 +184,15 @@ export default function ChatMessage({ message }: ChatMessageProps) {
             ? 'bg-purple-900/15 px-1 py-0.5 lg:p-4 rounded-md lg:rounded-2xl border border-purple-400/30 shadow-lg backdrop-blur-sm' 
             : 'bg-slate-800/25 px-1 py-0.5 lg:p-4 rounded-md lg:rounded-2xl border border-slate-400/30 shadow-lg backdrop-blur-sm'
         }`}>
-          <DynamicMarkdown>
-            {message.content}
-          </DynamicMarkdown>
+          {isThinking && isAssistant ? (
+            <TypingDots />
+          ) : message.type === 'suggestion' && message.metadata?.suggestions ? (
+            <SuggestionContent suggestions={message.metadata.suggestions} />
+          ) : (
+            <DynamicMarkdown>
+              {message.content}
+            </DynamicMarkdown>
+          )}
         </div>
       </div>
     </div>
