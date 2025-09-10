@@ -111,7 +111,6 @@ export default function ChatMessage({ message }: ChatMessageProps) {
       <CompactEngineMove 
         move={message.content}
         analysis={message.metadata?.engineAnalysis}
-        commentary={message.metadata?.commentary}
       />
     );
   }
