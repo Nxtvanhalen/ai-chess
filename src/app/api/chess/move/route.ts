@@ -98,12 +98,12 @@ export async function POST(request: NextRequest) {
 
     const completion = await createResponsesCompletion({
       model: 'gpt-5',
-      input: `I just played ${move}. What do you think of this move?`,
-      instructions: instructions,
+      input: `I just played ${move}. React briefly.`,
+      instructions: instructions + `\n\nREMEMBER: Keep your reaction to 1 sentence, maybe 2 if critical. Be witty, not eager. Examples: "Solid.", "That's brave.", "Engine won't like that.", "Interesting choice.", "Trading queens already?"`,
       reasoning: {
         effort: 'minimal' // Fast move analysis
       },
-      max_output_tokens: 200,
+      max_output_tokens: 100, // Reduced for brevity
     });
     
     // Parse Responses API format

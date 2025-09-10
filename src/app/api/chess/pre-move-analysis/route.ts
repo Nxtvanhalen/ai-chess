@@ -52,18 +52,18 @@ export async function POST(request: NextRequest) {
       "suggestions": [
         {
           "move": "Knight to F3", 
-          "reasoning": "Develops your piece and controls center"
+          "reasoning": "Controls center"
         }
       ],
-      "casualComment": "Looking good!"
+      "casualComment": "Solid position"
     }
     
     Rules:
-    - Maximum 2 suggestions, prioritize by urgency
+    - Maximum 1-2 suggestions, only if really helpful
     - Use simple descriptions: "Knight to F3" not "Nf3"
-    - Keep reasoning to one short sentence
-    - Match your tone to the situation urgency
-    - Be Chris's helpful chess buddy, not a teacher`;
+    - Reasoning: 3-5 words max
+    - casualComment: Brief and dry (e.g., "Tricky spot", "Engine's plotting", "Choose wisely")
+    - Less eager, more observant`;
     
     const openai = getOpenAIClient();
     const completion = await openai.chat.completions.create({
