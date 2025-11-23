@@ -10,8 +10,11 @@ Personality:
 - More observational than instructional
 
 When suggesting moves (only when really needed):
-- "Bishop G5?" or "Castle maybe"
-- "Knight F3" or "Push the D pawn"
+- CRITICAL: ONLY suggest moves from the "ALL LEGAL MOVES" list provided in the board state
+- Use format: "[Piece] to [Square]" (e.g., "Bishop to G5", "Knight to F3")
+- If move involves capture, mention it: "Bishop to G5 takes Knight"
+- NEVER suggest a move unless you can see it listed in the legal moves
+- If you're unsure, reference the specific move from the list (e.g., "from the captures list: Bishop to G5")
 - No explanations unless asked
 
 When reacting to moves:
@@ -32,6 +35,19 @@ Important:
 - You're the friend who's good at chess but doesn't need to prove it
 - Save longer responses for when Chris specifically asks for analysis
 
+CRITICAL RULE - MOVE SUGGESTIONS:
+When the board state is provided, you will see complete lists of ALL legal moves organized by:
+- 🎯 Checking moves
+- ⚔️ Captures
+- 🏰 Castling
+- 📈 Developing moves
+- 📋 All moves by piece
+
+ONLY suggest moves that appear in these lists. NEVER invent a move or suggest based on "chess principles" alone.
+If suggesting "Bishop to E4", verify it appears in the Bishop's move list first.
+
+The lists show EVERY legal move in the position. If a move isn't listed, it's ILLEGAL.
+
 Remember: You're the witty friend who happens to be decent at chess. Not trying to impress, just keeping Chris company.`;
 
 import { Chess } from 'chess.js';
@@ -45,22 +61,40 @@ export const formatMoveContext = (fen: string, lastMove?: string) => {
   // Map piece types to full names
   const pieceNames: Record<string, string> = {
     'k': 'King',
-    'q': 'Queen', 
+    'q': 'Queen',
     'r': 'Rook',
     'b': 'Bishop',
     'n': 'Knight',
     'p': 'Pawn'
   };
-  
-  // Get legal moves in readable format (limit for brevity)
+
+  // Get ALL legal moves and categorize them
   const legalMoves = chess.moves({ verbose: true });
-  const formattedMoves = legalMoves.map(move => {
+
+  // Categorize moves by type for better AI understanding
+  const captures = legalMoves.filter(m => m.captured);
+  const checks = legalMoves.filter(m => m.san.includes('+'));
+  const castling = legalMoves.filter(m => m.flags.includes('k') || m.flags.includes('q'));
+  const developing = legalMoves.filter(m =>
+    (m.piece === 'n' || m.piece === 'b') &&
+    ['1', '8'].includes(m.from[1]) // Moving from back rank
+  );
+
+  // Group moves by piece for clarity
+  const movesByPiece: Record<string, string[]> = {};
+  legalMoves.forEach(move => {
     const piece = pieceNames[move.piece];
     const from = move.from.toUpperCase();
     const to = move.to.toUpperCase();
     const capture = move.captured ? ` (captures ${pieceNames[move.captured]})` : '';
-    return `${piece} from ${from} to ${to}${capture}`;
-  }).slice(0, 8);
+    const check = move.san.includes('+') ? ' CHECK!' : '';
+    const moveStr = `${from}→${to}${capture}${check}`;
+
+    if (!movesByPiece[piece]) {
+      movesByPiece[piece] = [];
+    }
+    movesByPiece[piece].push(moveStr);
+  });
   
   // Build tactical context
   let context = `POSITION ANALYSIS:\n`;
@@ -115,18 +149,96 @@ export const formatMoveContext = (fen: string, lastMove?: string) => {
     });
   }
   
-  // Sample legal moves
-  if (formattedMoves.length > 0) {
-    context += `\nSAMPLE LEGAL MOVES:\n`;
-    formattedMoves.forEach(move => context += `- ${move}\n`);
-    if (legalMoves.length > 8) {
-      context += `(... and ${legalMoves.length - 8} more moves available)\n`;
+  // COMPLETE legal moves organized by category and piece
+  context += `\n=== ALL LEGAL MOVES (${legalMoves.length} total) ===\n`;
+
+  // Priority moves first
+  if (checks.length > 0) {
+    context += `\n🎯 CHECKING MOVES (${checks.length}):\n`;
+    checks.forEach(m => {
+      const piece = pieceNames[m.piece];
+      context += `  ${piece}: ${m.from.toUpperCase()}→${m.to.toUpperCase()}\n`;
+    });
+  }
+
+  if (captures.length > 0) {
+    context += `\n⚔️ CAPTURES (${captures.length}):\n`;
+    captures.slice(0, 10).forEach(m => {
+      const piece = pieceNames[m.piece];
+      const captured = pieceNames[m.captured!];
+      context += `  ${piece}: ${m.from.toUpperCase()}→${m.to.toUpperCase()} (takes ${captured})\n`;
+    });
+    if (captures.length > 10) {
+      context += `  ... and ${captures.length - 10} more captures\n`;
     }
   }
+
+  if (castling.length > 0) {
+    context += `\n🏰 CASTLING:\n`;
+    castling.forEach(m => {
+      const side = m.flags.includes('k') ? 'Kingside (O-O)' : 'Queenside (O-O-O)';
+      context += `  ${side}\n`;
+    });
+  }
+
+  if (developing.length > 0) {
+    context += `\n📈 DEVELOPING MOVES (${developing.length}):\n`;
+    developing.forEach(m => {
+      const piece = pieceNames[m.piece];
+      context += `  ${piece}: ${m.from.toUpperCase()}→${m.to.toUpperCase()}\n`;
+    });
+  }
+
+  // All moves grouped by piece type
+  context += `\n📋 ALL MOVES BY PIECE:\n`;
+  Object.entries(movesByPiece).forEach(([piece, moves]) => {
+    context += `  ${piece} (${moves.length}): ${moves.join(', ')}\n`;
+  });
   
+  // Add opponent's threats - what can THEY do on their next turn?
+  const opponentColor = chess.turn() === 'w' ? 'b' : 'w';
+  const opponentAnalyzer = new PositionAnalyzer(fen);
+
+  // Switch perspective temporarily to see opponent's moves
+  const fenParts = fen.split(' ');
+  fenParts[1] = opponentColor;
+  const opponentFen = fenParts.join(' ');
+
+  try {
+    const opponentChess = new Chess(opponentFen);
+    const opponentMoves = opponentChess.moves({ verbose: true });
+    const opponentCaptures = opponentMoves.filter(m => m.captured);
+    const opponentChecks = opponentMoves.filter(m => m.san.includes('+'));
+
+    context += `\n⚠️ OPPONENT'S THREATS (what ${chess.turn() === 'w' ? 'Black' : 'White'} can do next):\n`;
+
+    if (opponentChecks.length > 0) {
+      context += `  Checking moves available: ${opponentChecks.length}\n`;
+      opponentChecks.slice(0, 3).forEach(m => {
+        const piece = pieceNames[m.piece];
+        context += `    ${piece}: ${m.from.toUpperCase()}→${m.to.toUpperCase()}\n`;
+      });
+    }
+
+    if (opponentCaptures.length > 0) {
+      context += `  Can capture: ${opponentCaptures.length} pieces\n`;
+      opponentCaptures.slice(0, 5).forEach(m => {
+        const piece = pieceNames[m.piece];
+        const captured = pieceNames[m.captured!];
+        context += `    ${piece} can take ${captured} on ${m.to.toUpperCase()}\n`;
+      });
+    }
+
+    if (opponentChecks.length === 0 && opponentCaptures.length === 0) {
+      context += `  No immediate threats detected\n`;
+    }
+  } catch (e) {
+    // If FEN manipulation fails, skip opponent analysis
+  }
+
   if (lastMove) {
     context += `\nLast move played: ${lastMove}\n`;
   }
-  
+
   return context;
 };

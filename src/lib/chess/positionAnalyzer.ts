@@ -295,17 +295,39 @@ export class PositionAnalyzer {
 
   private getAttackersOfSquare(square: Square, attackerColor: 'w' | 'b'): Square[] {
     const attackers: Square[] = [];
-    
-    // This is a simplified version - in a full implementation you'd check all piece types
-    const moves = this.chess.moves({ verbose: true });
-    
-    for (const move of moves) {
-      if (move.color === attackerColor && move.to === square) {
-        attackers.push(move.from);
+
+    // CRITICAL FIX: We need to check what pieces of attackerColor can attack this square
+    // chess.moves() only returns moves for the CURRENT player, so we need to check manually
+
+    // Temporarily switch turns to get opponent's perspective if needed
+    const currentTurn = this.chess.turn();
+    const needsTurnSwitch = currentTurn !== attackerColor;
+
+    if (needsTurnSwitch) {
+      // Create a temporary position with switched turn
+      const fen = this.chess.fen();
+      const fenParts = fen.split(' ');
+      fenParts[1] = attackerColor; // Switch active color
+      const tempChess = new Chess(fenParts.join(' '));
+
+      // Get all moves from this color's perspective
+      const moves = tempChess.moves({ verbose: true });
+      for (const move of moves) {
+        if (move.to === square) {
+          attackers.push(move.from);
+        }
+      }
+    } else {
+      // Current player's moves - can use directly
+      const moves = this.chess.moves({ verbose: true });
+      for (const move of moves) {
+        if (move.to === square) {
+          attackers.push(move.from);
+        }
       }
     }
-    
-    return attackers;
+
+    return [...new Set(attackers)]; // Remove duplicates
   }
 
   private findKing(color: 'w' | 'b'): Square | null {
