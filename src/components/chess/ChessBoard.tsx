@@ -318,16 +318,14 @@ export default function ChessBoard({
             }}
           >
             <span
-              className={`font-bold leading-none ${
-                isLight 
-                  ? 'text-slate-600 drop-shadow-sm' 
-                  : 'text-slate-200 drop-shadow-md'
-              }`}
+              className="font-bold leading-none text-black"
               style={{
-                fontSize: `${Math.max(8, squareSize * 0.2)}px`,
-                textShadow: isLight 
-                  ? '1px 1px 2px rgba(0,0,0,0.3)' 
-                  : '1px 1px 2px rgba(0,0,0,0.8)',
+                fontSize: `${Math.max(6, squareSize * 0.15)}px`,
+                background: 'rgba(245, 240, 230, 0.65)',
+                padding: '0px 1px',
+                borderRadius: '1px',
+                border: '0.5px solid rgba(240, 235, 225, 0.7)',
+                boxShadow: '0 0.5px 1px rgba(0, 0, 0, 0.1)',
               }}
             >
               {files[file]}{ranks[rank]}
