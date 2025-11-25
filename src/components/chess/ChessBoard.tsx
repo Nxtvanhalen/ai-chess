@@ -440,7 +440,7 @@ export default function ChessBoard({
             boxShadow: 'inset 0 1px 3px rgba(255, 255, 255, 0.3)'
           }}
           showBoardNotation={false}
-          animationDuration={200}
+          animationDuration={800}
           arePiecesDraggable={interactive}
         />
         
