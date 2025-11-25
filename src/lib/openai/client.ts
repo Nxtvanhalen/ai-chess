@@ -49,7 +49,7 @@ export interface ResponsesAPIParams {
   input: string;
   instructions: string;
   reasoning?: {
-    effort: 'minimal' | 'medium' | 'high';
+    effort: 'none' | 'low' | 'medium' | 'high';
   };
   previous_response_id?: string;
   max_output_tokens?: number;
