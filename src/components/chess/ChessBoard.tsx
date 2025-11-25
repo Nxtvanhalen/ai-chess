@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Chess, Move, Square } from 'chess.js';
 import { getPieceName } from '@/lib/chess/pieceNames';
+import { customPieces } from './CustomPieces';
 
 interface ChessBoardProps {
   onMove: (move: Move) => void;
@@ -234,11 +235,13 @@ export default function ChessBoard({
         backgroundColor: 'hsla(var(--chess-highlight), 0.4)',
         background: 'radial-gradient(circle, hsla(var(--chess-highlight), 0.6), hsla(var(--chess-highlight), 0.2))',
         boxShadow: '0 0 20px hsla(var(--chess-highlight), 0.6), inset 0 0 0 2px hsla(var(--chess-highlight), 0.8)',
+        animation: 'trail-from 2s ease-in-out infinite',
       },
       [game.history({ verbose: true })[game.history({ verbose: true }).length - 1].to]: {
         backgroundColor: 'hsla(var(--chess-accent), 0.4)',
         background: 'radial-gradient(circle, hsla(var(--chess-accent), 0.6), hsla(var(--chess-accent), 0.2))',
         boxShadow: '0 0 20px hsla(var(--chess-accent), 0.6), inset 0 0 0 2px hsla(var(--chess-accent), 0.8)',
+        animation: 'trail-to 2s ease-in-out infinite',
       },
     }),
     // Highlight check situation
@@ -422,6 +425,7 @@ export default function ChessBoard({
           onPieceDrop={handleDrop}
           onSquareClick={handleSquareClick}
           boardOrientation={orientation}
+          customPieces={customPieces}
           customSquareStyles={customSquareStyles}
           customBoardStyle={{
             borderRadius: '16px',
