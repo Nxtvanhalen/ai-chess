@@ -46,52 +46,71 @@ export async function POST(request: NextRequest) {
     }
     
     systemPrompt += `
-    
-    Format your response as JSON:
+
+    CRITICAL: You MUST respond with valid JSON in EXACTLY this format. Do not respond with anything other than JSON.
+
+    Required JSON structure:
     {
       "suggestions": [
         {
-          "move": "Knight to F3", 
+          "move": "Knight to F3",
+          "reasoning": "Develops piece"
+        },
+        {
+          "move": "Pawn to E4",
           "reasoning": "Controls center"
         }
       ],
-      "casualComment": "Solid position"
+      "casualComment": "Choose wisely"
     }
-    
-    Rules:
-    - Maximum 1-2 suggestions, only if really helpful
-    - Use simple descriptions: "Knight to F3" not "Nf3"
-    - Reasoning: 3-5 words max
-    - casualComment: Brief and dry (e.g., "Tricky spot", "Engine's plotting", "Choose wisely")
-    - Less eager, more observant`;
+
+    MANDATORY RULES:
+    1. ALWAYS include the "suggestions" array (even if empty: [])
+    2. ALWAYS include "casualComment" string
+    3. Provide 1-2 move suggestions maximum
+    4. Use simple descriptions: "Knight to F3" not "Nf3"
+    5. Keep reasoning to 3-5 words
+    6. casualComment must be brief and dry
+
+    Example valid response:
+    {"suggestions": [{"move": "Knight to F3", "reasoning": "Solid development"}], "casualComment": "Solid position"}
+
+    DO NOT respond with empty JSON. ALWAYS provide at least one suggestion and a comment.`;
     
     const openai = getOpenAIClient();
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o',
+      model: 'gpt-5.1',
       messages: [
         { role: 'system', content: systemPrompt },
-        { 
-          role: 'user', 
+        {
+          role: 'user',
           content: `${context}\n\nGame phase: ${gamePhase || 'opening'}\nRecent moves: ${moveHistory?.slice(-3).join(', ') || 'None yet'}\n\nWhat moves would you casually suggest to Chris?`
         }
       ],
-      temperature: 0.8,
-      max_tokens: 300,
+      max_completion_tokens: 300,
       response_format: { type: 'json_object' }
     });
     
     const response = JSON.parse(completion.choices[0].message.content || '{}');
-    
+
+    console.log('Pre-move analysis raw response:', JSON.stringify(response, null, 2));
+
     const suggestions: MoveSuggestion[] = response.suggestions?.map((s: any) => ({
       move: s.move,
       reasoning: s.reasoning,
       casual: true
     })) || [];
-    
-    return NextResponse.json({
+
+    console.log('Pre-move analysis formatted suggestions:', JSON.stringify(suggestions, null, 2));
+
+    const result = {
       suggestions: suggestions.slice(0, 2), // Ensure max 2 suggestions
       comment: response.casualComment || "Your turn!"
-    });
+    };
+
+    console.log('Pre-move analysis final result:', JSON.stringify(result, null, 2));
+
+    return NextResponse.json(result);
     
   } catch (error) {
     console.error('Pre-move analysis error:', error);

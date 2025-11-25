@@ -37,16 +37,15 @@ export async function POST(request: NextRequest) {
     
     const openai = getOpenAIClient();
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o',
+      model: 'gpt-5.1',
       messages: [
         { role: 'system', content: systemPrompt },
-        { 
-          role: 'user', 
+        {
+          role: 'user',
           content: `${context}${evaluationContext}\n\nThe engine just played: ${engineMove.san || engineMove}\n\nWhat's your casual take on this move?`
         }
       ],
-      temperature: 0.9,
-      max_tokens: 50, // One sentence
+      max_completion_tokens: 50, // One sentence
     });
     
     const commentary = completion.choices[0].message.content || "Interesting move by the engine.";

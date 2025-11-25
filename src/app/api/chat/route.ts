@@ -87,15 +87,15 @@ export async function POST(request: NextRequest) {
     // Use GPT-5 Responses API with reasoning control for faster responses
     // No need for response chaining - GPT-5 handles turn-by-turn naturally
     const completion = await createResponsesCompletion({
-      model: 'gpt-5',
+      model: 'gpt-5.1',
       input: message,
       instructions: instructions,
       reasoning: {
-        effort: 'minimal' // Fast responses for chat
+        effort: 'low' // Fast responses for chat
       },
       max_output_tokens: 1000,
     });
-    
+
     // Parse Responses API format
     const messageOutput = completion.output.find((item: any) => item.type === 'message');
     const textContent = messageOutput?.content.find((content: any) => content.type === 'output_text');

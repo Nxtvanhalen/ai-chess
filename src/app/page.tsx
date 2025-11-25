@@ -112,8 +112,12 @@ export default function Home() {
   // Get AI suggestions when it's user's turn
   const getAISuggestions = useCallback(async (fen: string) => {
     if (!conversationId) return;
-    
+
     try {
+      // Create abort controller with 10 second timeout for slow API responses
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+
       const response = await fetch('/api/chess/pre-move-analysis', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -121,8 +125,11 @@ export default function Home() {
           fen,
           moveHistory: messagesRef.current.filter(m => m.metadata?.moveContext).map(m => m.metadata?.moveContext),
           gamePhase: detectGamePhase(fen)
-        })
+        }),
+        signal: controller.signal
       });
+
+      clearTimeout(timeoutId);
       
       if (response.ok) {
         const data = await response.json();
