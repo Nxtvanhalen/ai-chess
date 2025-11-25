@@ -120,7 +120,7 @@ body {
 
 body {
   color: hsl(var(--foreground));
-  background: linear-gradient(135deg, #1a0d2e, #2d1b4e, #4c2a7e);
+  background: #000000;
   min-height: 100vh;
   /* Extend background behind safe areas on iPhone */
   min-height: calc(100vh + env(safe-area-inset-top) + env(safe-area-inset-bottom));
@@ -149,7 +149,7 @@ body::before {
   left: calc(-1 * env(safe-area-inset-left));
   right: calc(-1 * env(safe-area-inset-right));
   height: calc(100vh + env(safe-area-inset-top) + env(safe-area-inset-bottom) + 500px);
-  background: linear-gradient(135deg, #1a0d2e, #2d1b4e, #4c2a7e);
+  background: #000000;
   z-index: -1;
   pointer-events: none;
 }
@@ -162,7 +162,7 @@ body::after {
   left: 0;
   right: 0;
   height: 500px;
-  background: linear-gradient(135deg, #1a0d2e, #2d1b4e, #4c2a7e);
+  background: #000000;
   z-index: -2;
   pointer-events: none;
 }
@@ -859,7 +859,7 @@ select {
     flex: 1; /* Take remaining space */
     min-height: 0; /* Allow shrinking */
     z-index: 10;
-    background: linear-gradient(135deg, #1a0d2e, #2d1b4e, #4c2a7e);
+    background: #000000;
     
     /* Smooth transitions */
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -915,7 +915,7 @@ select {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: linear-gradient(to bottom, rgb(88 28 135), rgb(15 23 42));
+  background: #000000;
   backdrop-filter: blur(12px);
   overflow: hidden;
   position: relative;
@@ -960,7 +960,7 @@ select {
   /* Desktop and landscape - normal flow */
   position: relative;
   z-index: 30;
-  background: linear-gradient(to right, rgb(88 28 135), rgb(30 58 138), rgb(88 28 135));
+  background: #000000;
   margin: 0;
   padding: 0;
   border: none;
@@ -984,8 +984,8 @@ select {
     /* Reset any transforms */
     transform: translateY(0) !important;
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    
-    background: linear-gradient(135deg, #4c2a7e, #2d1b4e, #1a0d2e);
+
+    background: #000000;
     padding: 0.25rem;
     min-height: 4rem; /* Define consistent height */
   }
@@ -1022,7 +1022,7 @@ select {
 
 /* Chat Input Styling */
 .chat-input {
-  background: linear-gradient(to right, rgb(88 28 135), rgb(30 58 138), rgb(88 28 135));
+  background: #000000;
   backdrop-filter: blur(4px);
   transition: all 0.3s ease-out;
 }
