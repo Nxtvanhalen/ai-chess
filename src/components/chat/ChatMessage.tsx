@@ -130,8 +130,8 @@ export default function ChatMessage({ message }: ChatMessageProps) {
   
   return (
     <div className={`flex gap-1 lg:gap-4 px-1 lg:px-6 py-1 lg:py-6 animate-in slide-in-from-bottom-6 lg:slide-in-from-bottom-8 fade-in duration-700 lg:duration-1000 ease-out ${
-      isAssistant 
-        ? 'bg-gradient-to-r from-purple-900/20 via-blue-900/10 to-purple-900/20 border-l-4 border-purple-400/40 rounded-r-2xl mx-0 lg:mx-2' 
+      isAssistant
+        ? 'mx-0 lg:mx-2'
         : 'hover:bg-purple-900/10 rounded-l-2xl mx-0 lg:mx-2'
     }`}>
       <div className="flex-shrink-0">
