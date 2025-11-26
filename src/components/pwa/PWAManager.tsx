@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { usePWAInstall } from '@/hooks/usePWAInstall';
 import PWAInstallButton from './PWAInstallButton';
 import PWAInstallBanner from './PWAInstallBanner';
@@ -16,7 +17,7 @@ interface PWAManagerProps {
 
 /**
  * PWA Manager Component
- * 
+ *
  * Orchestrates the entire PWA installation experience:
  * - Manages component visibility based on installation state
  * - Coordinates between install button, banner, and welcome message
@@ -32,6 +33,8 @@ export default function PWAManager({
   bannerPosition = 'bottom',
   className = '',
 }: PWAManagerProps) {
+  const [mounted, setMounted] = useState(false);
+
   const {
     isInstallable,
     isInstalled,
@@ -40,15 +43,27 @@ export default function PWAManager({
     platform,
   } = usePWAInstall();
 
-  // Debug logging for development
-  if (process.env.NODE_ENV === 'development') {
-    console.log('[PWA Manager] Current state:', {
-      isInstallable,
-      isInstalled,
-      isStandalone,
-      canShowBanner,
-      platform,
-    });
+  // Only render after client-side hydration to prevent mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Debug logging for development (in useEffect to avoid hydration issues)
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[PWA Manager] Current state:', {
+        isInstallable,
+        isInstalled,
+        isStandalone,
+        canShowBanner,
+        platform,
+      });
+    }
+  }, [isInstallable, isInstalled, isStandalone, canShowBanner, platform]);
+
+  // Don't render anything until after hydration
+  if (!mounted) {
+    return null;
   }
 
   return (

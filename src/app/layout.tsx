@@ -3,6 +3,11 @@ import "./globals.css";
 import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NODE_ENV === 'production'
+      ? 'https://chess.chrisbergstrom.com'
+      : 'http://localhost:3000'
+  ),
   title: "Chester AI Chess",
   description: "Play chess with Chester, your witty AI companion",
   manifest: "/manifest.json",
