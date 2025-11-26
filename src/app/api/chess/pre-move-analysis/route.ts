@@ -3,21 +3,91 @@ import { getOpenAIClient } from '@/lib/openai/client';
 import { formatMoveContext } from '@/lib/openai/chess-butler-prompt';
 import { PositionAnalyzer } from '@/lib/chess/positionAnalyzer';
 import { MoveSuggestion } from '@/types';
+import { GameMemoryService } from '@/lib/services/GameMemoryService';
+import { ChesterMemoryService } from '@/lib/services/ChesterMemoryService';
 
 export async function POST(request: NextRequest) {
   try {
-    const { fen, moveHistory, gamePhase } = await request.json();
-    
+    const { fen, moveHistory, gamePhase, gameId, userId = 'chris', gameContext } = await request.json();
+
     if (!fen) {
       return NextResponse.json({ error: 'FEN is required' }, { status: 400 });
     }
-    
+
+    console.log('Pre-move analysis - Starting:', {
+      hasGameId: !!gameId,
+      currentPhase: gamePhase,
+      totalMoves: gameContext?.totalMoves
+    });
+
+    // Fetch comprehensive game memory context
+    let fullGameContext = null;
+    let chesterPersonality = null;
+
+    if (gameId) {
+      try {
+        fullGameContext = await GameMemoryService.getGameContext(gameId);
+        chesterPersonality = await ChesterMemoryService.getPersonalityContext(userId);
+
+        console.log('Pre-move analysis - Memory loaded:', {
+          totalMovesInMemory: fullGameContext?.totalMoves || 0,
+          previousSuggestions: fullGameContext?.suggestionsGiven?.length || 0,
+          tacticalThemes: fullGameContext?.tacticalThemes || []
+        });
+      } catch (error) {
+        console.error('Error fetching game memory:', error);
+        // Continue without memory - graceful degradation
+      }
+    }
+
     const context = formatMoveContext(fen);
     const analyzer = new PositionAnalyzer(fen);
     const analysis = analyzer.analyzePosition();
     
     // Create urgency-based system prompt
     let systemPrompt = `You are Chester, Chris's chess buddy watching him play. `;
+
+    // Add personality and relationship context
+    if (chesterPersonality) {
+      systemPrompt += `\n\nYour relationship:
+- Rapport Level: ${chesterPersonality.rapportLevel}/10
+- Games Together: ${chesterPersonality.gamesPlayed}
+- Recent Performance: ${chesterPersonality.recentPerformance}`;
+
+      if (chesterPersonality.commonMistakes.length > 0) {
+        systemPrompt += `\n- Watch for: ${chesterPersonality.commonMistakes.join(', ')}`;
+      }
+    }
+
+    // Add comprehensive game context
+    if (fullGameContext) {
+      // Add tactical themes
+      if (fullGameContext.tacticalThemes.length > 0) {
+        systemPrompt += `\n\nTactical themes seen: ${fullGameContext.tacticalThemes.join(', ')}`;
+      }
+
+      // Add recent suggestions and their outcomes
+      const recentSuggestions = fullGameContext.suggestionsGiven.slice(-3);
+      if (recentSuggestions.length > 0) {
+        systemPrompt += `\n\nYour recent suggestions:`;
+        recentSuggestions.forEach(s => {
+          const outcome = s.followed ? (s.outcome === 'good' ? '✓ Good!' : s.outcome === 'bad' ? '✗ Bad' : '~ Okay') : '(ignored)';
+          systemPrompt += `\n- Move ${s.move_number}: ${s.suggestions.map(sg => sg.move).join(' or ')} ${outcome}`;
+        });
+        systemPrompt += `\n\nLearn from these outcomes when making new suggestions.`;
+      }
+
+      // Add full move history for better context
+      if (fullGameContext.fullMoveHistory.length > 0) {
+        const moveSequence = fullGameContext.fullMoveHistory
+          .slice(-20) // Last 20 moves
+          .map(m => `${m.move_number}. ${m.player_type === 'human' ? 'Chris' : 'AI'}: ${m.san}`)
+          .join(', ');
+        systemPrompt += `\n\nRecent moves: ${moveSequence}`;
+      }
+    }
+
+    systemPrompt += `\n\n`;
     
     if (analysis.urgencyLevel === 'emergency') {
       systemPrompt += `URGENT SITUATION! Chris needs immediate help. Focus on:
@@ -109,6 +179,36 @@ export async function POST(request: NextRequest) {
     };
 
     console.log('Pre-move analysis final result:', JSON.stringify(result, null, 2));
+
+    // Save suggestions to game memory
+    if (gameId && result.suggestions.length > 0) {
+      try {
+        const moveNumber = gameContext?.totalMoves || 1;
+
+        await GameMemoryService.addSuggestions(gameId, {
+          move_number: moveNumber,
+          suggestions: result.suggestions,
+          followed: false, // Will be updated when user makes move
+          timestamp: new Date().toISOString()
+        });
+
+        // Also save as commentary
+        await GameMemoryService.addCommentary(gameId, {
+          move_number: moveNumber,
+          type: 'suggestion',
+          content: `Chester suggests: ${result.suggestions.map(s => s.move).join(' or ')}. ${result.comment}`,
+          timestamp: new Date().toISOString(),
+          metadata: {
+            urgency_level: analysis.urgencyLevel
+          }
+        });
+
+        console.log('Suggestions saved to game memory');
+      } catch (error) {
+        console.error('Error saving suggestions to game memory:', error);
+        // Don't fail the request if memory save fails
+      }
+    }
 
     return NextResponse.json(result);
     

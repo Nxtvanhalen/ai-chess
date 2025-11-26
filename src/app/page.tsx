@@ -10,16 +10,17 @@ import { generateId, generateSimpleId } from '@/lib/utils/uuid';
 import { ChatMessage, MoveSuggestion } from '@/types';
 import { PerformanceMonitor, debounce } from '@/lib/utils/performance';
 import { haptics } from '@/lib/utils/haptics';
-import { 
-  createGame, 
-  updateGamePosition, 
-  saveMove, 
-  createConversation, 
-  saveMessage, 
+import {
+  createGame,
+  updateGamePosition,
+  saveMove,
+  createConversation,
+  saveMessage,
   getConversationMessages,
-  getCurrentGame 
+  getCurrentGame
 } from '@/lib/supabase/database';
 import { supabase } from '@/lib/supabase/client';
+import { GameMemoryService } from '@/lib/services/GameMemoryService';
 
 export default function Home() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -80,11 +81,19 @@ export default function Home() {
           const newGame = await createGame('white');
           setCurrentGameId(newGame.id);
           setCurrentPosition(newGame.fen);
-          
+
+          // Initialize game memory
+          try {
+            await GameMemoryService.createGameMemory(newGame.id, 'chris');
+            console.log('Game memory initialized for game:', newGame.id);
+          } catch (error) {
+            console.error('Error initializing game memory:', error);
+          }
+
           // Create conversation for this game
           const conversation = await createConversation(newGame.id);
           setConversationId(conversation.id);
-          
+
           // Add welcome message
           const welcomeMessage: ChatMessage = {
             id: await generateId(),
@@ -92,13 +101,13 @@ export default function Home() {
             content: "Hey Chris! Ready for another game? I'll be here watching and giving you some tips. You're playing white against the engine. Good luck!",
             timestamp: new Date(),
           };
-          
+
           setMessages([welcomeMessage]);
           await saveMessage(conversation.id, 'assistant', welcomeMessage.content);
-          
+
           // Get initial suggestions
           setTimeout(() => {
-            getAISuggestions(newGame.fen);
+            getAISuggestions(newGame.fen, newGame.id);
           }, 500);
         }
       } catch (error) {
@@ -110,7 +119,7 @@ export default function Home() {
   }, []);
 
   // Get AI suggestions when it's user's turn
-  const getAISuggestions = useCallback(async (fen: string) => {
+  const getAISuggestions = useCallback(async (fen: string, gameId?: string) => {
     if (!conversationId) return;
 
     try {
@@ -124,16 +133,22 @@ export default function Home() {
         body: JSON.stringify({
           fen,
           moveHistory: messagesRef.current.filter(m => m.metadata?.moveContext).map(m => m.metadata?.moveContext),
-          gamePhase: detectGamePhase(fen)
+          gamePhase: detectGamePhase(fen),
+          gameId: gameId || currentGameId,
+          userId: 'chris',
+          gameContext: {
+            fen,
+            totalMoves: messagesRef.current.filter(m => m.metadata?.moveContext).length
+          }
         }),
         signal: controller.signal
       });
 
       clearTimeout(timeoutId);
-      
+
       if (response.ok) {
         const data = await response.json();
-        
+
         // Add suggestion message
         const suggestionMessage: ChatMessage = {
           id: generateSimpleId(),
@@ -145,13 +160,13 @@ export default function Home() {
             suggestions: data.suggestions
           }
         };
-        
+
         setMessages(prev => [...prev, suggestionMessage]);
       }
     } catch (error) {
       console.error('Error getting AI suggestions:', error);
     }
-  }, [conversationId]);
+  }, [conversationId, currentGameId]);
   
   const detectGamePhase = (fen: string) => {
     const moves = messagesRef.current.filter(m => m.metadata?.moveContext).length;
@@ -214,12 +229,23 @@ export default function Home() {
           moveHistory: messages.filter(m => m.metadata?.moveContext),
           gameContext: {
             fen: move.after,
+            totalMoves: newMoveCount,
             fullMoveHistory: messages.filter(m => m.metadata?.moveContext).map(m => ({
               role: m.role,
               move: m.metadata?.moveContext,
               position: m.metadata?.position
             }))
           },
+          gameId: currentGameId,
+          userId: 'chris',
+          moveDetails: {
+            san: move.san,
+            from: move.from,
+            to: move.to,
+            piece: move.piece,
+            captured: move.captured,
+            player_type: 'human'
+          }
         }),
       });
       
@@ -498,6 +524,8 @@ export default function Home() {
             totalMoves: messages.filter(m => m.metadata?.moveContext).length
           } : undefined,
           moveHistory: messages,
+          gameId: currentGameId,
+          userId: 'chris'
         }),
       });
       
@@ -572,17 +600,25 @@ export default function Home() {
     // Reset game state
     setGameOver({ checkmate: false });
     setMoveCount(0);
-    
+
     try {
       // Create new game
       const newGame = await createGame('white');
       setCurrentGameId(newGame.id);
       setCurrentPosition(newGame.fen);
-      
+
+      // Initialize game memory
+      try {
+        await GameMemoryService.createGameMemory(newGame.id, 'chris');
+        console.log('Game memory initialized for restarted game:', newGame.id);
+      } catch (error) {
+        console.error('Error initializing game memory:', error);
+      }
+
       // Create conversation for this game
       const conversation = await createConversation(newGame.id);
       setConversationId(conversation.id);
-      
+
       // Add new game message
       const newGameMessage: ChatMessage = {
         id: await generateId(),
@@ -590,13 +626,18 @@ export default function Home() {
         content: "New game! The board is reset and Chester's ready for another match. Your move, Chris!",
         timestamp: new Date(),
       };
-      
+
       setMessages([newGameMessage]);
       await saveMessage(conversation.id, 'assistant', newGameMessage.content);
+
+      // Get initial suggestions for new game
+      setTimeout(() => {
+        getAISuggestions(newGame.fen, newGame.id);
+      }, 500);
     } catch (error) {
       console.error('Error restarting game:', error);
     }
-  }, []);
+  }, [getAISuggestions]);
 
   return (
     <GameLayout

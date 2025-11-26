@@ -3,39 +3,65 @@ import { createResponsesCompletion } from '@/lib/openai/client';
 import { CHESS_BUTLER_SYSTEM_PROMPT, formatMoveContext } from '@/lib/openai/chess-butler-prompt';
 import { checkRateLimit, getRateLimitHeaders, getClientIP } from '@/lib/middleware/rate-limit';
 import { extractMoveSuggestions, validateMoveSuggestion } from '@/lib/chess/board-validator';
+import { GameMemoryService } from '@/lib/services/GameMemoryService';
+import { ChesterMemoryService } from '@/lib/services/ChesterMemoryService';
 
 export async function POST(request: NextRequest) {
   try {
     // Check rate limit
     const clientIP = getClientIP(request);
     const rateLimitResult = checkRateLimit(clientIP);
-    
+
     if (!rateLimitResult.allowed) {
       return NextResponse.json(
-        { 
+        {
           error: 'Rate limit exceeded. Please wait before sending another message.',
           retryAfter: Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000)
-        }, 
-        { 
+        },
+        {
           status: 429,
           headers: getRateLimitHeaders(rateLimitResult)
         }
       );
     }
 
-    const { message, gameContext, moveHistory } = await request.json();
-    
+    const { message, gameContext, moveHistory, gameId, userId = 'chris' } = await request.json();
+
     // Debug: Log game context to help troubleshoot Chester's board visibility
     console.log('Chester Chat API - Game Context:', {
       hasGameContext: !!gameContext,
       fen: gameContext?.fen,
       lastMove: gameContext?.lastMove,
       totalMoves: gameContext?.totalMoves,
-      messageLength: message.length
+      messageLength: message.length,
+      hasGameId: !!gameId
     });
-    
+
     if (!message) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
+    }
+
+    // Fetch comprehensive game memory context
+    let fullGameContext = null;
+    let chesterPersonality = null;
+
+    if (gameId) {
+      try {
+        fullGameContext = await GameMemoryService.getGameContext(gameId);
+        chesterPersonality = await ChesterMemoryService.getPersonalityContext(userId);
+
+        console.log('Chester Memory Context:', {
+          hasFullContext: !!fullGameContext,
+          totalMovesInMemory: fullGameContext?.totalMoves || 0,
+          commentaryCount: fullGameContext?.chesterCommentary?.length || 0,
+          tacticalThemes: fullGameContext?.tacticalThemes || [],
+          rapportLevel: chesterPersonality?.rapportLevel || 1,
+          gamesPlayed: chesterPersonality?.gamesPlayed || 0
+        });
+      } catch (error) {
+        console.error('Error fetching game memory context:', error);
+        // Continue without memory context - graceful degradation
+      }
     }
     
     // Check if this is a playing style analysis question
@@ -51,35 +77,91 @@ export async function POST(request: NextRequest) {
     
     // Build comprehensive instructions for Responses API
     let instructions = CHESS_BUTLER_SYSTEM_PROMPT;
-    
+
+    // Add Chester's personality and relationship context
+    if (chesterPersonality) {
+      instructions += `\n\nYOUR RELATIONSHIP WITH CHRIS:
+- Rapport Level: ${chesterPersonality.rapportLevel}/10
+- Games Played Together: ${chesterPersonality.gamesPlayed}
+- Current Performance: ${chesterPersonality.recentPerformance}
+- Current Streak: ${chesterPersonality.currentStreak > 0 ? `${chesterPersonality.currentStreak} wins` : 'none'}`;
+
+      if (chesterPersonality.commonMistakes.length > 0) {
+        instructions += `\n- Common Patterns to Watch: ${chesterPersonality.commonMistakes.join(', ')}`;
+      }
+
+      if (chesterPersonality.strongAreas.length > 0) {
+        instructions += `\n- Strong Areas: ${chesterPersonality.strongAreas.join(', ')}`;
+      }
+    }
+
     if (gameContext?.fen) {
       instructions += `\n\nCURRENT BOARD STATE - You CAN see the board clearly:\n${formatMoveContext(gameContext.fen, gameContext.lastMove)}`;
-      
+
       if (gameContext.totalMoves) {
         instructions += `\n\nGame Progress: ${gameContext.totalMoves} moves have been played.`;
       }
     } else {
       instructions += `\n\nNote: No current board state available. Ask Chris to make a move if you need to see the position.`;
     }
-    
-    // Add move history for style analysis questions
-    if (isStyleAnalysis && moveHistory && moveHistory.length > 0) {
-      const recentMoves = moveHistory.slice(-50); // Last 50 moves
+
+    // Add comprehensive game memory context
+    if (fullGameContext) {
+      // Add tactical themes detected
+      if (fullGameContext.tacticalThemes.length > 0) {
+        instructions += `\n\nTactical Themes in This Game: ${fullGameContext.tacticalThemes.join(', ')}`;
+      }
+
+      // Add game narrative if available
+      if (fullGameContext.gameNarrative) {
+        instructions += `\n\nGame Story So Far: ${fullGameContext.gameNarrative}`;
+      }
+
+      // Add recent commentary for context continuity
+      const recentCommentary = fullGameContext.chesterCommentary.slice(-5);
+      if (recentCommentary.length > 0) {
+        instructions += `\n\nYour Recent Commentary:`;
+        recentCommentary.forEach(comment => {
+          instructions += `\n- Move ${comment.move_number}: ${comment.content}`;
+        });
+      }
+
+      // Add move history for style analysis questions
+      if (isStyleAnalysis && fullGameContext.fullMoveHistory.length > 0) {
+        const recentMoves = fullGameContext.fullMoveHistory.slice(-50); // Last 50 moves
+        const moveSequence = recentMoves
+          .map(m => `${m.move_number}. ${m.player_type === 'human' ? 'Chris' : 'AI'}: ${m.san}${m.captured ? ' (captured ' + m.captured + ')' : ''}`)
+          .join(', ');
+
+        instructions += `\n\nRecent move history for style analysis (last ${recentMoves.length} moves): ${moveSequence}.
+
+        As Chester, analyze Chris's playing style based on these moves, looking for patterns in:
+        - Opening preferences and development
+        - Tactical vs positional approach
+        - Risk-taking vs cautious play
+        - Piece coordination and planning
+        - Endgame tendencies
+
+        Provide specific, actionable insights about their chess style in your characteristic Chester voice.`;
+      }
+    } else if (isStyleAnalysis && moveHistory && moveHistory.length > 0) {
+      // Fallback to old moveHistory if game memory not available
+      const recentMoves = moveHistory.slice(-50);
       const moveSequence = recentMoves
         .filter((m: any) => m.metadata?.moveContext)
         .map((m: any) => `${m.role === 'user' ? 'Chris' : 'AI'}: ${m.metadata.moveContext}`)
         .join(', ');
-      
+
       if (moveSequence) {
-        instructions += `\n\nRecent move history for style analysis (last ${recentMoves.length} moves): ${moveSequence}. 
-        
+        instructions += `\n\nRecent move history for style analysis (last ${recentMoves.length} moves): ${moveSequence}.
+
         As Chester, analyze Chris's playing style based on these moves, looking for patterns in:
         - Opening preferences and development
-        - Tactical vs positional approach  
+        - Tactical vs positional approach
         - Risk-taking vs cautious play
         - Piece coordination and planning
         - Endgame tendencies
-        
+
         Provide specific, actionable insights about their chess style in your characteristic Chester voice.`;
       }
     }
@@ -104,15 +186,15 @@ export async function POST(request: NextRequest) {
     // Validate move suggestions if a game context exists
     if (gameContext?.fen) {
       const moveSuggestions = extractMoveSuggestions(content);
-      
+
       // Check each move suggestion and add corrections if needed
       for (const suggestion of moveSuggestions) {
         const validation = validateMoveSuggestion(gameContext.fen, suggestion);
-        
+
         if (!validation.isValid) {
           // Log the error for debugging
           console.log(`Chester move validation error: ${suggestion} - ${validation.error}`);
-          
+
           // If Chester made an error, append a correction note
           if (validation.correctedMove) {
             content += `\n\n[Note: ${validation.correctedMove}]`;
@@ -120,7 +202,37 @@ export async function POST(request: NextRequest) {
         }
       }
     }
-    
+
+    // Save chat interaction to game memory
+    if (gameId && gameContext?.totalMoves !== undefined) {
+      try {
+        // Save user's question as commentary
+        await GameMemoryService.addCommentary(gameId, {
+          move_number: gameContext.totalMoves,
+          type: 'chat',
+          content: `User: ${message}`,
+          timestamp: new Date().toISOString(),
+          metadata: {}
+        });
+
+        // Save Chester's response as commentary
+        await GameMemoryService.addCommentary(gameId, {
+          move_number: gameContext.totalMoves,
+          type: 'chat',
+          content: `Chester: ${content}`,
+          timestamp: new Date().toISOString(),
+          metadata: {
+            urgency_level: isStyleAnalysis ? 'strategic' : undefined
+          }
+        });
+
+        console.log('Chat interaction saved to game memory');
+      } catch (error) {
+        console.error('Error saving chat to game memory:', error);
+        // Don't fail the request if memory save fails
+      }
+    }
+
     // Return simple response - GPT-5 handles conversation naturally
     return new Response(content, {
       headers: {

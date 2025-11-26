@@ -23,7 +23,7 @@ const PIECE_URLS = {
 // Create custom piece renderer with rotation and color adjustments
 // All pieces: white faces up (12 o'clock), black faces down (6 o'clock)
 // White pieces are chrome/metallic silver, black pieces are dark purple
-const createPieceRenderer = (pieceUrl: string, isWhite: boolean, isKnight: boolean = false) => {
+const createPieceRenderer = (pieceUrl: string, isWhite: boolean) => {
   return ({ squareWidth, isDragging }: CustomPieceFnArgs) => (
     <img
       src={pieceUrl}
@@ -44,18 +44,18 @@ const createPieceRenderer = (pieceUrl: string, isWhite: boolean, isKnight: boole
 
 // Export custom pieces configuration
 export const customPieces = {
-  wP: createPieceRenderer(PIECE_URLS.wP, true, false),
-  wN: createPieceRenderer(PIECE_URLS.wN, true, true), // Knight - no rotation
-  wB: createPieceRenderer(PIECE_URLS.wB, true, false),
-  wR: createPieceRenderer(PIECE_URLS.wR, true, false),
-  wQ: createPieceRenderer(PIECE_URLS.wQ, true, false),
-  wK: createPieceRenderer(PIECE_URLS.wK, true, false),
-  bP: createPieceRenderer(PIECE_URLS.bP, false, false),
-  bN: createPieceRenderer(PIECE_URLS.bN, false, true), // Knight - no rotation
-  bB: createPieceRenderer(PIECE_URLS.bB, false, false),
-  bR: createPieceRenderer(PIECE_URLS.bR, false, false),
-  bQ: createPieceRenderer(PIECE_URLS.bQ, false, false),
-  bK: createPieceRenderer(PIECE_URLS.bK, false, false),
+  wP: createPieceRenderer(PIECE_URLS.wP, true),
+  wN: createPieceRenderer(PIECE_URLS.wN, true),
+  wB: createPieceRenderer(PIECE_URLS.wB, true),
+  wR: createPieceRenderer(PIECE_URLS.wR, true),
+  wQ: createPieceRenderer(PIECE_URLS.wQ, true),
+  wK: createPieceRenderer(PIECE_URLS.wK, true),
+  bP: createPieceRenderer(PIECE_URLS.bP, false),
+  bN: createPieceRenderer(PIECE_URLS.bN, false),
+  bB: createPieceRenderer(PIECE_URLS.bB, false),
+  bR: createPieceRenderer(PIECE_URLS.bR, false),
+  bQ: createPieceRenderer(PIECE_URLS.bQ, false),
+  bK: createPieceRenderer(PIECE_URLS.bK, false),
 };
 
 // Alternative ornate piece sets (comment/uncomment to switch)
