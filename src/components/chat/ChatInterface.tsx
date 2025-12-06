@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, useMotionValue, animate } from 'framer-motion';
 import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
 import LoadingIndicator from './LoadingIndicator';
@@ -26,21 +26,55 @@ export default function ChatInterface({
   const lastScrollHeightRef = useRef(0);
   const userScrolledUpRef = useRef(false);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const scrollAnimationRef = useRef<{ stop: () => void } | null>(null);
+  const lastTargetRef = useRef(0);
+  const isAnimatingRef = useRef(false);
 
-  // Smooth scroll to bottom using native CSS smooth scrolling
+  // Smooth scroll using Framer Motion's animate for buttery smoothness
   const scrollToBottom = useCallback((smooth: boolean = true) => {
     const container = scrollContainerRef.current;
     if (!container) return;
 
-    // Use requestAnimationFrame for smoother timing
-    requestAnimationFrame(() => {
-      if (smooth) {
-        container.scrollTo({
-          top: container.scrollHeight,
-          behavior: 'smooth'
-        });
-      } else {
-        container.scrollTop = container.scrollHeight;
+    const targetScroll = container.scrollHeight - container.clientHeight;
+
+    if (!smooth) {
+      container.scrollTop = targetScroll;
+      return;
+    }
+
+    // If already animating toward a similar target, let it continue (don't jitter)
+    if (isAnimatingRef.current && Math.abs(targetScroll - lastTargetRef.current) < 20) {
+      return;
+    }
+
+    const startScroll = container.scrollTop;
+    const distance = targetScroll - startScroll;
+
+    // Don't animate if already at bottom
+    if (Math.abs(distance) < 3) {
+      container.scrollTop = targetScroll;
+      return;
+    }
+
+    // Cancel previous animation if target changed
+    if (scrollAnimationRef.current) {
+      scrollAnimationRef.current.stop();
+      scrollAnimationRef.current = null;
+    }
+
+    lastTargetRef.current = targetScroll;
+    isAnimatingRef.current = true;
+
+    // Use Framer Motion's animate for smooth, GPU-accelerated animation
+    scrollAnimationRef.current = animate(startScroll, targetScroll, {
+      duration: 1.5,
+      ease: [0.16, 1, 0.3, 1], // More dramatic easeOutExpo - very smooth deceleration
+      onUpdate: (value) => {
+        container.scrollTop = value;
+      },
+      onComplete: () => {
+        scrollAnimationRef.current = null;
+        isAnimatingRef.current = false;
       }
     });
   }, []);
@@ -81,14 +115,14 @@ export default function ChatInterface({
     const observer = new MutationObserver(() => {
       // Only auto-scroll if user hasn't intentionally scrolled up
       if (!userScrolledUpRef.current || isNearBottom()) {
-        // Debounce scroll calls during rapid updates (typing)
+        // Debounce scroll calls - longer delay to let animation complete
         if (scrollTimeoutRef.current) {
           clearTimeout(scrollTimeoutRef.current);
         }
 
         scrollTimeoutRef.current = setTimeout(() => {
           scrollToBottom(true);
-        }, 16); // ~60fps timing
+        }, 100); // 100ms debounce - let content settle
       }
     });
 
@@ -106,25 +140,13 @@ export default function ChatInterface({
     };
   }, [scrollToBottom, isNearBottom]);
 
-  // Also scroll on messages array changes (catches structural updates)
+  // Scroll on new messages only (not content changes - MutationObserver handles that)
   useEffect(() => {
-    // Reset user scroll flag on new messages - they probably want to see new content
     if (!userScrolledUpRef.current) {
-      requestAnimationFrame(() => {
-        scrollToBottom(true);
-      });
+      // Small delay to let new message render
+      setTimeout(() => scrollToBottom(true), 50);
     }
   }, [messages.length, scrollToBottom]);
-
-  // Initial scroll and scroll on any message content change
-  useEffect(() => {
-    // Create a content signature from message contents
-    const contentSignature = messages.map(m => m.content?.length || 0).join(',');
-
-    if (!userScrolledUpRef.current) {
-      scrollToBottom(true);
-    }
-  }, [messages, scrollToBottom]);
 
   const handleScrollToBottomClick = useCallback(() => {
     userScrolledUpRef.current = false;
