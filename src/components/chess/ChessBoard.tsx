@@ -439,12 +439,12 @@ export default function ChessBoard({
           }}
           customDarkSquareStyle={{
             background: theme.darkSquare.background,
-            boxShadow: theme.darkSquare.boxShadow,
+            ...(theme.darkSquare.boxShadow && { boxShadow: theme.darkSquare.boxShadow }),
             transition: 'all 0.5s ease-in-out',
           }}
           customLightSquareStyle={{
             background: theme.lightSquare.background,
-            boxShadow: theme.lightSquare.boxShadow,
+            ...(theme.lightSquare.boxShadow && { boxShadow: theme.lightSquare.boxShadow }),
             transition: 'all 0.5s ease-in-out',
           }}
           showBoardNotation={false}
