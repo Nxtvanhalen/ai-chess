@@ -9,18 +9,46 @@ interface ChatMessageProps {
   message: ChatMessageType;
 }
 
+// Animation variants for group chat feel
+const messageVariants = {
+  hidden: {
+    opacity: 0,
+    y: 30,
+    scale: 0.94
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      type: "spring",
+      stiffness: 120,
+      damping: 14,
+      duration: 1
+    }
+  },
+  exit: {
+    opacity: 0,
+    y: -10,
+    scale: 0.96,
+    transition: {
+      duration: 0.3
+    }
+  }
+};
+
 const HighlightedText = ({ children }: { children: string }) => {
   // Pattern to match chess moves like "Knight to E4", "Pawn to D5", "castles kingside", etc.
   const movePattern = /((?:King|Queen|Rook|Bishop|Knight|Pawn)\s+to\s+[A-H][1-8]|castles\s+(?:kingside|queenside))/gi;
-  
+
   const parts = children.split(movePattern);
-  
+
   return (
     <>
       {parts.map((part, index) => {
         if (movePattern.test(part)) {
           return (
-            <span 
+            <span
               key={index}
               className="chess-move-highlight font-semibold text-blue-300"
               style={{
@@ -100,7 +128,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
   const isThinking = message.metadata?.isThinking;
 
   // Engine messages now render like a 3rd person in chat (below)
-  
+
   // Get display name and styling based on role
   const getName = () => {
     if (isEngine) return 'Engine';
@@ -123,7 +151,13 @@ export default function ChatMessage({ message }: ChatMessageProps) {
   // Engine thinking indicator
   if (isEngine && isThinking) {
     return (
-      <div className="flex gap-1 lg:gap-4 px-1 lg:px-6 py-1 lg:py-6 animate-in slide-in-from-bottom-6 fade-in duration-700 ease-out mx-0 lg:mx-2">
+      <motion.div
+        variants={messageVariants}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+        className="flex gap-1 lg:gap-4 px-1 lg:px-6 py-1 lg:py-6 mx-0 lg:mx-2"
+      >
         <div className="flex-shrink-0">
           <div className="w-5 h-5 lg:w-10 lg:h-10 rounded-full bg-gradient-to-br from-red-600 via-orange-500 to-yellow-500 glow-effect shadow-lg flex items-center justify-center text-white text-xs lg:text-lg">
             ♟
@@ -159,14 +193,20 @@ export default function ChatMessage({ message }: ChatMessageProps) {
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div className={`flex gap-1 lg:gap-4 px-1 lg:px-6 py-1 lg:py-6 animate-in slide-in-from-bottom-6 lg:slide-in-from-bottom-8 fade-in duration-700 lg:duration-1000 ease-out ${
-      isUser ? 'hover:bg-purple-900/10 rounded-l-2xl' : ''
-    } mx-0 lg:mx-2`}>
+    <motion.div
+      variants={messageVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+      className={`flex gap-1 lg:gap-4 px-1 lg:px-6 py-1 lg:py-6 ${
+        isUser ? 'hover:bg-purple-900/10 rounded-l-2xl' : ''
+      } mx-0 lg:mx-2`}
+    >
       <div className="flex-shrink-0">
         {isEngine ? (
           <div className="w-5 h-5 lg:w-10 lg:h-10 rounded-full bg-gradient-to-br from-red-600 via-orange-500 to-yellow-500 glow-effect shadow-lg flex items-center justify-center text-white text-xs lg:text-lg">
@@ -223,6 +263,6 @@ export default function ChatMessage({ message }: ChatMessageProps) {
           )}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

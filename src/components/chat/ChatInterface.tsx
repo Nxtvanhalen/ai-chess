@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
 import LoadingIndicator from './LoadingIndicator';
@@ -188,11 +189,11 @@ export default function ChatInterface({
 
         {/* Message container with ref for MutationObserver */}
         <div ref={messagesContentRef} className="space-y-1">
-          {visibleMessages.map((message) => (
-            <div key={message.id} className="w-full">
-              <ChatMessage message={message} />
-            </div>
-          ))}
+          <AnimatePresence mode="popLayout">
+            {visibleMessages.map((message) => (
+              <ChatMessage key={message.id} message={message} />
+            ))}
+          </AnimatePresence>
         </div>
         
         <div 
