@@ -225,21 +225,35 @@ export class PositionAnalyzer {
     // Emergency: King in danger or major material loss imminent
     const currentColor = this.chess.turn();
     const kingSafetyStatus = currentColor === 'w' ? kingSafetyParam.white : kingSafetyParam.black;
-    
-    if (!kingSafetyStatus.safe || this.chess.inCheck()) {
+
+    // Check or immediate king danger = emergency
+    if (this.chess.inCheck()) {
       return 'emergency';
     }
 
-    // Major material imbalance or hanging pieces
-    if (Math.abs(materialCount.imbalance) >= 5 || threats.some(t => t.isHanging && t.value >= 3)) {
+    // Hanging piece worth 3+ (Knight/Bishop or better) = emergency
+    const myThreats = threats.filter(t => t.piece.startsWith(currentColor));
+    if (myThreats.some(t => t.isHanging && t.value >= 3)) {
       return 'emergency';
     }
 
-    // Tactical: Some threats exist or minor material imbalance
-    if (threats.length > 0 || Math.abs(materialCount.imbalance) >= 2) {
+    // Major material imbalance (down a rook or more)
+    if (materialCount.imbalance <= -5) {
+      return 'emergency';
+    }
+
+    // Tactical: Only if there's a SIGNIFICANT hanging piece (not just pawns)
+    // or we can capture something valuable
+    const enemyThreats = threats.filter(t => !t.piece.startsWith(currentColor));
+    const canCaptureValuable = enemyThreats.some(t => t.isHanging && t.value >= 3);
+    const myHangingMinor = myThreats.some(t => t.isHanging && t.value >= 3);
+
+    if (canCaptureValuable || myHangingMinor || Math.abs(materialCount.imbalance) >= 3) {
       return 'tactical';
     }
 
+    // Default to strategic - most positions should be here
+    // Don't trigger tactical just because pawns are attacked
     return 'strategic';
   }
 

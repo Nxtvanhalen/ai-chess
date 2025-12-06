@@ -37,6 +37,7 @@ export default function Home() {
   const timeoutRefs = useRef<Set<NodeJS.Timeout>>(new Set());
   const messagesRef = useRef<ChatMessage[]>([]);
   const performanceMonitor = useRef<PerformanceMonitor>(PerformanceMonitor.getInstance());
+  const gameStartTimeRef = useRef<number>(Date.now());
 
   // Streaming Chester responses hook
   const { streamChat, isStreaming } = useChesterStream();
@@ -232,8 +233,21 @@ export default function Home() {
         move.after,
         'human'
       );
-      
-      // Update game position  
+
+      // Also save to game memory for Chester's recall
+      await GameMemoryService.addMove(currentGameId, {
+        move_number: newMoveCount,
+        san: move.san,
+        from: move.from,
+        to: move.to,
+        piece: move.piece,
+        captured: move.captured,
+        fen_after: move.after,
+        player_type: 'human',
+        timestamp: new Date().toISOString()
+      });
+
+      // Update game position
       await updateGamePosition(currentGameId, move.after, '');
       
       // Add user move message with typing effect
@@ -393,8 +407,11 @@ export default function Home() {
                   setCurrentPosition(aiMoveData.fen);
                   const newAiMoveCount = moveCount + 2;
                   setMoveCount(newAiMoveCount);
-                  
-                  // Save AI move to database
+
+                  // Check if engine delivered checkmate (SAN notation ends with #)
+                  const isEngineCheckmate = aiMoveData.san?.includes('#');
+
+                  // Save AI move to database (do this even for checkmate)
                   await saveMove(
                     currentGameId!,
                     Math.ceil(newAiMoveCount / 2),
@@ -403,7 +420,20 @@ export default function Home() {
                     aiMoveData.fen,
                     'ai'
                   );
-                  
+
+                  // Also save to game memory for Chester's recall
+                  await GameMemoryService.addMove(currentGameId!, {
+                    move_number: newAiMoveCount,
+                    san: aiMoveData.san,
+                    from: aiMoveData.from || '',
+                    to: aiMoveData.to || '',
+                    piece: aiMoveData.piece || '',
+                    captured: aiMoveData.captured,
+                    fen_after: aiMoveData.fen,
+                    player_type: 'ai',
+                    timestamp: new Date().toISOString()
+                  });
+
                   // Update game position with AI move
                   await updateGamePosition(currentGameId!, aiMoveData.fen, '');
                   
@@ -460,10 +490,17 @@ export default function Home() {
                     });
                   }
                   
-                  // After engine move, get suggestions for user's next move
-                  setTimeout(() => {
-                    getAISuggestions(aiMoveData.fen);
-                  }, 1000);
+                  // If engine delivered checkmate, handle it and don't get suggestions
+                  if (isEngineCheckmate) {
+                    console.log('Engine delivered checkmate:', aiMoveData.san);
+                    // Engine plays black, so black wins
+                    handleCheckmate('black');
+                  } else {
+                    // After engine move, get suggestions for user's next move
+                    setTimeout(() => {
+                      getAISuggestions(aiMoveData.fen);
+                    }, 1000);
+                  }
                   
                 } catch (moveError) {
                   console.error('Error processing AI move:', moveError);
@@ -632,26 +669,39 @@ export default function Home() {
     }
   }, [currentPosition, messages, conversationId, currentGameId, streamChat]);
 
-  const handleCheckmate = useCallback((winner: 'white' | 'black') => {
+  const handleCheckmate = useCallback(async (winner: 'white' | 'black') => {
     setGameOver({ checkmate: true, winner });
-    
+
+    // Finalize game in database
+    if (currentGameId) {
+      try {
+        const durationSeconds = Math.floor((Date.now() - gameStartTimeRef.current) / 1000);
+        const result = winner === 'white' ? 'white_wins' : 'black_wins';
+        await GameMemoryService.finalizeGame(currentGameId, result, durationSeconds);
+        console.log('Game finalized:', { result, durationSeconds, gameId: currentGameId });
+      } catch (error) {
+        console.error('Error finalizing game:', error);
+      }
+    }
+
     // Add checkmate message
     const checkmateMessage: ChatMessage = {
       id: generateSimpleId(),
       role: 'assistant',
-      content: winner === 'white' 
+      content: winner === 'white'
         ? "Checkmate! Well played, Chris. You've secured victory. Would you like to play again?"
         : "Checkmate! I've managed to secure the win this time. Good game, Chris! Ready for another?",
       timestamp: new Date(),
     };
-    
+
     setMessages(prev => [...prev, checkmateMessage]);
-  }, []);
+  }, [currentGameId]);
 
   const handleRestart = useCallback(async () => {
     // Reset game state
     setGameOver({ checkmate: false });
     setMoveCount(0);
+    gameStartTimeRef.current = Date.now();
 
     try {
       // Create new game

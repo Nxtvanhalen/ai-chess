@@ -434,4 +434,83 @@ export class GameMemoryService {
       throw error;
     }
   }
+
+  /**
+   * Get recent games for a user (for past game analysis)
+   */
+  static async getRecentGames(userId: string = 'chris', limit: number = 5): Promise<GameMemory[]> {
+    const { data, error } = await supabase
+      .from('game_memory')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      console.error('Error fetching recent games:', error);
+      throw error;
+    }
+
+    return (data || []) as GameMemory[];
+  }
+
+  /**
+   * Get the last game (not the current one) - doesn't require finalization
+   */
+  static async getLastCompletedGame(userId: string = 'chris', currentGameId?: string): Promise<GameMemory | null> {
+    let query = supabase
+      .from('game_memory')
+      .select('*')
+      .eq('user_id', userId)
+      .gt('total_moves', 0) // Has at least some moves
+      .order('created_at', { ascending: false })
+      .limit(2); // Get 2 in case first is current game
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('Error fetching last game:', error);
+      throw error;
+    }
+
+    if (!data || data.length === 0) return null;
+
+    // Return the first game that isn't the current one
+    for (const game of data) {
+      if (game.game_id !== currentGameId) {
+        return game as GameMemory;
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Get game summary for past game review
+   */
+  static async getGameSummary(gameId: string): Promise<{
+    result: string | null;
+    totalMoves: number;
+    duration: number | null;
+    tacticalThemes: string[];
+    narrative: string | null;
+    keyMoments: ChesterCommentary[];
+  } | null> {
+    const memory = await this.getGameMemory(gameId);
+    if (!memory) return null;
+
+    // Get key moments (tactical commentary, not routine moves)
+    const keyMoments = memory.chester_commentary.filter(c =>
+      c.type === 'tactical' || c.type === 'blunder' || c.type === 'brilliant'
+    );
+
+    return {
+      result: memory.final_result,
+      totalMoves: memory.total_moves,
+      duration: memory.game_duration_seconds,
+      tacticalThemes: memory.tactical_themes,
+      narrative: memory.game_narrative,
+      keyMoments
+    };
+  }
 }

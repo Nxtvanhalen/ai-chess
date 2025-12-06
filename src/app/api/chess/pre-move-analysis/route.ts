@@ -88,33 +88,63 @@ export async function POST(request: NextRequest) {
     }
 
     systemPrompt += `\n\n`;
-    
+
     if (analysis.urgencyLevel === 'emergency') {
-      systemPrompt += `URGENT SITUATION! Chris needs immediate help. Focus on:
-      - Saving hanging pieces or capturing enemy hanging pieces
-      - Getting out of check or preventing checkmate
-      - Critical tactical moves only
-      
-      Be direct but supportive: "Dude, save that Knight!" or "Grab that hanging Queen!"`;
-      
+      systemPrompt += `URGENT! Focus on the critical issue:
+      - If in check: get out of check
+      - If piece hanging worth 3+: save it or trade favorably
+      - If can capture high-value piece: take it
+
+      Be direct: "Dude, save that Knight!" or "Grab that free piece!"`;
+
     } else if (analysis.urgencyLevel === 'tactical') {
-      systemPrompt += `Tactical situation - Chris has some threats to handle or opportunities to seize. Focus on:
-      - Material gains/losses
-      - Piece safety
-      - Simple tactical shots
-      
-      Be encouraging: "Nice spot - go for it!" or "Watch out for that attack"`;
-      
+      systemPrompt += `There might be tactics here, but DON'T obsess over saving pawns. Prioritize:
+      - Active piece play over passive defense
+      - Creating threats over reacting to minor threats
+      - Central control and piece activity
+      - Only mention pawn saves if it's actually significant (like a passed pawn)
+
+      Be proactive: "Create some chaos!" or "Let's put pressure on"`;
+
     } else {
-      systemPrompt += `Good position for strategic thinking. Focus on:
-      - Piece development and improvement  
-      - King safety (castling)
-      - Central control
-      - Positional advantages
-      
-      Stay casual and friendly: "How about..." or "Maybe try..."`;
+      // Strategic - most common case, needs variety
+      const strategicIdeas = [
+        'Piece activity - get your pieces to better squares',
+        'Create a plan - attack on kingside? Queenside? Central breakthrough?',
+        'Improve your worst piece - which piece is doing nothing?',
+        'Control key squares and files',
+        'Prepare a pawn break to open lines',
+        'Coordinate your pieces for an attack',
+        'Prophylaxis - what does your opponent want? Stop it.',
+      ];
+      const randomIdea = strategicIdeas[Math.floor(Math.random() * strategicIdeas.length)];
+
+      systemPrompt += `Calm position - think strategically. Today's focus: ${randomIdea}
+
+      AVOID suggesting:
+      - Saving pawns unless they're truly important (passed pawns, protecting key squares)
+      - Repetitive defensive moves
+      - The same type of move you've suggested recently
+
+      Think like a coach: "What's the plan here?" "Where should pieces go?"`;
     }
-    
+
+    // Add tactical safety check for ALL urgency levels
+    systemPrompt += `
+
+    TACTICAL SAFETY - MOST IMPORTANT:
+    Before suggesting ANY move, you MUST mentally play it out:
+    1. If I suggest this move, what can the opponent do NEXT?
+    2. Will the piece I move be immediately captured? (Check for queens, rooks, bishops attacking that square)
+    3. Does this move leave another piece undefended?
+    4. NEVER suggest a move that loses material on the very next move
+    5. If capturing a piece, make sure your piece isn't immediately recaptured for free
+
+    Example BAD suggestion: "Knight to D5" when the opponent's Queen can take it next move
+    Example GOOD suggestion: "Knight to F3" developing safely to a protected square
+
+    Think one move ahead MINIMUM before suggesting!`;
+
     systemPrompt += `
 
     CRITICAL: You MUST respond with valid JSON in EXACTLY this format. Do not respond with anything other than JSON.
@@ -140,10 +170,12 @@ export async function POST(request: NextRequest) {
     3. Provide 1-2 move suggestions maximum
     4. Use simple descriptions: "Knight to F3" not "Nf3"
     5. Keep reasoning to 3-5 words
-    6. casualComment must be brief and dry
+    6. casualComment must be STANDALONE - do NOT reference "both", "these", "either", or the suggestions since they appear AFTER your comment in the UI
+    7. casualComment should describe the position or give general chess wisdom
 
-    Example valid response:
-    {"suggestions": [{"move": "Knight to F3", "reasoning": "Solid development"}], "casualComment": "Solid position"}
+    Example valid responses:
+    {"suggestions": [{"move": "Knight to F3", "reasoning": "Solid development"}], "casualComment": "Good time to develop pieces"}
+    {"suggestions": [{"move": "Castle Kingside", "reasoning": "King safety"}], "casualComment": "King safety is key right now"}
 
     DO NOT respond with empty JSON. ALWAYS provide at least one suggestion and a comment.`;
     

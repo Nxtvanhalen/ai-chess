@@ -70,10 +70,48 @@ export async function POST(request: NextRequest) {
       'my strategy', 'my tactics', 'my moves', 'analyze my play', 'my chess',
       'how do i play', 'my tendencies', 'my patterns', 'my strengths', 'my weaknesses'
     ];
-    
-    const isStyleAnalysis = styleAnalysisKeywords.some(keyword => 
+
+    const isStyleAnalysis = styleAnalysisKeywords.some(keyword =>
       message.toLowerCase().includes(keyword)
     );
+
+    // Check if asking about past games
+    const pastGameKeywords = [
+      'last game', 'previous game', 'past game', 'earlier game', 'before this',
+      'our last', 'that game', 'recent game', 'yesterday', 'last match'
+    ];
+
+    const isAskingAboutPastGame = pastGameKeywords.some(keyword =>
+      message.toLowerCase().includes(keyword)
+    );
+
+    // Fetch past game context if needed
+    let pastGameContext = null;
+    if (isAskingAboutPastGame) {
+      try {
+        const lastGame = await GameMemoryService.getLastCompletedGame(userId, gameId);
+        if (lastGame) {
+          pastGameContext = {
+            result: lastGame.final_result,
+            totalMoves: lastGame.total_moves,
+            duration: lastGame.game_duration_seconds,
+            tacticalThemes: lastGame.tactical_themes || [],
+            narrative: lastGame.game_narrative,
+            moveHistory: lastGame.full_move_history?.slice(-25) || [], // Last 25 moves
+            commentary: lastGame.chester_commentary?.slice(-10) || [] // Last 10 comments
+          };
+          console.log('Past game context loaded:', {
+            result: pastGameContext.result,
+            moves: pastGameContext.totalMoves,
+            moveHistoryLength: pastGameContext.moveHistory.length
+          });
+        } else {
+          console.log('No past game found for user:', userId);
+        }
+      } catch (error) {
+        console.error('Error fetching past game:', error);
+      }
+    }
     
     // Build comprehensive instructions for Responses API
     let instructions = CHESS_BUTLER_SYSTEM_PROMPT;
@@ -103,6 +141,45 @@ export async function POST(request: NextRequest) {
       }
     } else {
       instructions += `\n\nNote: No current board state available. Ask Chris to make a move if you need to see the position.`;
+    }
+
+    // Add past game context if user is asking about it
+    if (pastGameContext) {
+      instructions += `\n\nPAST GAME DATA (you CAN see this):`;
+      instructions += `\n- Result: ${pastGameContext.result || 'Unknown'}`;
+      instructions += `\n- Total Moves: ${pastGameContext.totalMoves}`;
+
+      if (pastGameContext.duration) {
+        const mins = Math.floor(pastGameContext.duration / 60);
+        instructions += `\n- Duration: ${mins} minutes`;
+      }
+
+      if (pastGameContext.tacticalThemes.length > 0) {
+        instructions += `\n- Tactical Themes: ${pastGameContext.tacticalThemes.join(', ')}`;
+      }
+
+      if (pastGameContext.narrative) {
+        instructions += `\n- Game Summary: ${pastGameContext.narrative}`;
+      }
+
+      if (pastGameContext.moveHistory.length > 0) {
+        const moveSequence = pastGameContext.moveHistory
+          .map((m: any) => `${m.move_number}. ${m.player_type === 'human' ? 'Chris' : 'AI'}: ${m.san}`)
+          .join(', ');
+        instructions += `\n- Key Moves: ${moveSequence}`;
+      }
+
+      if (pastGameContext.commentary.length > 0) {
+        instructions += `\n- Your Commentary from that game:`;
+        pastGameContext.commentary.forEach((c: any) => {
+          instructions += `\n  * ${c.content}`;
+        });
+      }
+
+      instructions += `\n\nUse this data to answer Chris's question about the past game.`;
+    } else if (isAskingAboutPastGame) {
+      // User asked about past game but we don't have data
+      instructions += `\n\nNote: Chris is asking about a past game, but no completed game history was found in the database. Let them know you don't have records of previous games yet, but you'll remember future games.`;
     }
 
     // Add comprehensive game memory context
