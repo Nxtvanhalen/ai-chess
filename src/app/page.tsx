@@ -236,20 +236,24 @@ export default function Home() {
       // Update game position  
       await updateGamePosition(currentGameId, move.after, '');
       
-      // Add user move message
+      // Add user move message with typing effect
+      const moveMessageId = generateSimpleId();
+      const moveText = `I played ${convertMoveToPlainEnglish(move.san)}`;
       const moveMessage: ChatMessage = {
-        id: generateSimpleId(),
+        id: moveMessageId,
         role: 'user',
-        content: `I played ${convertMoveToPlainEnglish(move.san)}`,
+        content: '',
         timestamp: new Date(),
         metadata: {
+          isThinking: true,
           moveContext: move.san,
           position: move.after,
         },
       };
-      
+
       setMessages(prev => [...prev, moveMessage]);
-      await saveMessage(conversationId, 'user', moveMessage.content, moveMessage.metadata);
+      typeText(moveText, moveMessageId);
+      await saveMessage(conversationId, 'user', moveText, moveMessage.metadata);
       
       setIsLoading(true);
       
