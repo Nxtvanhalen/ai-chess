@@ -499,9 +499,10 @@ export class GameMemoryService {
     const memory = await this.getGameMemory(gameId);
     if (!memory) return null;
 
-    // Get key moments (tactical commentary, not routine moves)
+    // Get key moments (tactical commentary based on urgency level, not routine moves)
     const keyMoments = memory.chester_commentary.filter(c =>
-      c.type === 'tactical' || c.type === 'blunder' || c.type === 'brilliant'
+      c.type === 'post_move' &&
+      (c.metadata?.urgency_level === 'emergency' || c.metadata?.urgency_level === 'tactical')
     );
 
     return {
