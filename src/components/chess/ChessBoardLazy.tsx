@@ -2,6 +2,7 @@
 
 import { lazy, Suspense } from 'react';
 import { Move, Square } from 'chess.js';
+import { BoardTheme } from '@/lib/chess/boardThemes';
 
 // Lazy load the heavy ChessBoard component
 const ChessBoardComponent = lazy(() => import('./ChessBoard'));
@@ -12,6 +13,7 @@ interface ChessBoardProps {
   orientation?: 'white' | 'black';
   interactive?: boolean;
   onCheckmate?: (winner: 'white' | 'black') => void;
+  theme?: BoardTheme;
 }
 
 // Loading fallback with similar dimensions to prevent layout shift

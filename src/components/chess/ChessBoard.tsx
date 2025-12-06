@@ -5,6 +5,7 @@ import { Chessboard } from 'react-chessboard';
 import { Chess, Move, Square } from 'chess.js';
 import { getPieceName } from '@/lib/chess/pieceNames';
 import { customPieces } from './CustomPieces';
+import { BoardTheme, defaultTheme } from '@/lib/chess/boardThemes';
 
 interface ChessBoardProps {
   onMove: (move: Move) => void;
@@ -12,6 +13,7 @@ interface ChessBoardProps {
   orientation?: 'white' | 'black';
   interactive?: boolean;
   onCheckmate?: (winner: 'white' | 'black') => void;
+  theme?: BoardTheme;
 }
 
 export default function ChessBoard({
@@ -20,6 +22,7 @@ export default function ChessBoard({
   orientation = 'white',
   interactive = true,
   onCheckmate,
+  theme = defaultTheme,
 }: ChessBoardProps) {
   const [game, setGame] = useState(new Chess());
   const [boardWidth, setBoardWidth] = useState(400);
@@ -428,20 +431,21 @@ export default function ChessBoard({
           customPieces={customPieces}
           customSquareStyles={customSquareStyles}
           customBoardStyle={{
-            borderRadius: '16px',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 40px hsla(var(--primary), 0.1)',
-            border: '2px solid hsla(var(--border), 0.8)',
-            background: 'linear-gradient(135deg, hsl(var(--chess-light)), hsl(var(--chess-dark)))',
+            borderRadius: theme.boardStyle.borderRadius,
+            boxShadow: theme.boardStyle.boxShadow,
+            border: theme.boardStyle.border,
+            background: theme.boardStyle.background,
+            transition: 'all 0.5s ease-in-out',
           }}
-          customDarkSquareStyle={{ 
-            backgroundColor: 'hsl(var(--chess-dark))',
-            background: 'linear-gradient(135deg, hsl(var(--chess-dark)), hsl(234 25% 40%))',
-            boxShadow: 'inset 0 1px 3px rgba(0, 0, 0, 0.2)'
+          customDarkSquareStyle={{
+            background: theme.darkSquare.background,
+            boxShadow: theme.darkSquare.boxShadow,
+            transition: 'all 0.5s ease-in-out',
           }}
-          customLightSquareStyle={{ 
-            backgroundColor: 'hsl(var(--chess-light))',
-            background: 'linear-gradient(135deg, hsl(var(--chess-light)), hsl(45 15% 92%))',
-            boxShadow: 'inset 0 1px 3px rgba(255, 255, 255, 0.3)'
+          customLightSquareStyle={{
+            background: theme.lightSquare.background,
+            boxShadow: theme.lightSquare.boxShadow,
+            transition: 'all 0.5s ease-in-out',
           }}
           showBoardNotation={false}
           animationDuration={800}

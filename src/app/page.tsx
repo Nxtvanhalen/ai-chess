@@ -21,6 +21,9 @@ import {
 } from '@/lib/supabase/database';
 import { supabase } from '@/lib/supabase/client';
 import { GameMemoryService } from '@/lib/services/GameMemoryService';
+import { useChesterStream } from '@/hooks/useChesterStream';
+import { BoardTheme, boardThemes, defaultTheme } from '@/lib/chess/boardThemes';
+import ThemeSelector from '@/components/chess/ThemeSelector';
 
 export default function Home() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -30,9 +33,45 @@ export default function Home() {
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [moveCount, setMoveCount] = useState(0);
   const [gameOver, setGameOver] = useState<{checkmate: boolean, winner?: 'white' | 'black'}>({checkmate: false});
+  const [boardTheme, setBoardTheme] = useState<BoardTheme>(defaultTheme);
   const timeoutRefs = useRef<Set<NodeJS.Timeout>>(new Set());
   const messagesRef = useRef<ChatMessage[]>([]);
   const performanceMonitor = useRef<PerformanceMonitor>(PerformanceMonitor.getInstance());
+
+  // Streaming Chester responses hook
+  const { streamChat, isStreaming } = useChesterStream();
+
+  // Typing effect helper for move commentary
+  const typeText = useCallback((
+    text: string,
+    messageId: string,
+    onComplete?: () => void
+  ) => {
+    let displayedLength = 0;
+    const typingDelay = 35; // ms between characters (slower for readability)
+    const charsPerTick = 1;
+
+    const interval = setInterval(() => {
+      displayedLength = Math.min(displayedLength + charsPerTick, text.length);
+      const displayedText = text.slice(0, displayedLength);
+
+      setMessages(prev =>
+        prev.map(msg =>
+          msg.id === messageId
+            ? { ...msg, content: displayedText, metadata: { isThinking: false } }
+            : msg
+        )
+      );
+
+      if (displayedLength >= text.length) {
+        clearInterval(interval);
+        onComplete?.();
+      }
+    }, typingDelay);
+
+    // Return cleanup function
+    return () => clearInterval(interval);
+  }, []);
   
   // Keep messagesRef in sync
   useEffect(() => {
@@ -72,50 +111,41 @@ export default function Home() {
   useEffect(() => {
     const initializeGame = async () => {
       try {
-        // Always create a new game for now (to avoid loading old data)
-        // const existingGame = await getCurrentGame();
-        
-        // Create new game instead of restoring existing
-        {
-          // Create new game
-          const newGame = await createGame('white');
-          setCurrentGameId(newGame.id);
-          setCurrentPosition(newGame.fen);
+        // Create new game
+        const newGame = await createGame('white');
+        setCurrentGameId(newGame.id);
+        setCurrentPosition(newGame.fen);
 
-          // Initialize game memory
-          try {
-            await GameMemoryService.createGameMemory(newGame.id, 'chris');
-            console.log('Game memory initialized for game:', newGame.id);
-          } catch (error) {
-            console.error('Error initializing game memory:', error);
-          }
-
-          // Create conversation for this game
-          const conversation = await createConversation(newGame.id);
-          setConversationId(conversation.id);
-
-          // Add welcome message
-          const welcomeMessage: ChatMessage = {
-            id: await generateId(),
-            role: 'assistant',
-            content: "Hey Chris! Ready for another game? I'll be here watching and giving you some tips. You're playing white against the engine. Good luck!",
-            timestamp: new Date(),
-          };
-
-          setMessages([welcomeMessage]);
-          await saveMessage(conversation.id, 'assistant', welcomeMessage.content);
-
-          // Get initial suggestions
-          setTimeout(() => {
-            getAISuggestions(newGame.fen, newGame.id);
-          }, 500);
+        // Initialize game memory
+        try {
+          await GameMemoryService.createGameMemory(newGame.id, 'chris');
+          console.log('Game memory initialized for game:', newGame.id);
+        } catch (error) {
+          console.error('Error initializing game memory:', error);
         }
+
+        // Create conversation for this game
+        const conversation = await createConversation(newGame.id);
+        setConversationId(conversation.id);
+
+        // Add welcome message - start with full text (no typing on init to avoid hook issues)
+        const welcomeText = "Hey Chris! Ready for another game? I'll be here watching and giving you some tips. You're playing white against the engine. Good luck!";
+        const welcomeMessage: ChatMessage = {
+          id: await generateId(),
+          role: 'assistant',
+          content: welcomeText,
+          timestamp: new Date(),
+        };
+
+        setMessages([welcomeMessage]);
+        await saveMessage(conversation.id, 'assistant', welcomeText);
       } catch (error) {
         console.error('Error initializing game:', error);
       }
     };
 
     initializeGame();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Get AI suggestions when it's user's turn
@@ -148,25 +178,31 @@ export default function Home() {
 
       if (response.ok) {
         const data = await response.json();
+        const commentText = data.comment || "Your move!";
+        const suggestionMessageId = generateSimpleId();
 
-        // Add suggestion message
+        // Add suggestion message with typing effect
         const suggestionMessage: ChatMessage = {
-          id: generateSimpleId(),
+          id: suggestionMessageId,
           role: 'assistant',
           type: 'suggestion',
-          content: data.comment || "Your move!",
+          content: '',
           timestamp: new Date(),
           metadata: {
-            suggestions: data.suggestions
+            isThinking: true,
+            suggestions: data.suggestions // Include suggestions from start so they render
           }
         };
 
         setMessages(prev => [...prev, suggestionMessage]);
+
+        // Type out the comment
+        typeText(commentText, suggestionMessageId);
       }
     } catch (error) {
       console.error('Error getting AI suggestions:', error);
     }
-  }, [conversationId, currentGameId]);
+  }, [conversationId, currentGameId, typeText]);
   
   const detectGamePhase = (fen: string) => {
     const moves = messagesRef.current.filter(m => m.metadata?.moveContext).length;
@@ -264,33 +300,24 @@ export default function Home() {
         
         if (reader) {
           try {
+            // Read all content first
+            let fullContent = '';
             while (true) {
               const { done, value } = await reader.read();
               if (done) break;
-              
               const chunk = decoder.decode(value);
-              aiResponse.content += chunk;
+              fullContent += chunk;
             }
-            
-            // Add small delay before showing content to allow fade-in animation
-            const fadeTimeout = setTimeout(() => {
-              setMessages(prev => 
-                prev.map(msg => 
-                  msg.id === aiResponse.id 
-                    ? { ...msg, content: aiResponse.content, metadata: { isThinking: false } }
-                    : msg
-                )
-              );
-              timeoutRefs.current.delete(fadeTimeout);
-            }, 300);
-            timeoutRefs.current.add(fadeTimeout);
+            aiResponse.content = fullContent;
+
+            // Use typing effect to display the content
+            typeText(fullContent, aiResponse.id);
           } catch (streamError) {
             console.error('Stream reading error:', streamError);
-            aiResponse.content = "I encountered an error while generating my response. Please try again.";
-            setMessages(prev => 
-              prev.map(msg => 
-                msg.id === aiResponse.id 
-                  ? { ...msg, content: aiResponse.content, metadata: { isThinking: false } }
+            setMessages(prev =>
+              prev.map(msg =>
+                msg.id === aiResponse.id
+                  ? { ...msg, content: "I encountered an error. Please try again.", metadata: { isThinking: false } }
                   : msg
               )
             );
@@ -334,21 +361,24 @@ export default function Home() {
               body: JSON.stringify({
                 fen: move.after,
                 difficulty: 'medium',
-                playerMoveHistory
+                playerMoveHistory,
+                newGame: moveCount === 0 // Signal new game on first move
               }),
             });
           
             if (aiMoveResponse.ok) {
               const aiMoveData = await aiMoveResponse.json();
               
-              // Show realistic thinking process
-              if (aiMoveData.analysis?.analysis) {
-                setMessages(prev => prev.map(msg => 
-                  msg.id === engineMoveMessage.id 
-                    ? { ...msg, metadata: { ...msg.metadata, analysis: aiMoveData.analysis.analysis } }
-                    : msg
-                ));
-              }
+              // Show realistic thinking process (or book move)
+              const analysisText = aiMoveData.analysis?.fromBook
+                ? aiMoveData.analysis.analysis // "Playing Sicilian Defense" etc.
+                : aiMoveData.analysis?.analysis || 'Engine is thinking...';
+
+              setMessages(prev => prev.map(msg =>
+                msg.id === engineMoveMessage.id
+                  ? { ...msg, metadata: { ...msg.metadata, analysis: analysisText, fromBook: aiMoveData.analysis?.fromBook } }
+                  : msg
+              ));
               
               // Wait for realistic thinking time
               const thinkingTime = aiMoveData.analysis?.thinkingTime || 1500;
@@ -406,18 +436,24 @@ export default function Home() {
                   
                   if (analysisResponse.ok) {
                     const analysisData = await analysisResponse.json();
-                    
-                    // Add Chester's commentary on engine move
+
+                    // Add Chester's commentary on engine move with typing effect
+                    const analysisMessageId = generateSimpleId();
                     const analysisMessage: ChatMessage = {
-                      id: generateSimpleId(),
+                      id: analysisMessageId,
                       role: 'assistant',
                       type: 'analysis',
-                      content: analysisData.commentary,
-                      timestamp: new Date()
+                      content: '',
+                      timestamp: new Date(),
+                      metadata: { isThinking: true }
                     };
-                    
+
                     setMessages(prev => [...prev, analysisMessage]);
-                    await saveMessage(conversationId!, 'assistant', analysisMessage.content);
+
+                    // Type out the analysis
+                    typeText(analysisData.commentary, analysisMessageId, async () => {
+                      await saveMessage(conversationId!, 'assistant', analysisData.commentary);
+                    });
                   }
                   
                   // After engine move, get suggestions for user's next move
@@ -445,7 +481,7 @@ export default function Home() {
     } finally {
       setIsLoading(false);
     }
-  }, [moveCount, currentGameId, conversationId, getAISuggestions]);
+  }, [moveCount, currentGameId, conversationId, getAISuggestions, typeText]);
 
   const convertMoveToPlainEnglish = (san: string) => {
     // Convert algebraic notation to plain English
@@ -494,7 +530,7 @@ export default function Home() {
 
   const handleSendMessage = useCallback(async (content: string) => {
     if (!conversationId) return;
-    
+
     // Add user message
     const userMessage: ChatMessage = {
       id: generateSimpleId(),
@@ -502,83 +538,95 @@ export default function Home() {
       content,
       timestamp: new Date(),
     };
-    
+
     setMessages(prev => [...prev, userMessage]);
-    
+
     // Save user message to database
     await saveMessage(conversationId, 'user', userMessage.content);
-    
+
     setIsLoading(true);
-    
+
+    // Create thinking message for streaming
+    const thinkingMessageId = generateSimpleId();
+    const thinkingMessage: ChatMessage = {
+      id: thinkingMessageId,
+      role: 'assistant',
+      content: '',
+      timestamp: new Date(),
+      metadata: { isThinking: true }
+    };
+
+    setMessages(prev => [...prev, thinkingMessage]);
+
     try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: content,
-          gameContext: currentPosition ? {
-            fen: currentPosition,
-            lastMove: messages.slice(-5).find(m => m.metadata?.moveContext)?.metadata?.moveContext,
-            totalMoves: messages.filter(m => m.metadata?.moveContext).length
-          } : undefined,
-          moveHistory: messages,
-          gameId: currentGameId,
-          userId: 'chris'
-        }),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to send message');
-      }
-      
-      // Show thinking indicator immediately
-      const thinkingMessage: ChatMessage = {
-        id: generateSimpleId(),
-        role: 'assistant',
-        content: '',
-        timestamp: new Date(),
-        metadata: { isThinking: true }
-      };
-      
-      setMessages(prev => [...prev, thinkingMessage]);
-      
-      // Handle non-streaming response (GPT-5 without verification)
-      const responseText = await response.text();
-      
-      // Replace thinking message with actual response
-      const assistantMessage: ChatMessage = {
-        id: thinkingMessage.id,
-        role: 'assistant',
-        content: responseText,
-        timestamp: new Date(),
-        metadata: { isThinking: false }
-      };
-      
-      setMessages(prev => 
-        prev.map(msg => 
-          msg.id === thinkingMessage.id 
-            ? assistantMessage
+      // Use streaming for real-time Chester responses
+      const gameContext = currentPosition ? {
+        fen: currentPosition,
+        lastMove: messages.slice(-5).find(m => m.metadata?.moveContext)?.metadata?.moveContext,
+        totalMoves: messages.filter(m => m.metadata?.moveContext).length
+      } : undefined;
+
+      await streamChat(
+        content,
+        gameContext,
+        currentGameId,
+        {
+          typingDelay: 20, // 20ms between characters for smooth typing effect
+          onChunk: (chunk) => {
+            // Update message content as characters are "typed"
+            setMessages(prev =>
+              prev.map(msg =>
+                msg.id === thinkingMessageId
+                  ? { ...msg, content: msg.content + chunk, metadata: { isThinking: false } }
+                  : msg
+              )
+            );
+          },
+          onComplete: async (fullText) => {
+            // Ensure final message shows complete text
+            setMessages(prev =>
+              prev.map(msg =>
+                msg.id === thinkingMessageId
+                  ? { ...msg, content: fullText, metadata: { isThinking: false } }
+                  : msg
+              )
+            );
+            // Save final response to database
+            await saveMessage(conversationId, 'assistant', fullText);
+          },
+          onError: (error) => {
+            console.error('Streaming error:', error);
+            setMessages(prev =>
+              prev.map(msg =>
+                msg.id === thinkingMessageId
+                  ? {
+                      ...msg,
+                      content: "I apologize, but I'm having trouble connecting. Please try again.",
+                      metadata: { isThinking: false }
+                    }
+                  : msg
+              )
+            );
+          }
+        }
+      );
+    } catch (error) {
+      console.error('Error sending message:', error);
+      setMessages(prev =>
+        prev.map(msg =>
+          msg.id === thinkingMessageId
+            ? {
+                ...msg,
+                content: "I apologize, but I'm having trouble connecting to my services. Please ensure the OpenAI API key is configured.",
+                metadata: { isThinking: false }
+              }
             : msg
         )
       );
-      
-      // Save assistant response to database
-      await saveMessage(conversationId, 'assistant', assistantMessage.content);
-    } catch (error) {
-      console.error('Error sending message:', error);
-      const errorMessage: ChatMessage = {
-        id: generateSimpleId(),
-        role: 'assistant',
-        content: "I apologize, but I'm having trouble connecting to my services. Please ensure the OpenAI API key is configured.",
-        timestamp: new Date(),
-      };
-      setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }
-  }, [currentPosition, messages, conversationId]);
+  }, [currentPosition, messages, conversationId, currentGameId, streamChat]);
 
   const handleCheckmate = useCallback((winner: 'white' | 'black') => {
     setGameOver({ checkmate: true, winner });
@@ -619,25 +667,21 @@ export default function Home() {
       const conversation = await createConversation(newGame.id);
       setConversationId(conversation.id);
 
-      // Add new game message
+      // Add new game message - full text to avoid closure issues
+      const newGameText = "New game! The board is reset and Chester's ready for another match. Your move, Chris!";
       const newGameMessage: ChatMessage = {
         id: await generateId(),
         role: 'assistant',
-        content: "New game! The board is reset and Chester's ready for another match. Your move, Chris!",
+        content: newGameText,
         timestamp: new Date(),
       };
 
       setMessages([newGameMessage]);
-      await saveMessage(conversation.id, 'assistant', newGameMessage.content);
-
-      // Get initial suggestions for new game
-      setTimeout(() => {
-        getAISuggestions(newGame.fen, newGame.id);
-      }, 500);
+      await saveMessage(conversation.id, 'assistant', newGameText);
     } catch (error) {
       console.error('Error restarting game:', error);
     }
-  }, [getAISuggestions]);
+  }, []);
 
   return (
     <GameLayout
@@ -649,6 +693,7 @@ export default function Home() {
             orientation="white"
             interactive={!gameOver.checkmate}
             onCheckmate={handleCheckmate}
+            theme={boardTheme}
           />
           {gameOver.checkmate && (
             <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-2xl backdrop-blur-sm">
@@ -669,6 +714,12 @@ export default function Home() {
             </div>
           )}
         </div>
+      }
+      controls={
+        <ThemeSelector
+          currentTheme={boardTheme}
+          onThemeChange={setBoardTheme}
+        />
       }
       chat={
         <ChatInterfaceLazy

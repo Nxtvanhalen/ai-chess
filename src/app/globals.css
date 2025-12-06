@@ -837,11 +837,27 @@ select {
   width: 100%;
 }
 
-.board-desktop {
+.board-desktop-wrapper {
+  display: flex;
+  flex-direction: column;
   flex-shrink: 0;
   width: 55%;
   border-right: 2px solid rgba(147, 51, 234, 0.3);
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.board-desktop {
+  flex: 1;
+  min-height: 0;
+}
+
+.controls-desktop {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.75rem 1rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-top: 1px solid rgba(147, 51, 234, 0.2);
 }
 
 .chat-desktop {
@@ -858,12 +874,28 @@ select {
   width: 100%;
 }
 
-.board-landscape {
+.board-landscape-wrapper {
+  display: flex;
+  flex-direction: column;
   flex-shrink: 0;
   width: 55%;
   border-right: 2px solid rgba(147, 51, 234, 0.3);
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.board-landscape {
+  flex: 1;
+  min-height: 0;
+}
+
+.controls-landscape {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.5rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-top: 1px solid rgba(147, 51, 234, 0.2);
 }
 
 .chat-landscape {
@@ -881,13 +913,13 @@ select {
     min-height: 100vh;
     max-height: 100vh;
   }
-  
-  .board-desktop,
-  .board-landscape {
+
+  .board-desktop-wrapper,
+  .board-landscape-wrapper {
     min-width: 50%;
     max-width: 60%;
   }
-  
+
   .chat-desktop,
   .chat-landscape {
     min-width: 40%;
@@ -946,6 +978,19 @@ select {
     user-select: none;
   }
   
+  /* Controls Section - Between board and chat */
+  .controls-section {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: flex-end;
+    padding: 0.5rem 0.75rem;
+    background: rgba(0, 0, 0, 0.4);
+    border-top: 1px solid rgba(147, 51, 234, 0.2);
+    border-bottom: 1px solid rgba(147, 51, 234, 0.2);
+    z-index: 25;
+    position: relative;
+  }
+
   /* Chat Section - Flexible item taking remaining space */
   .chat-section {
     position: relative;
@@ -954,15 +999,15 @@ select {
     min-height: 0; /* Allow shrinking */
     z-index: 10;
     background: #000000;
-    
+
     /* Smooth transitions */
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     margin: 0;
     padding: 0;
-    
+
     /* Ensure no overlap with visual separator */
     border-top: 1px solid rgba(147, 51, 234, 0.3);
-    
+
     /* Remove bottom padding - sticky input handles this */
     padding-bottom: 0;
   }

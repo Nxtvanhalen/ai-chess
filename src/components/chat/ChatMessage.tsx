@@ -1,11 +1,8 @@
 'use client';
 
 import { ChatMessage as ChatMessageType } from '@/types';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import Image from 'next/image';
-import CompactEngineMove from './CompactEngineMove';
-import ThinkingIndicator from './ThinkingIndicator';
-import LoadingIndicator from './LoadingIndicator';
 import DynamicMarkdown from './DynamicMarkdown';
 
 interface ChatMessageProps {
@@ -64,8 +61,14 @@ const TypingDots = () => (
   </div>
 );
 
-const SuggestionContent = ({ suggestions }: { suggestions: any[] }) => (
+const SuggestionContent = ({ suggestions, comment }: { suggestions: any[], comment?: string }) => (
   <div className="space-y-3">
+    {/* Show Chester's typed comment first */}
+    {comment && (
+      <div className="text-slate-200">
+        {comment}
+      </div>
+    )}
     <div className="flex items-center gap-2">
       <span className="text-purple-300 text-sm italic">Here's what I'm thinking:</span>
     </div>
@@ -93,49 +96,83 @@ const SuggestionContent = ({ suggestions }: { suggestions: any[] }) => (
 export default function ChatMessage({ message }: ChatMessageProps) {
   const isAssistant = message.role === 'assistant';
   const isEngine = message.role === 'engine';
+  const isUser = message.role === 'user';
   const isThinking = message.metadata?.isThinking;
+
+  // Engine messages now render like a 3rd person in chat (below)
   
-  // Handle engine move display
-  if (isEngine || message.type === 'move' && message.metadata?.engineAnalysis) {
-    // Show thinking indicator if engine is thinking
-    if (isThinking) {
-      return (
-        <ThinkingIndicator 
-          name="Engine" 
-          message={message.metadata?.analysis || 'Engine is thinking'}
-        />
-      );
-    }
-    
+  // Get display name and styling based on role
+  const getName = () => {
+    if (isEngine) return 'Engine';
+    if (isAssistant) return 'Chester';
+    return 'Chris';
+  };
+
+  const getNameClass = () => {
+    if (isEngine) return 'bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent';
+    if (isAssistant) return 'bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent';
+    return 'text-slate-900 dark:text-slate-100';
+  };
+
+  const getBubbleClass = () => {
+    if (isEngine) return 'bg-red-900/15 px-1 py-0.5 lg:p-4 rounded-md lg:rounded-2xl border border-red-400/30 shadow-lg backdrop-blur-sm';
+    if (isAssistant) return 'bg-purple-900/15 px-1 py-0.5 lg:p-4 rounded-md lg:rounded-2xl border border-purple-400/30 shadow-lg backdrop-blur-sm';
+    return 'bg-slate-800/25 px-1 py-0.5 lg:p-4 rounded-md lg:rounded-2xl border border-slate-400/30 shadow-lg backdrop-blur-sm';
+  };
+
+  // Engine thinking indicator
+  if (isEngine && isThinking) {
     return (
-      <CompactEngineMove 
-        move={message.content}
-        analysis={message.metadata?.engineAnalysis}
-      />
+      <div className="flex gap-1 lg:gap-4 px-1 lg:px-6 py-1 lg:py-6 animate-in slide-in-from-bottom-6 fade-in duration-700 ease-out mx-0 lg:mx-2">
+        <div className="flex-shrink-0">
+          <div className="w-5 h-5 lg:w-10 lg:h-10 rounded-full bg-gradient-to-br from-red-600 via-orange-500 to-yellow-500 glow-effect shadow-lg flex items-center justify-center text-white text-xs lg:text-lg">
+            ♟
+          </div>
+        </div>
+        <div className="flex-1 overflow-hidden">
+          <div className="flex items-baseline gap-1 mb-1">
+            <span className="font-bold text-xs lg:text-sm bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">
+              Engine
+            </span>
+          </div>
+          <div className="bg-red-900/15 px-1 py-0.5 lg:p-4 rounded-md lg:rounded-2xl border border-red-400/30 shadow-lg backdrop-blur-sm">
+            <div className="flex items-center gap-2">
+              <span className="text-orange-300 text-sm italic">{message.metadata?.analysis || 'Thinking...'}</span>
+              <div className="flex gap-0.5 ml-2">
+                {[0, 1, 2].map((i) => (
+                  <motion.div
+                    key={i}
+                    className="w-1.5 h-1.5 bg-orange-400 rounded-full"
+                    animate={{
+                      scale: [1, 1.2, 1],
+                      opacity: [0.5, 1, 0.5],
+                    }}
+                    transition={{
+                      duration: 1.2,
+                      repeat: Infinity,
+                      delay: i * 0.2,
+                      ease: "easeInOut",
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     );
   }
-  
-  // Handle suggestion display - now integrated into regular message flow
-  // (Suggestions will be handled in the main message content below)
-  
-  // Show thinking animation separately (only for engine, not Chester)
-  if (isThinking && isEngine) {
-    return (
-      <ThinkingIndicator 
-        name="Engine" 
-        message={message.metadata?.analysis || 'Engine is thinking'}
-      />
-    );
-  }
-  
+
   return (
     <div className={`flex gap-1 lg:gap-4 px-1 lg:px-6 py-1 lg:py-6 animate-in slide-in-from-bottom-6 lg:slide-in-from-bottom-8 fade-in duration-700 lg:duration-1000 ease-out ${
-      isAssistant
-        ? 'mx-0 lg:mx-2'
-        : 'hover:bg-purple-900/10 rounded-l-2xl mx-0 lg:mx-2'
-    }`}>
+      isUser ? 'hover:bg-purple-900/10 rounded-l-2xl' : ''
+    } mx-0 lg:mx-2`}>
       <div className="flex-shrink-0">
-        {isAssistant ? (
+        {isEngine ? (
+          <div className="w-5 h-5 lg:w-10 lg:h-10 rounded-full bg-gradient-to-br from-red-600 via-orange-500 to-yellow-500 glow-effect shadow-lg flex items-center justify-center text-white text-xs lg:text-lg">
+            ♟
+          </div>
+        ) : isAssistant ? (
           <div className="w-5 h-5 lg:w-10 lg:h-10 rounded-full bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 glow-effect shadow-lg overflow-hidden relative">
             <Image
               src="/chester.png"
@@ -160,33 +197,25 @@ export default function ChatMessage({ message }: ChatMessageProps) {
           </div>
         )}
       </div>
-      
+
       <div className="flex-1 overflow-hidden">
         <div className="flex items-baseline gap-1 mb-1">
-          <span className={`font-bold text-xs lg:text-sm ${
-            isAssistant 
-              ? 'bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent' 
-              : 'text-slate-900 dark:text-slate-100'
-          }`}>
-            {isAssistant ? 'Chester' : 'Chris'}
+          <span className={`font-bold text-xs lg:text-sm ${getNameClass()}`}>
+            {getName()}
           </span>
           <span className="text-xs lg:text-xs text-slate-500 dark:text-slate-400 font-medium hidden lg:inline">
-            {new Date(message.timestamp).toLocaleTimeString([], { 
-              hour: '2-digit', 
-              minute: '2-digit' 
+            {new Date(message.timestamp).toLocaleTimeString([], {
+              hour: '2-digit',
+              minute: '2-digit'
             })}
           </span>
         </div>
-        
-        <div className={`markdown-content prose prose-sm max-w-none prose-invert prose-p:leading-tight prose-p:mb-0 prose-headings:font-bold prose-a:text-blue-400 text-slate-200 text-sm lg:text-base ${
-          isAssistant 
-            ? 'bg-purple-900/15 px-1 py-0.5 lg:p-4 rounded-md lg:rounded-2xl border border-purple-400/30 shadow-lg backdrop-blur-sm' 
-            : 'bg-slate-800/25 px-1 py-0.5 lg:p-4 rounded-md lg:rounded-2xl border border-slate-400/30 shadow-lg backdrop-blur-sm'
-        }`}>
+
+        <div className={`markdown-content prose prose-sm max-w-none prose-invert prose-p:leading-tight prose-p:mb-0 prose-headings:font-bold prose-a:text-blue-400 text-slate-200 text-sm lg:text-base ${getBubbleClass()}`}>
           {isThinking && isAssistant ? (
             <TypingDots />
           ) : message.type === 'suggestion' && message.metadata?.suggestions ? (
-            <SuggestionContent suggestions={message.metadata.suggestions} />
+            <SuggestionContent suggestions={message.metadata.suggestions} comment={message.content} />
           ) : (
             <DynamicMarkdown>
               {message.content}

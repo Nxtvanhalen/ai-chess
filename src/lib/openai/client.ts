@@ -53,11 +53,12 @@ export interface ResponsesAPIParams {
   };
   previous_response_id?: string;
   max_output_tokens?: number;
+  stream?: boolean;
 }
 
 export async function createResponsesCompletion(params: ResponsesAPIParams) {
   const apiKey = process.env.OPENAI_API_KEY;
-  
+
   if (!apiKey) {
     throw new Error('OPENAI_API_KEY environment variable is not set');
   }
@@ -79,4 +80,86 @@ export async function createResponsesCompletion(params: ResponsesAPIParams) {
 
     return response.json();
   });
+}
+
+// Streaming version of Responses API for real-time Chester responses
+export async function createResponsesCompletionStream(
+  params: Omit<ResponsesAPIParams, 'stream'>
+): Promise<ReadableStream<Uint8Array>> {
+  const apiKey = process.env.OPENAI_API_KEY;
+
+  if (!apiKey) {
+    throw new Error('OPENAI_API_KEY environment variable is not set');
+  }
+
+  const response = await fetch('https://api.openai.com/v1/responses', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ ...params, stream: true }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(`Responses API error: ${response.status} ${response.statusText} - ${JSON.stringify(errorData)}`);
+  }
+
+  if (!response.body) {
+    throw new Error('No response body for streaming');
+  }
+
+  return response.body;
+}
+
+// Parse SSE stream and extract text chunks
+export async function* parseResponsesStream(
+  stream: ReadableStream<Uint8Array>
+): AsyncGenerator<string, void, unknown> {
+  const reader = stream.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop() || '';
+
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          const data = line.slice(6).trim();
+
+          if (data === '[DONE]') return;
+
+          try {
+            const parsed = JSON.parse(data);
+
+            // Extract text delta from response
+            if (parsed.type === 'response.output_text.delta') {
+              yield parsed.delta || '';
+            } else if (parsed.type === 'content_block_delta') {
+              yield parsed.delta?.text || '';
+            } else if (parsed.delta?.content) {
+              // Handle various delta formats
+              for (const content of parsed.delta.content) {
+                if (content.type === 'output_text' && content.text) {
+                  yield content.text;
+                }
+              }
+            }
+          } catch {
+            // Skip unparseable lines
+          }
+        }
+      }
+    }
+  } finally {
+    reader.releaseLock();
+  }
 }

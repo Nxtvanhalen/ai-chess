@@ -7,9 +7,10 @@ import { PWAManager } from '@/components/pwa';
 interface GameLayoutProps {
   chessBoard: ReactNode;
   chat: ReactNode;
+  controls?: ReactNode;
 }
 
-export default function GameLayout({ chessBoard, chat }: GameLayoutProps) {
+export default function GameLayout({ chessBoard, chat, controls }: GameLayoutProps) {
   const { isMobile, isLandscape, dismissKeyboard } = useDeviceDetection();
 
   // Handle keyboard dismissal via touch outside (mobile portrait only)
@@ -41,7 +42,14 @@ export default function GameLayout({ chessBoard, chat }: GameLayoutProps) {
               {chessBoard}
             </div>
           </div>
-          
+
+          {/* Controls Section - Between board and chat */}
+          {controls && (
+            <div className="controls-section">
+              {controls}
+            </div>
+          )}
+
           {/* Chat Section - CSS controlled positioning above input */}
           <div className="chat-section">
             {chat}
@@ -59,8 +67,15 @@ export default function GameLayout({ chessBoard, chat }: GameLayoutProps) {
       {/* Mobile Landscape Layout: Side by side */}
       {isMobile && isLandscape && (
         <div className="layout-landscape">
-          <div className="board-landscape">
-            {chessBoard}
+          <div className="board-landscape-wrapper">
+            <div className="board-landscape">
+              {chessBoard}
+            </div>
+            {controls && (
+              <div className="controls-landscape">
+                {controls}
+              </div>
+            )}
           </div>
           <div className="chat-landscape">
             {chat}
@@ -71,8 +86,15 @@ export default function GameLayout({ chessBoard, chat }: GameLayoutProps) {
       {/* Desktop Layout: Side by side */}
       {!isMobile && (
         <div className="layout-desktop">
-          <div className="board-desktop">
-            {chessBoard}
+          <div className="board-desktop-wrapper">
+            <div className="board-desktop">
+              {chessBoard}
+            </div>
+            {controls && (
+              <div className="controls-desktop">
+                {controls}
+              </div>
+            )}
           </div>
           <div className="chat-desktop">
             {chat}
