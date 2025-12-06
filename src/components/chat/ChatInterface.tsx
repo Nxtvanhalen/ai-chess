@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
 import LoadingIndicator from './LoadingIndicator';
@@ -12,90 +12,125 @@ interface ChatInterfaceProps {
   isLoading?: boolean;
 }
 
-export default function ChatInterface({ 
-  messages, 
+export default function ChatInterface({
+  messages,
   onSendMessage,
-  isLoading = false 
+  isLoading = false
 }: ChatInterfaceProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [isAtBottom, setIsAtBottom] = useState(true);
+  const messagesContentRef = useRef<HTMLDivElement>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
-  const [scrollTop, setScrollTop] = useState(0);
-  const [containerHeight, setContainerHeight] = useState(0);
-  const intersectionObserverRef = useRef<IntersectionObserver | null>(null);
   const [isLandscape, setIsLandscape] = useState(false);
+  const lastScrollHeightRef = useRef(0);
+  const userScrolledUpRef = useRef(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const scrollToBottom = (force: boolean = false) => {
+  // Smooth scroll to bottom using native CSS smooth scrolling
+  const scrollToBottom = useCallback((smooth: boolean = true) => {
     const container = scrollContainerRef.current;
-    const endElement = messagesEndRef.current;
-    
-    if (container && endElement) {
-      // Force immediate scroll for new messages
-      if (force) {
-        container.scrollTop = container.scrollHeight;
-      } else {
-        // Smooth scroll for user-initiated scrolling
-        endElement.scrollIntoView({ 
-          behavior: 'smooth',
-          block: 'end',
-          inline: 'nearest'
+    if (!container) return;
+
+    // Use requestAnimationFrame for smoother timing
+    requestAnimationFrame(() => {
+      if (smooth) {
+        container.scrollTo({
+          top: container.scrollHeight,
+          behavior: 'smooth'
         });
+      } else {
+        container.scrollTop = container.scrollHeight;
       }
-    }
-  };
+    });
+  }, []);
 
-  // Enhanced auto-scroll with IntersectionObserver
-  useEffect(() => {
-    // Always force scroll to bottom when new messages arrive
-    // Increased delay for virtual scrolling DOM updates
-    const scrollTimeout = setTimeout(() => {
-      scrollToBottom(true); // Force scroll
-    }, 50);
-    
-    return () => clearTimeout(scrollTimeout);
-  }, [messages]);
-  
-  // Setup IntersectionObserver for scroll button visibility
-  useEffect(() => {
-    const endElement = messagesEndRef.current;
+  // Check if user is near the bottom (within 100px)
+  const isNearBottom = useCallback(() => {
     const container = scrollContainerRef.current;
-    
-    if (!endElement || !container) return;
-    
-    intersectionObserverRef.current = new IntersectionObserver(
-      ([entry]) => {
-        const isVisible = entry.isIntersecting;
-        setIsAtBottom(isVisible);
-        setShowScrollButton(!isVisible && messages.length > 3);
-      },
-      {
-        root: container,
-        rootMargin: '0px 0px -20px 0px', // Trigger slightly before fully visible
-        threshold: 0.1
-      }
-    );
-    
-    intersectionObserverRef.current.observe(endElement);
-    
-    return () => {
-      intersectionObserverRef.current?.disconnect();
-    };
-  }, [messages.length]);
+    if (!container) return true;
 
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
-    setScrollTop(scrollTop);
-    
-    // Update scroll button visibility based on scroll position
-    const isScrolledToBottom = scrollHeight - scrollTop - clientHeight < 50;
-    setShowScrollButton(!isScrolledToBottom && messages.length > 3);
-  };
-  
-  const handleScrollToBottomClick = () => {
-    scrollToBottom(false); // Smooth scroll on manual click
-  };
-  
+    const threshold = 100; // pixels from bottom
+    return container.scrollHeight - container.scrollTop - container.clientHeight < threshold;
+  }, []);
+
+  // Handle user scroll - detect if they scrolled up intentionally
+  const handleScroll = useCallback(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const nearBottom = isNearBottom();
+
+    // User scrolled away from bottom
+    if (!nearBottom) {
+      userScrolledUpRef.current = true;
+      setShowScrollButton(messages.length > 2);
+    } else {
+      userScrolledUpRef.current = false;
+      setShowScrollButton(false);
+    }
+  }, [isNearBottom, messages.length]);
+
+  // MutationObserver to watch for content changes (typing effect, new messages)
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    const messagesContent = messagesContentRef.current;
+
+    if (!container || !messagesContent) return;
+
+    const observer = new MutationObserver(() => {
+      // Only auto-scroll if user hasn't intentionally scrolled up
+      if (!userScrolledUpRef.current || isNearBottom()) {
+        // Debounce scroll calls during rapid updates (typing)
+        if (scrollTimeoutRef.current) {
+          clearTimeout(scrollTimeoutRef.current);
+        }
+
+        scrollTimeoutRef.current = setTimeout(() => {
+          scrollToBottom(true);
+        }, 16); // ~60fps timing
+      }
+    });
+
+    observer.observe(messagesContent, {
+      childList: true,      // Watch for new messages
+      subtree: true,        // Watch nested elements
+      characterData: true,  // Watch text content changes (typing)
+    });
+
+    return () => {
+      observer.disconnect();
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, [scrollToBottom, isNearBottom]);
+
+  // Also scroll on messages array changes (catches structural updates)
+  useEffect(() => {
+    // Reset user scroll flag on new messages - they probably want to see new content
+    if (!userScrolledUpRef.current) {
+      requestAnimationFrame(() => {
+        scrollToBottom(true);
+      });
+    }
+  }, [messages.length, scrollToBottom]);
+
+  // Initial scroll and scroll on any message content change
+  useEffect(() => {
+    // Create a content signature from message contents
+    const contentSignature = messages.map(m => m.content?.length || 0).join(',');
+
+    if (!userScrolledUpRef.current) {
+      scrollToBottom(true);
+    }
+  }, [messages, scrollToBottom]);
+
+  const handleScrollToBottomClick = useCallback(() => {
+    userScrolledUpRef.current = false;
+    setShowScrollButton(false);
+    scrollToBottom(true);
+  }, [scrollToBottom]);
+
   // Simplified orientation detection for CSS classes only
   useEffect(() => {
     const updateOrientation = () => {
@@ -107,33 +142,14 @@ export default function ChatInterface({
 
     updateOrientation();
     window.addEventListener('resize', updateOrientation);
-    
+
     return () => {
       window.removeEventListener('resize', updateOrientation);
     };
   }, []);
 
-  // Track container height for scroll calculations
-  useEffect(() => {
-    const messagesContainer = messagesEndRef.current?.parentElement;
-    if (!messagesContainer) return;
-    
-    const resizeObserver = new ResizeObserver(entries => {
-      for (const entry of entries) {
-        setContainerHeight(entry.contentRect.height);
-      }
-    });
-    
-    resizeObserver.observe(messagesContainer);
-    return () => resizeObserver.disconnect();
-  }, []);
-  
-  // Simple message rendering - disabled virtual scrolling to prevent overlaps
-  const visibleMessages = useMemo(() => {
-    // Always render all messages to prevent height calculation issues
-    // Chess chat typically has manageable message counts
-    return messages;
-  }, [messages]);
+  // Simple message rendering
+  const visibleMessages = useMemo(() => messages, [messages]);
 
   return (
     <div className={`chat-interface ${isLandscape ? 'landscape' : 'portrait'}`}>
@@ -170,8 +186,8 @@ export default function ChatInterface({
           </div>
         )}
 
-        {/* Simple message container - no virtual scrolling */}
-        <div className="space-y-1">
+        {/* Message container with ref for MutationObserver */}
+        <div ref={messagesContentRef} className="space-y-1">
           {visibleMessages.map((message) => (
             <div key={message.id} className="w-full">
               <ChatMessage message={message} />

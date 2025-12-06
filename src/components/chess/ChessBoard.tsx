@@ -434,7 +434,7 @@ export default function ChessBoard({
             borderRadius: theme.boardStyle.borderRadius,
             boxShadow: theme.boardStyle.boxShadow,
             border: theme.boardStyle.border,
-            background: theme.boardStyle.background,
+            ...(theme.boardStyle.background && { background: theme.boardStyle.background }),
             transition: 'all 0.5s ease-in-out',
           }}
           customDarkSquareStyle={{
