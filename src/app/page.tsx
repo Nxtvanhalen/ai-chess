@@ -129,16 +129,42 @@ export default function Home() {
         const conversation = await createConversation(newGame.id);
         setConversationId(conversation.id);
 
-        // Add welcome message - start with full text (no typing on init to avoid hook issues)
+        // Add welcome message with typing effect
         const welcomeText = "Hey Chris! Ready for another game? I'll be here watching and giving you some tips. You're playing white against the engine. Good luck!";
+        const welcomeId = await generateId();
         const welcomeMessage: ChatMessage = {
-          id: await generateId(),
+          id: welcomeId,
           role: 'assistant',
-          content: welcomeText,
+          content: '',
           timestamp: new Date(),
+          metadata: { isThinking: true }
         };
 
         setMessages([welcomeMessage]);
+
+        // Start typing effect after brief delay
+        setTimeout(() => {
+          let displayedLength = 0;
+          const typingDelay = 35;
+
+          const interval = setInterval(() => {
+            displayedLength = Math.min(displayedLength + 1, welcomeText.length);
+            const displayedText = welcomeText.slice(0, displayedLength);
+
+            setMessages(prev =>
+              prev.map(msg =>
+                msg.id === welcomeId
+                  ? { ...msg, content: displayedText, metadata: { isThinking: false } }
+                  : msg
+              )
+            );
+
+            if (displayedLength >= welcomeText.length) {
+              clearInterval(interval);
+            }
+          }, typingDelay);
+        }, 300);
+
         await saveMessage(conversation.id, 'assistant', welcomeText);
       } catch (error) {
         console.error('Error initializing game:', error);
