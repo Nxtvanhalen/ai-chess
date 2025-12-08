@@ -35,7 +35,7 @@ const createPieceRenderer = (pieceUrl: string, isWhite: boolean, scale: number =
           width: squareWidth,
           height: squareWidth,
           opacity: isDragging ? 0.5 : 1,
-          cursor: 'pointer',
+          pointerEvents: 'none', // Let square handle clicks for full-square clickability
           transform: `${rotation}${scaleTransform}`,
           filter: isWhite
             ? 'brightness(1.1) contrast(1.3) saturate(0.5) grayscale(0.3)' // Chrome/metallic silver
