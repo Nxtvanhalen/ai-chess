@@ -32,19 +32,10 @@ const PIECE_COMPONENTS = {
   k: King,
 };
 
-const createPieceRenderer = (PieceComponent: any, isWhite: boolean) => {
+const createPieceRenderer = (PieceComponent: any, isWhite: boolean, pieceType: string) => {
   return ({ squareWidth, isDragging }: CustomPieceFnArgs) => {
     const palette = isWhite ? PALETTES.white : PALETTES.black;
-    const rotation = isWhite ? 'rotate(180deg)' : 'rotate(0deg)'; // Pieces face each other? No, standard is usually one way.
-    // Wait, previous code had: const rotation = (isWhite && !noRotate) ? 'rotate(180deg)' : 'rotate(0deg)';
-    // Usually white is at bottom, pieces face up.
-    // In many chess sets (images), they face forward. 
-    // SVG vectors usually face "up" or "forward".
-
-    // Let's stick to standard 0 rotation unless we see they are upside down.
-    // Previous code rotated White pieces 180deg but 'noRotate' was true for all white pieces except... none?
-    // "wP: createPieceRenderer(PIECE_URLS.wP, true, 2, true)" -> noRotate=true
-    // So actually they were NOT rotated.
+    const size = pieceType === 'p' ? '200%' : '180%'; // Pawns slightly larger (200%) vs others (180%)
 
     return (
       <div
@@ -56,26 +47,25 @@ const createPieceRenderer = (PieceComponent: any, isWhite: boolean) => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          // Hover glow effect could be added here
         }}
       >
         <PieceComponent
           primary={palette.primary}
           secondary={palette.secondary}
           accent={palette.accent}
-          stroke={palette.primary} // Weld with body color
-          strokeWidth={isWhite ? '0.5' : '0.2'} // Thicker weld for white to hide cracks, thin for black to preserve detail
+          stroke={palette.primary}
+          strokeWidth={isWhite ? '0.5' : '0.2'}
           style={{
-            width: '180%',   // Use Layout Size instead of Scale to force HD Renders
-            height: '180%',
+            width: size,
+            height: size,
             position: 'absolute',
             top: '50%',
             left: '50%',
-            transform: 'translate(-50%, -50%)', // Center based on new size
+            transform: 'translate(-50%, -50%)',
             willChange: 'transform',
             filter: isWhite
-              ? 'brightness(1.1) contrast(1.1) drop-shadow(0 2px 3px rgba(0,0,0,0.3))' // Crisp Original with slight polish
-              : 'brightness(0.65) sepia(0.4) hue-rotate(210deg) saturate(1.4) contrast(1.2) drop-shadow(0 4px 6px rgba(0,0,0,0.5)) drop-shadow(0 0 10px rgba(168, 85, 247, 0.3))', // Dark Obsidian with clearer Violet tint
+              ? 'brightness(1.1) contrast(1.1) drop-shadow(0 2px 3px rgba(0,0,0,0.3))'
+              : 'brightness(0.65) sepia(0.4) hue-rotate(210deg) saturate(1.4) contrast(1.2) drop-shadow(0 4px 6px rgba(0,0,0,0.5)) drop-shadow(0 0 10px rgba(168, 85, 247, 0.3))',
           }}
         />
       </div>
@@ -84,16 +74,16 @@ const createPieceRenderer = (PieceComponent: any, isWhite: boolean) => {
 };
 
 export const customPieces = {
-  wP: createPieceRenderer(Pawn, true),
-  wN: createPieceRenderer(Knight, true),
-  wB: createPieceRenderer(Bishop, true),
-  wR: createPieceRenderer(Rook, true),
-  wQ: createPieceRenderer(Queen, true),
-  wK: createPieceRenderer(King, true),
-  bP: createPieceRenderer(Pawn, false),
-  bN: createPieceRenderer(Knight, false),
-  bB: createPieceRenderer(Bishop, false),
-  bR: createPieceRenderer(Rook, false),
-  bQ: createPieceRenderer(Queen, false),
-  bK: createPieceRenderer(King, false),
+  wP: createPieceRenderer(Pawn, true, 'p'),
+  wN: createPieceRenderer(Knight, true, 'n'),
+  wB: createPieceRenderer(Bishop, true, 'b'),
+  wR: createPieceRenderer(Rook, true, 'r'),
+  wQ: createPieceRenderer(Queen, true, 'q'),
+  wK: createPieceRenderer(King, true, 'k'),
+  bP: createPieceRenderer(Pawn, false, 'p'),
+  bN: createPieceRenderer(Knight, false, 'n'),
+  bB: createPieceRenderer(Bishop, false, 'b'),
+  bR: createPieceRenderer(Rook, false, 'r'),
+  bQ: createPieceRenderer(Queen, false, 'q'),
+  bK: createPieceRenderer(King, false, 'k'),
 };
