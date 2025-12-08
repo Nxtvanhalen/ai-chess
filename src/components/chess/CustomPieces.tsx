@@ -68,8 +68,10 @@ const createPieceRenderer = (PieceComponent: any, isWhite: boolean) => {
           style={{
             width: '100%',
             height: '100%',
-            transform: 'scale(2.0)', // Maximized size
-            transformOrigin: 'center', // Ensure they scale from center
+            transform: 'translate3d(0,0,0) scale(2.0)', // Force GPU & Size
+            transformOrigin: 'center',
+            backfaceVisibility: 'hidden', // Prevent rasterization blur
+            willChange: 'transform',      // Hint to browser
             filter: isWhite
               ? 'brightness(1.1) contrast(1.1) drop-shadow(0 2px 3px rgba(0,0,0,0.3))' // Crisp Original with slight polish
               : 'brightness(0.65) sepia(0.4) hue-rotate(210deg) saturate(1.4) contrast(1.2) drop-shadow(0 4px 6px rgba(0,0,0,0.5)) drop-shadow(0 0 10px rgba(168, 85, 247, 0.3))', // Dark Obsidian with clearer Violet tint
