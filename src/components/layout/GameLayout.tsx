@@ -64,20 +64,16 @@ export default function GameLayout({ chessBoard, chat, controls }: GameLayoutPro
         </>
       )}
 
-      {/* Mobile Landscape Layout: Side by side */}
+      {/* Mobile Landscape Layout: Focused Board Only */}
       {isMobile && isLandscape && (
         <div className="layout-landscape">
-          <div className="board-landscape-wrapper">
-            <div className="board-landscape">
+          <div className="board-landscape-wrapper w-full h-full border-none shadow-none">
+            <div className="board-landscape w-full h-full flex items-center justify-center">
               {chessBoard}
             </div>
-            {controls && (
-              <div className="controls-landscape">
-                {controls}
-              </div>
-            )}
+            {/* Controls HIDDEN in landscape as requested to prevent overlap */}
           </div>
-          <div className="chat-landscape">
+          <div className="hidden">
             {chat}
           </div>
         </div>
@@ -93,7 +89,7 @@ export default function GameLayout({ chessBoard, chat, controls }: GameLayoutPro
             {controls && (
               <div className="controls-desktop">
                 {controls}
-                <div className="text-xs text-slate-500 mt-4 text-center font-mono select-none opacity-50">System v2.5 (Landscape Layout)</div>
+                <div className="text-xs text-slate-500 mt-4 text-center font-mono select-none opacity-50">System v2.6 (Focus Mode)</div>
               </div>
             )}
           </div>
