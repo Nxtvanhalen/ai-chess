@@ -1,69 +1,96 @@
 import React from 'react';
 import type { CustomPieceFnArgs } from 'react-chessboard/dist/chessboard/types';
+import { Pawn } from './pieces/Pawn';
+import { Knight } from './pieces/Knight';
+import { Bishop } from './pieces/Bishop';
+import { Rook } from './pieces/Rook';
+import { Queen } from './pieces/Queen';
+import { King } from './pieces/King';
 
-// Chess.com 3D pieces - dimensional and ornate!
-const PIECE_URLS = {
-  // White pieces - 3D style
-  wP: '/PAWN.svg',
-  wN: '/Gemini_Generated_Image_40n0va40n0va40n0-removebg-preview (2).svg',
-  wB: '/BishopNoBG.svg',
-  wR: '/CastleNOBG.svg',
-  wQ: '/QUEEN.svg',
-  wK: '/King.svg',
-
-  // Black pieces - 3D style
-  bP: '/PAWN.svg',
-  bN: '/Gemini_Generated_Image_40n0va40n0va40n0-removebg-preview (2).svg',
-  bB: '/BishopNoBG.svg',
-  bR: '/CastleNOBG.svg',
-  bQ: '/QUEEN.svg',
-  bK: '/King.svg',
+// Define Piece Palettes for "God Mode" Customization
+const PALETTES = {
+  white: {
+    // Chrome/Silver Aesthetic
+    primary: '#cbd5e1',    // Slate-300 (Darker Silver for better solidity)
+    secondary: '#f8fafc',  // Slate-50
+    accent: '#64748b',     // Slate-500 (Stronger Grey to define 3D shading)
+  },
+  black: {
+    // Obsidian/Void Aesthetic (matching the board theme)
+    primary: '#0f172a',    // Slate-900 (Deep Navy/Black)
+    secondary: '#581c87',  // Purple-900 (Dark Purple)
+    accent: '#a855f7',     // Purple-500 (Glowing Purple Accent)
+  }
 };
 
-// Create custom piece renderer with rotation and color adjustments
-// All pieces: white faces up (12 o'clock), black faces down (6 o'clock)
-// White pieces are chrome/metallic silver, black pieces are dark purple
-const createPieceRenderer = (pieceUrl: string, isWhite: boolean, scale: number = 1, noRotate: boolean = false) => {
+const PIECE_COMPONENTS = {
+  p: Pawn,
+  n: Knight,
+  b: Bishop,
+  r: Rook,
+  q: Queen,
+  k: King,
+};
+
+const createPieceRenderer = (PieceComponent: any, isWhite: boolean) => {
   return ({ squareWidth, isDragging }: CustomPieceFnArgs) => {
-    const rotation = (isWhite && !noRotate) ? 'rotate(180deg)' : 'rotate(0deg)';
-    const scaleTransform = scale !== 1 ? ` scale(${scale})` : '';
+    const palette = isWhite ? PALETTES.white : PALETTES.black;
+    const rotation = isWhite ? 'rotate(180deg)' : 'rotate(0deg)'; // Pieces face each other? No, standard is usually one way.
+    // Wait, previous code had: const rotation = (isWhite && !noRotate) ? 'rotate(180deg)' : 'rotate(0deg)';
+    // Usually white is at bottom, pieces face up.
+    // In many chess sets (images), they face forward. 
+    // SVG vectors usually face "up" or "forward".
+
+    // Let's stick to standard 0 rotation unless we see they are upside down.
+    // Previous code rotated White pieces 180deg but 'noRotate' was true for all white pieces except... none?
+    // "wP: createPieceRenderer(PIECE_URLS.wP, true, 2, true)" -> noRotate=true
+    // So actually they were NOT rotated.
+
     return (
-      <img
-        src={pieceUrl}
-        alt="chess piece"
+      <div
         style={{
           width: squareWidth,
           height: squareWidth,
           opacity: isDragging ? 0.5 : 1,
-          pointerEvents: 'none', // Let square handle clicks for full-square clickability
-          transform: `${rotation}${scaleTransform}`,
-          filter: isWhite
-            ? 'brightness(1.1) contrast(1.3) saturate(0.5) grayscale(0.3)' // Chrome/metallic silver
-            : 'brightness(0.6) hue-rotate(270deg) saturate(1.5) contrast(1.2)', // Dark purple pieces
+          pointerEvents: 'none',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          // Hover glow effect could be added here
         }}
-      />
+      >
+        <PieceComponent
+          primary={palette.primary}
+          secondary={palette.secondary}
+          accent={palette.accent}
+          stroke={palette.primary} // Weld with body color
+          strokeWidth={isWhite ? '0.5' : '0.2'} // Thicker weld for white to hide cracks, thin for black to preserve detail
+          style={{
+            width: '100%',
+            height: '100%',
+            transform: 'scale(2.0)', // Maximized size
+            transformOrigin: 'center', // Ensure they scale from center
+            filter: isWhite
+              ? 'brightness(1.1) contrast(1.1) drop-shadow(0 2px 3px rgba(0,0,0,0.3))' // Crisp Original with slight polish
+              : 'brightness(0.65) sepia(0.4) hue-rotate(210deg) saturate(1.4) contrast(1.2) drop-shadow(0 4px 6px rgba(0,0,0,0.5)) drop-shadow(0 0 10px rgba(168, 85, 247, 0.3))', // Dark Obsidian with clearer Violet tint
+          }}
+        />
+      </div>
     );
   };
 };
 
-// Export custom pieces configuration
 export const customPieces = {
-  wP: createPieceRenderer(PIECE_URLS.wP, true, 2, true), // 2x bigger, no rotation
-  wN: createPieceRenderer(PIECE_URLS.wN, true, 2, true), // 2x bigger, no rotation
-  wB: createPieceRenderer(PIECE_URLS.wB, true, 2, true), // 2x bigger, no rotation
-  wR: createPieceRenderer(PIECE_URLS.wR, true, 2, true), // 2x bigger, no rotation
-  wQ: createPieceRenderer(PIECE_URLS.wQ, true, 2, true), // 2x bigger, no rotation
-  wK: createPieceRenderer(PIECE_URLS.wK, true, 2, true), // 2x bigger, no rotation
-  bP: createPieceRenderer(PIECE_URLS.bP, false, 2), // 2x bigger
-  bN: createPieceRenderer(PIECE_URLS.bN, false, 2), // 2x bigger
-  bB: createPieceRenderer(PIECE_URLS.bB, false, 2), // 2x bigger
-  bR: createPieceRenderer(PIECE_URLS.bR, false, 2), // 2x bigger
-  bQ: createPieceRenderer(PIECE_URLS.bQ, false, 2), // 2x bigger
-  bK: createPieceRenderer(PIECE_URLS.bK, false, 2), // 2x bigger
-};
-
-// Alternative ornate piece sets (comment/uncomment to switch)
-export const ORNATE_STYLES = {
-  standard: PIECE_URLS,
-  // Add more styles here as we find them
+  wP: createPieceRenderer(Pawn, true),
+  wN: createPieceRenderer(Knight, true),
+  wB: createPieceRenderer(Bishop, true),
+  wR: createPieceRenderer(Rook, true),
+  wQ: createPieceRenderer(Queen, true),
+  wK: createPieceRenderer(King, true),
+  bP: createPieceRenderer(Pawn, false),
+  bN: createPieceRenderer(Knight, false),
+  bB: createPieceRenderer(Bishop, false),
+  bR: createPieceRenderer(Rook, false),
+  bQ: createPieceRenderer(Queen, false),
+  bK: createPieceRenderer(King, false),
 };
