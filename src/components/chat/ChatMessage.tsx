@@ -159,8 +159,15 @@ export default function ChatMessage({ message }: ChatMessageProps) {
         className="flex gap-1 lg:gap-4 px-1 lg:px-6 py-1 lg:py-6 mx-0 lg:mx-2"
       >
         <div className="flex-shrink-0">
-          <div className="w-5 h-5 lg:w-10 lg:h-10 rounded-full bg-gradient-to-br from-red-600 via-orange-500 to-yellow-500 glow-effect shadow-lg flex items-center justify-center text-white text-xs lg:text-lg">
-            ♟
+          <div className="w-5 h-5 lg:w-10 lg:h-10 rounded-full overflow-hidden relative">
+            <Image
+              src="/EngineNOBG.svg"
+              alt="Engine"
+              width={40}
+              height={40}
+              className="absolute inset-0 w-full h-full object-cover"
+              priority
+            />
           </div>
         </div>
         <div className="flex-1 overflow-hidden">
@@ -209,17 +216,24 @@ export default function ChatMessage({ message }: ChatMessageProps) {
     >
       <div className="flex-shrink-0">
         {isEngine ? (
-          <div className="w-5 h-5 lg:w-10 lg:h-10 rounded-full bg-gradient-to-br from-red-600 via-orange-500 to-yellow-500 glow-effect shadow-lg flex items-center justify-center text-white text-xs lg:text-lg">
-            ♟
+          <div className="w-5 h-5 lg:w-10 lg:h-10 rounded-full overflow-hidden relative">
+            <Image
+              src="/EngineNOBG.svg"
+              alt="Engine"
+              width={40}
+              height={40}
+              className="absolute inset-0 w-full h-full object-cover"
+              priority
+            />
           </div>
         ) : isAssistant ? (
-          <div className="w-5 h-5 lg:w-10 lg:h-10 rounded-full bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 glow-effect shadow-lg overflow-hidden relative">
+          <div className="w-5 h-5 lg:w-10 lg:h-10 rounded-full overflow-hidden relative">
             <Image
-              src="/chester.png"
+              src="/Chester.svg"
               alt="Chester"
               width={40}
               height={40}
-              className="absolute inset-0 w-full h-full object-cover opacity-100"
+              className="absolute inset-0 w-full h-full object-cover"
               priority
             />
           </div>
