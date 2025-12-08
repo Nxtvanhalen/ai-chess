@@ -876,7 +876,7 @@ select {
 
 .board-landscape-wrapper {
   display: flex;
-  flex-direction: column;
+  flex-direction: row; /* Side-by-side Layout */
   flex-shrink: 0;
   width: 55%;
   border-right: 2px solid rgba(147, 51, 234, 0.3);
@@ -887,15 +887,21 @@ select {
 .board-landscape {
   flex: 1;
   min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .controls-landscape {
   flex-shrink: 0;
   display: flex;
-  justify-content: flex-end;
+  flex-direction: column; /* Stack controls vertically on the side */
+  justify-content: center; /* Center them vertically */
+  align-items: center;
   padding: 0.5rem;
   background: rgba(0, 0, 0, 0.3);
-  border-top: 1px solid rgba(147, 51, 234, 0.2);
+  border-left: 1px solid rgba(147, 51, 234, 0.2); /* Separate from board */
+  border-top: none;
 }
 
 .chat-landscape {
