@@ -30,24 +30,34 @@ export default function ChessBoard({
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
   const boardContainerRef = useRef<HTMLDivElement>(null);
   const [possibleMoves, setPossibleMoves] = useState<Square[]>([]);
-  const [checkInfo, setCheckInfo] = useState<{king: Square, attacker: Square, path: Square[]} | null>(null);
+  const [checkInfo, setCheckInfo] = useState<{ king: Square, attacker: Square, path: Square[] } | null>(null);
   const [isLandscape, setIsLandscape] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [overlayKey, setOverlayKey] = useState(0);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // Smooth fade-in effect to mask SVG hydration
+  useEffect(() => {
+    // Initial delay to let React hydrate and browser paint the SVGs
+    const timer = setTimeout(() => {
+      setIsLoaded(true);
+    }, 600);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const updateBoardSize = () => {
       const viewportHeight = window.innerHeight;
       const viewportWidth = window.innerWidth;
-      
+
       const mobile = viewportWidth < 1024; // lg breakpoint
       const landscape = viewportWidth > viewportHeight;
-      
+
       setIsMobile(mobile);
       setIsLandscape(landscape);
-      
+
       let maxSize;
-      
+
       if (mobile && landscape) {
         // Mobile landscape: use available height minus some padding
         maxSize = Math.min(viewportHeight - 40, viewportWidth * 0.55 - 40);
@@ -58,7 +68,7 @@ export default function ChessBoard({
         // Desktop: responsive to container width
         maxSize = Math.min(viewportWidth * 0.55 - 48, viewportHeight - 120);
       }
-      
+
       setBoardWidth(Math.floor(Math.max(maxSize, 300))); // Minimum size of 300px
     };
 
@@ -92,19 +102,19 @@ export default function ChessBoard({
     const fromRank = parseInt(from[1]);
     const toFile = files.indexOf(to[0]);
     const toRank = parseInt(to[1]);
-    
+
     const fileStep = fromFile === toFile ? 0 : (toFile - fromFile) / Math.abs(toFile - fromFile);
     const rankStep = fromRank === toRank ? 0 : (toRank - fromRank) / Math.abs(toRank - fromRank);
-    
+
     let currentFile = fromFile + fileStep;
     let currentRank = fromRank + rankStep;
-    
+
     while (currentFile !== toFile || currentRank !== toRank) {
       path.push(`${files[currentFile]}${currentRank}` as Square);
       currentFile += fileStep;
       currentRank += rankStep;
     }
-    
+
     return path;
   };
 
@@ -117,13 +127,13 @@ export default function ChessBoard({
         onCheckmate(winner);
       }
     }
-    
+
     // Check for check
     if (game.inCheck()) {
       const kingColor = game.turn();
       const board = game.board();
       let kingSquare: Square | null = null;
-      
+
       // Find the king in check
       for (let row = 0; row < 8; row++) {
         for (let col = 0; col < 8; col++) {
@@ -136,25 +146,25 @@ export default function ChessBoard({
         }
         if (kingSquare) break;
       }
-      
+
       if (kingSquare) {
         // Find the attacking piece
         const moves = game.moves({ verbose: true });
         const gameCopy = new Chess(game.fen());
         gameCopy.turn() === 'w' ? gameCopy.load(game.fen().replace(' w ', ' b ')) : gameCopy.load(game.fen().replace(' b ', ' w '));
-        
+
         const attackingMoves = gameCopy.moves({ verbose: true }).filter(move => move.to === kingSquare);
-        
+
         if (attackingMoves.length > 0) {
           const attackMove = attackingMoves[0];
           const attackerSquare = attackMove.from;
           const attackingPiece = game.get(attackerSquare);
-          
+
           let path: Square[] = [];
           if (attackingPiece && (attackingPiece.type === 'q' || attackingPiece.type === 'r' || attackingPiece.type === 'b')) {
             path = getPathBetweenSquares(attackerSquare, kingSquare);
           }
-          
+
           setCheckInfo({ king: kingSquare, attacker: attackerSquare, path });
         }
       }
@@ -167,7 +177,7 @@ export default function ChessBoard({
     if (!interactive) return;
 
     const piece = game.get(square as Square);
-    
+
     if (selectedSquare === square) {
       // Clicking same square deselects
       setSelectedSquare(null);
@@ -207,7 +217,7 @@ export default function ChessBoard({
       if (!interactive) return false;
 
       const gameCopy = new Chess(game.fen());
-      
+
       try {
         const move = gameCopy.move({
           from: sourceSquare as Square,
@@ -219,11 +229,11 @@ export default function ChessBoard({
 
         setGame(gameCopy);
         onMove(move);
-        
+
         // Clear selection after successful move
         setSelectedSquare(null);
         setPossibleMoves([]);
-        
+
         return true;
       } catch {
         return false;
@@ -295,20 +305,20 @@ export default function ChessBoard({
     const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
     const ranks = ['8', '7', '6', '5', '4', '3', '2', '1'];
     const identifiers = [];
-    
+
     // Use actual rendered board size for accurate positioning
     const actualBoardSize = boardContainerRef.current?.getBoundingClientRect().width || boardWidth;
     const borderSize = 2;
     const squareSize = (actualBoardSize - (borderSize * 2)) / 8;
-    
+
     for (let rank = 0; rank < 8; rank++) {
       for (let file = 0; file < 8; file++) {
         const isLight = (rank + file) % 2 === 0;
-        
+
         // Improved positioning calculation
         const leftPosition = borderSize + (file * squareSize);
         const topPosition = borderSize + (rank * squareSize);
-        
+
         identifiers.push(
           <div
             key={`${files[file]}${ranks[rank]}`}
@@ -341,7 +351,7 @@ export default function ChessBoard({
         );
       }
     }
-    
+
     return identifiers;
   };
 
@@ -349,12 +359,12 @@ export default function ChessBoard({
     const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
     const ranks = ['8', '7', '6', '5', '4', '3', '2', '1'];
     const pieceNames = [];
-    
+
     for (let rank = 0; rank < 8; rank++) {
       for (let file = 0; file < 8; file++) {
         const square = `${files[file]}${ranks[rank]}` as Square;
         const piece = game.get(square);
-        
+
         if (piece) {
           // Use actual rendered board size for accurate positioning
           const actualBoardSize = boardContainerRef.current?.getBoundingClientRect().width || boardWidth;
@@ -362,11 +372,11 @@ export default function ChessBoard({
           const squareSize = (actualBoardSize - (borderSize * 2)) / 8;
           const pieceKey = `${piece.color}${piece.type.toUpperCase()}`;
           const pieceName = getPieceName(pieceKey, square);
-          
+
           // Improved positioning calculation matching square identifiers
           const leftPosition = borderSize + (file * squareSize);
           const topPosition = borderSize + (rank * squareSize) + squareSize - Math.max(8, squareSize * 0.15);
-          
+
           pieceNames.push(
             <div
               key={`name-${square}`}
@@ -383,22 +393,22 @@ export default function ChessBoard({
             >
               <span className={`
                 font-black tracking-[0.15em] uppercase
-                ${piece.color === 'w' 
-                  ? 'text-white' 
+                ${piece.color === 'w'
+                  ? 'text-white'
                   : 'text-white'
                 }
               `}
-              style={{
-                fontSize: `${Math.max(6, squareSize * 0.12)}px`,
-                transform: 'scale(0.95)',
-                transformOrigin: 'center',
-                textShadow: '0 0 3px #000, 0 0 5px #000, 0 1px 0 #000, 0 -1px 0 #000, 1px 0 0 #000, -1px 0 0 #000',
-                WebkitFontSmoothing: 'subpixel-antialiased',
-                MozOsxFontSmoothing: 'auto',
-                textRendering: 'geometricPrecision',
-                fontWeight: 900,
-                letterSpacing: '0.15em'
-              }}>
+                style={{
+                  fontSize: `${Math.max(6, squareSize * 0.12)}px`,
+                  transform: 'scale(0.95)',
+                  transformOrigin: 'center',
+                  textShadow: '0 0 3px #000, 0 0 5px #000, 0 1px 0 #000, 0 -1px 0 #000, 1px 0 0 #000, -1px 0 0 #000',
+                  WebkitFontSmoothing: 'subpixel-antialiased',
+                  MozOsxFontSmoothing: 'auto',
+                  textRendering: 'geometricPrecision',
+                  fontWeight: 900,
+                  letterSpacing: '0.15em'
+                }}>
                 {pieceName.title}
               </span>
             </div>
@@ -406,18 +416,17 @@ export default function ChessBoard({
         }
       }
     }
-    
+
     return pieceNames;
   };
 
   return (
-    <div 
-      className={`chess-board-container flex items-center justify-center bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-indigo-900/20 ${
-        isMobile && isLandscape 
-          ? 'p-2 h-full' 
-          : 'p-1 lg:p-6 pt-2 lg:pt-6'
-      }`} 
-      style={{ 
+    <div
+      className={`chess-board-container flex items-center justify-center bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-indigo-900/20 ${isMobile && isLandscape
+        ? 'p-2 h-full'
+        : 'p-1 lg:p-6 pt-2 lg:pt-6'
+        }`}
+      style={{
         height: isMobile && isLandscape ? '100vh' : `${boardWidth + 8}px`,
         minHeight: isMobile && isLandscape ? '100vh' : 'auto'
       }}>
@@ -452,29 +461,41 @@ export default function ChessBoard({
           animationDuration={800}
           arePiecesDraggable={interactive}
         />
-        
+
         {/* Square identifiers overlay - sized to match actual rendered board */}
-        <div key={`identifiers-${overlayKey}`} className="absolute pointer-events-none" style={{ 
+        <div key={`identifiers-${overlayKey}`} className="absolute pointer-events-none" style={{
           top: 0,
           left: 0,
           width: '100%',
           height: '100%',
-          borderRadius: '16px', 
-          overflow: 'hidden' 
+          borderRadius: '16px',
+          overflow: 'hidden'
         }}>
           {renderSquareIdentifiers()}
         </div>
-        
+
         {/* Piece names overlay - sized to match actual rendered board */}
-        <div key={`pieces-${overlayKey}`} className="absolute pointer-events-none z-10" style={{ 
+        <div key={`pieces-${overlayKey}`} className="absolute pointer-events-none z-10" style={{
           top: 0,
           left: 0,
           width: '100%',
           height: '100%',
-          borderRadius: '16px', 
-          overflow: 'hidden' 
+          borderRadius: '16px',
+          overflow: 'hidden'
         }}>
           {renderPieceNames()}
+        </div>
+
+        {/* Smooth Loading Overlay - Masks the initial SVG hydration */}
+        <div
+          className={`absolute inset-0 z-50 bg-slate-900 flex items-center justify-center rounded-2xl transition-opacity duration-700 ease-in-out ${isLoaded ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+        >
+          <div className="bg-gradient-to-br from-purple-900/40 via-blue-900/40 to-indigo-900/40 rounded-2xl flex items-center justify-center w-full h-full">
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 animate-pulse shadow-[0_0_30px_rgba(168,85,247,0.5)]" />
+              <p className="text-slate-400 text-sm font-medium tracking-widest uppercase animate-pulse">Initializing Board</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
