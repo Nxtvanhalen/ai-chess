@@ -24,6 +24,7 @@ import { GameMemoryService } from '@/lib/services/GameMemoryService';
 import { useChesterStream } from '@/hooks/useChesterStream';
 import { BoardTheme, boardThemes, defaultTheme } from '@/lib/chess/boardThemes';
 import ThemeSelector from '@/components/chess/ThemeSelector';
+import ErrorBoundary from '@/components/utils/ErrorBoundary';
 
 export default function Home() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -32,7 +33,7 @@ export default function Home() {
   const [currentGameId, setCurrentGameId] = useState<string | null>(null);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [moveCount, setMoveCount] = useState(0);
-  const [gameOver, setGameOver] = useState<{checkmate: boolean, winner?: 'white' | 'black'}>({checkmate: false});
+  const [gameOver, setGameOver] = useState<{ checkmate: boolean, winner?: 'white' | 'black' }>({ checkmate: false });
   const [boardTheme, setBoardTheme] = useState<BoardTheme>(defaultTheme);
   const timeoutRefs = useRef<Set<NodeJS.Timeout>>(new Set());
   const messagesRef = useRef<ChatMessage[]>([]);
@@ -73,7 +74,7 @@ export default function Home() {
     // Return cleanup function
     return () => clearInterval(interval);
   }, []);
-  
+
   // Keep messagesRef in sync
   useEffect(() => {
     messagesRef.current = messages;
@@ -83,10 +84,10 @@ export default function Home() {
   useEffect(() => {
     performanceMonitor.current = PerformanceMonitor.getInstance();
     performanceMonitor.current.startFPSMonitoring();
-    
+
     // Preload critical libraries on user interaction
     preloadCriticalLibraries();
-    
+
     // Log performance report every 30 seconds in development
     const reportInterval = setInterval(() => {
       if (process.env.NODE_ENV === 'development') {
@@ -230,25 +231,25 @@ export default function Home() {
       console.error('Error getting AI suggestions:', error);
     }
   }, [conversationId, currentGameId, typeText]);
-  
+
   const detectGamePhase = (fen: string) => {
     const moves = messagesRef.current.filter(m => m.metadata?.moveContext).length;
     if (moves < 10) return 'opening';
     if (moves < 30) return 'middlegame';
     return 'endgame';
   };
-  
+
   const handleMove = useCallback(async (move: Move) => {
     if (!currentGameId || !conversationId) return;
-    
+
     // Haptic feedback for user move
     await haptics.moveMade();
-    
+
     // Update position after move
     setCurrentPosition(move.after);
     const newMoveCount = moveCount + 1;
     setMoveCount(newMoveCount);
-    
+
     try {
       // Save move to database
       await saveMove(
@@ -275,7 +276,7 @@ export default function Home() {
 
       // Update game position
       await updateGamePosition(currentGameId, move.after, '');
-      
+
       // Add user move message with typing effect
       const moveMessageId = generateSimpleId();
       const moveText = `I played ${convertMoveToPlainEnglish(move.san)}`;
@@ -294,9 +295,9 @@ export default function Home() {
       setMessages(prev => [...prev, moveMessage]);
       typeText(moveText, moveMessageId);
       await saveMessage(conversationId, 'user', moveText, moveMessage.metadata);
-      
+
       setIsLoading(true);
-      
+
       // Get AI commentary on the move
       const response = await fetch('/api/chess/move', {
         method: 'POST',
@@ -328,7 +329,7 @@ export default function Home() {
           }
         }),
       });
-      
+
       if (response.ok) {
         const reader = response.body?.getReader();
         const decoder = new TextDecoder();
@@ -339,9 +340,9 @@ export default function Home() {
           timestamp: new Date(),
           metadata: { isThinking: true }
         };
-        
+
         setMessages(prev => [...prev, aiResponse]);
-        
+
         if (reader) {
           try {
             // Read all content first
@@ -367,20 +368,20 @@ export default function Home() {
             );
           }
         }
-        
+
         // Save AI commentary to database
         await saveMessage(conversationId, 'assistant', aiResponse.content);
-        
+
         // After AI commentary, get AI's move (only if it's AI's turn to play)
         // Check if it's black's turn (AI plays black)
         const isAiTurn = move.after.includes(' b '); // FEN notation: 'b' means black to move
-        
+
         if (isAiTurn) {
           // Get player move history for engine adaptation
-          const playerMoveHistory = messages.filter(m => 
+          const playerMoveHistory = messages.filter(m =>
             m.role === 'user' && m.metadata?.moveContext
           ).map(m => m.metadata?.moveContext || '').slice(-10);
-          
+
           // First show engine move with thinking indicator
           const engineMoveMessage: ChatMessage = {
             id: generateSimpleId(),
@@ -388,13 +389,13 @@ export default function Home() {
             type: 'move',
             content: '',
             timestamp: new Date(),
-            metadata: { 
+            metadata: {
               isThinking: true,
               analysis: 'Engine is thinking...'
             }
           };
           setMessages(prev => [...prev, engineMoveMessage]);
-          
+
           // Get engine analysis first
           try {
             const aiMoveResponse = await fetch('/api/chess/ai-move', {
@@ -409,10 +410,10 @@ export default function Home() {
                 newGame: moveCount === 0 // Signal new game on first move
               }),
             });
-          
+
             if (aiMoveResponse.ok) {
               const aiMoveData = await aiMoveResponse.json();
-              
+
               // Show realistic thinking process (or book move)
               const analysisText = aiMoveData.analysis?.fromBook
                 ? aiMoveData.analysis.analysis // "Playing Sicilian Defense" etc.
@@ -423,10 +424,10 @@ export default function Home() {
                   ? { ...msg, metadata: { ...msg.metadata, analysis: analysisText, fromBook: aiMoveData.analysis?.fromBook } }
                   : msg
               ));
-              
+
               // Wait for realistic thinking time
               const thinkingTime = aiMoveData.analysis?.thinkingTime || 1500;
-              
+
               const aiMoveTimeout = setTimeout(async () => {
                 try {
                   // Update the board with AI's move
@@ -462,7 +463,7 @@ export default function Home() {
 
                   // Update game position with AI move
                   await updateGamePosition(currentGameId!, aiMoveData.fen, '');
-                  
+
                   // Update engine move message with real analysis
                   const updatedEngineMessage: ChatMessage = {
                     ...engineMoveMessage,
@@ -478,11 +479,11 @@ export default function Home() {
                       }
                     }
                   };
-                  
-                  setMessages(prev => prev.map(msg => 
+
+                  setMessages(prev => prev.map(msg =>
                     msg.id === engineMoveMessage.id ? updatedEngineMessage : msg
                   ));
-                  
+
                   // Get Chester's analysis of the engine move
                   const analysisResponse = await fetch('/api/chess/engine-move-analysis', {
                     method: 'POST',
@@ -493,7 +494,7 @@ export default function Home() {
                       engineEvaluation: aiMoveData.analysis?.evaluation || 0
                     })
                   });
-                  
+
                   if (analysisResponse.ok) {
                     const analysisData = await analysisResponse.json();
 
@@ -515,7 +516,7 @@ export default function Home() {
                       await saveMessage(conversationId!, 'assistant', analysisData.commentary);
                     });
                   }
-                  
+
                   // If engine delivered checkmate, handle it and don't get suggestions
                   if (isEngineCheckmate) {
                     console.log('Engine delivered checkmate:', aiMoveData.san);
@@ -527,7 +528,7 @@ export default function Home() {
                       getAISuggestions(aiMoveData.fen);
                     }, 1000);
                   }
-                  
+
                 } catch (moveError) {
                   console.error('Error processing AI move:', moveError);
                 } finally {
@@ -554,18 +555,18 @@ export default function Home() {
     // Convert algebraic notation to plain English
     const pieceMap: Record<string, string> = {
       'K': 'King',
-      'Q': 'Queen', 
+      'Q': 'Queen',
       'R': 'Rook',
       'B': 'Bishop',
       'N': 'Knight',
       'O-O': 'castles kingside',
       'O-O-O': 'castles queenside'
     };
-    
+
     // Handle castling
     if (san === 'O-O') return 'castles kingside';
     if (san === 'O-O-O') return 'castles queenside';
-    
+
     // Handle regular moves
     const piece = san[0];
     if (pieceMap[piece]) {
@@ -667,10 +668,10 @@ export default function Home() {
               prev.map(msg =>
                 msg.id === thinkingMessageId
                   ? {
-                      ...msg,
-                      content: "I apologize, but I'm having trouble connecting. Please try again.",
-                      metadata: { isThinking: false }
-                    }
+                    ...msg,
+                    content: "I apologize, but I'm having trouble connecting. Please try again.",
+                    metadata: { isThinking: false }
+                  }
                   : msg
               )
             );
@@ -683,10 +684,10 @@ export default function Home() {
         prev.map(msg =>
           msg.id === thinkingMessageId
             ? {
-                ...msg,
-                content: "I apologize, but I'm having trouble connecting to my services. Please ensure the OpenAI API key is configured.",
-                metadata: { isThinking: false }
-              }
+              ...msg,
+              content: "I apologize, but I'm having trouble connecting to my services. Please ensure the OpenAI API key is configured.",
+              metadata: { isThinking: false }
+            }
             : msg
         )
       );
@@ -764,50 +765,53 @@ export default function Home() {
   }, []);
 
   return (
-    <GameLayout
-      chessBoard={
-        <div className="relative h-full">
-          <ChessBoardLazy
-            onMove={handleMove}
-            position={currentPosition}
-            orientation="white"
-            interactive={!gameOver.checkmate}
-            onCheckmate={handleCheckmate}
-            theme={boardTheme}
-          />
-          {gameOver.checkmate && (
-            <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-2xl backdrop-blur-sm">
-              <div className="bg-gradient-to-br from-purple-900 to-blue-900 p-8 rounded-2xl shadow-2xl text-center">
-                <h2 className="text-3xl font-bold text-white mb-4">
-                  Checkmate!
-                </h2>
-                <p className="text-xl text-gray-200 mb-6">
-                  {gameOver.winner === 'white' ? 'White Wins!' : 'Black Wins!'}
-                </p>
-                <button
-                  onClick={handleRestart}
-                  className="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all transform hover:scale-105 shadow-lg"
-                >
-                  Start New Game
-                </button>
+    <ErrorBoundary>
+      <GameLayout
+        chessBoard={
+          <div className="relative h-full">
+            <ChessBoardLazy
+              onMove={handleMove}
+              position={currentPosition}
+              orientation="white"
+              interactive={!gameOver.checkmate}
+              onCheckmate={handleCheckmate}
+              theme={boardTheme}
+            />
+            {gameOver.checkmate && (
+              <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-2xl backdrop-blur-sm">
+                <div className="bg-gradient-to-br from-purple-900 to-blue-900 p-8 rounded-2xl shadow-2xl text-center">
+                  <h2 className="text-3xl font-bold text-white mb-4">
+                    Checkmate!
+                  </h2>
+                  <p className="text-xl text-gray-200 mb-6">
+                    {gameOver.winner === 'white' ? 'White Wins!' : 'Black Wins!'}
+                  </p>
+                  <button
+                    onClick={handleRestart}
+                    className="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all transform hover:scale-105 shadow-lg"
+                  >
+                    Start New Game
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
-        </div>
-      }
-      controls={
-        <ThemeSelector
-          currentTheme={boardTheme}
-          onThemeChange={setBoardTheme}
-        />
-      }
-      chat={
-        <ChatInterfaceLazy
-          messages={messages}
-          onSendMessage={handleSendMessage}
-          isLoading={isLoading}
-        />
-      }
-    />
+            )}
+          </div>
+        }
+        controls={
+          <ThemeSelector
+            currentTheme={boardTheme}
+            onThemeChange={setBoardTheme}
+          />
+        }
+        chat={
+          <ChatInterfaceLazy
+            messages={messages}
+            onSendMessage={handleSendMessage}
+            isLoading={isLoading || isStreaming}
+          />
+        }
+      />
+    </ErrorBoundary>
   );
 }
+
