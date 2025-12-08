@@ -20,16 +20,19 @@ if (process.env.ANALYZE === 'true') {
   }
 }
 
-// Add security headers
+// Add security headers (only strict in production)
+const isProd = process.env.NODE_ENV === 'production';
+
 const securityHeaders = [
   {
     key: 'X-DNS-Prefetch-Control',
     value: 'on'
   },
-  {
+  // HSTS only for production to avoid breaking localhost
+  ...(isProd ? [{
     key: 'Strict-Transport-Security',
     value: 'max-age=63072000; includeSubDomains; preload'
-  },
+  }] : []),
   {
     key: 'X-Frame-Options',
     value: 'SAMEORIGIN'
@@ -56,7 +59,8 @@ const securityHeaders = [
       "font-src 'self';",
       "connect-src 'self' https://*.supabase.co https://api.openai.com;",
       "frame-ancestors 'none';",
-      "upgrade-insecure-requests;"
+      // Only upgrade requests in production
+      ...(isProd ? ["upgrade-insecure-requests;"] : [])
     ].join(' ').replace(/\s{2,}/g, ' ').trim()
   }
 ];
