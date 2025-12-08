@@ -66,12 +66,13 @@ const createPieceRenderer = (PieceComponent: any, isWhite: boolean) => {
           stroke={palette.primary} // Weld with body color
           strokeWidth={isWhite ? '0.5' : '0.2'} // Thicker weld for white to hide cracks, thin for black to preserve detail
           style={{
-            width: '100%',
-            height: '100%',
-            transform: 'translate3d(0,0,0) scale(2.0)', // Force GPU & Size
-            transformOrigin: 'center',
-            backfaceVisibility: 'hidden', // Prevent rasterization blur
-            willChange: 'transform',      // Hint to browser
+            width: '180%',   // Use Layout Size instead of Scale to force HD Renders
+            height: '180%',
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)', // Center based on new size
+            willChange: 'transform',
             filter: isWhite
               ? 'brightness(1.1) contrast(1.1) drop-shadow(0 2px 3px rgba(0,0,0,0.3))' // Crisp Original with slight polish
               : 'brightness(0.65) sepia(0.4) hue-rotate(210deg) saturate(1.4) contrast(1.2) drop-shadow(0 4px 6px rgba(0,0,0,0.5)) drop-shadow(0 0 10px rgba(168, 85, 247, 0.3))', // Dark Obsidian with clearer Violet tint

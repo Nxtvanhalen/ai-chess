@@ -93,7 +93,7 @@ export default function GameLayout({ chessBoard, chat, controls }: GameLayoutPro
             {controls && (
               <div className="controls-desktop">
                 {controls}
-                <div className="text-xs text-slate-500 mt-4 text-center font-mono select-none opacity-50">System v2.2 (GPU Boost)</div>
+                <div className="text-xs text-slate-500 mt-4 text-center font-mono select-none opacity-50">System v2.3 (Resolution Fix)</div>
               </div>
             )}
           </div>
