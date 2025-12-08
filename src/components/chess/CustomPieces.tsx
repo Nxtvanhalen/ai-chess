@@ -48,6 +48,7 @@ const createPieceRenderer = (PieceComponent: any, isWhite: boolean, pieceType: s
           alignItems: 'center',
           justifyContent: 'center',
         }}
+        className="piece-pulse"
       >
         <PieceComponent
           primary={palette.primary}

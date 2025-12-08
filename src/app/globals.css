@@ -2,12 +2,51 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ========================================
+   CHARACTER ANIMATIONS (PHASE 4 - ZERO RISK)
+   ======================================== */
+
+@keyframes pawn-pulse {
+
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+
+  50% {
+    filter: brightness(1.25) drop-shadow(0 0 5px rgba(255, 255, 255, 0.4));
+  }
+}
+
+.pawn-pulse {
+  /* No transform! Only light. */
+  animation: pawn-pulse 4s ease-in-out infinite;
+  will-change: filter;
+}
+
+/* Stagger animations for organic feel */
+.pawn-pulse:nth-child(odd) {
+  animation-delay: 0.5s;
+}
+
+.pawn-pulse:nth-child(3n) {
+  animation-delay: 1.2s;
+}
+
+.pawn-pulse:nth-child(7n) {
+  animation-delay: 2.1s;
+}
+
 /* Thinking animation - smooth and mobile-friendly */
 @keyframes thinking-bounce {
-  0%, 60%, 100% {
+
+  0%,
+  60%,
+  100% {
     transform: translateY(0);
     opacity: 0.4;
   }
+
   30% {
     transform: translateY(-8px);
     opacity: 1;
@@ -50,7 +89,7 @@
   --input: 220 13% 91%;
   --ring: 215 100% 60%;
   --radius: 1rem;
-  
+
   /* Futuristic chess colors */
   --chess-dark: 234 25% 15%;
   --chess-light: 45 15% 25%;
@@ -76,7 +115,7 @@
   --border: 215 27% 12%;
   --input: 215 27% 12%;
   --ring: 215 100% 65%;
-  
+
   /* Futuristic chess colors dark */
   --chess-dark: 234 25% 15%;
   --chess-light: 45 15% 25%;
@@ -95,11 +134,13 @@ body {
   max-width: 100vw;
   overflow-x: hidden;
   height: 100%;
-  height: 100dvh; /* Dynamic viewport height - handles keyboard automatically */
+  height: 100dvh;
+  /* Dynamic viewport height - handles keyboard automatically */
   margin: 0;
   padding: 0;
-  color-scheme: dark; /* Force dark keyboard on iOS */
-  
+  color-scheme: dark;
+  /* Force dark keyboard on iOS */
+
   /* ChatGPT-style fixed viewport approach */
   overscroll-behavior: none;
   touch-action: manipulation;
@@ -111,7 +152,7 @@ body {
     height: 100vh;
     height: -webkit-fill-available;
   }
-  
+
   body {
     min-height: 100vh;
     min-height: -webkit-fill-available;
@@ -124,18 +165,18 @@ body {
   min-height: 100vh;
   /* Extend background behind safe areas on iPhone */
   min-height: calc(100vh + env(safe-area-inset-top) + env(safe-area-inset-bottom));
-  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, 
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto,
     'Helvetica Neue', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-feature-settings: 'cv11', 'ss01';
   font-variant-numeric: tabular-nums;
-  
+
   /* Fix mobile Chrome display issues */
   -webkit-overflow-scrolling: touch;
   -webkit-transform: translate3d(0, 0, 0);
   transform: translate3d(0, 0, 0);
-  
+
   /* Create a pseudo-element to extend background behind status bar */
   position: relative;
   margin: 0;
@@ -158,7 +199,8 @@ body::before {
 body::after {
   content: '';
   position: fixed;
-  bottom: -500px; /* Extend 500px below viewport */
+  bottom: -500px;
+  /* Extend 500px below viewport */
   left: 0;
   right: 0;
   height: 500px;
@@ -176,36 +218,37 @@ input[type="text"] {
 
 /* CRITICAL iOS Keyboard Accessory Bar Minimization */
 @supports (-webkit-touch-callout: none) {
+
   /* Target iOS Safari specifically */
   input[type="text"],
   textarea {
     /* Remove all iOS input assistance */
     -webkit-appearance: none !important;
     appearance: none !important;
-    
+
     /* Force minimal keyboard UI */
     -webkit-user-select: text;
     user-select: text;
-    
+
     /* Remove any formatting assistance that triggers accessory bar */
     -webkit-rtl-ordering: logical;
     -webkit-writing-mode: horizontal-tb;
     writing-mode: horizontal-tb;
-    
+
     /* Disable features that create tall accessory bars */
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
-    
+
     /* Remove input assistance completely */
     -webkit-touch-callout: none;
     -webkit-tap-highlight-color: transparent;
-    
+
     /* Critical: Signal to iOS this is basic text input */
     font-feature-settings: normal;
     font-kerning: auto;
     text-rendering: optimizeLegibility;
   }
-  
+
   /* Target the specific input in focus */
   input[type="text"]:focus,
   textarea:focus {
@@ -213,18 +256,18 @@ input[type="text"] {
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
     will-change: contents;
-    
+
     /* Remove any styling that might trigger accessory features */
     outline: none;
     border-radius: inherit;
-    
+
     /* Critical: Ensure iOS treats this as simple text */
     -webkit-user-modify: read-write;
   }
-  
+
   /* Hide any iOS-generated accessory elements */
-  input[type="text"] + *,
-  textarea + * {
+  input[type="text"]+*,
+  textarea+* {
     display: none !important;
   }
 }
@@ -275,15 +318,15 @@ select {
     transform: translateY(0) scale(1) rotate(0deg);
     filter: brightness(1) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
   }
+
   50% {
     transform: translateY(-8px) scale(1.1) rotate(-2deg);
-    filter: brightness(1.3) drop-shadow(0 12px 24px rgba(142, 255, 142, 0.8))
-            drop-shadow(0 0 20px rgba(142, 255, 142, 1));
+    filter: brightness(1.3) drop-shadow(0 12px 24px rgba(142, 255, 142, 0.8)) drop-shadow(0 0 20px rgba(142, 255, 142, 1));
   }
+
   100% {
     transform: translateY(-6px) scale(1.08) rotate(0deg);
-    filter: brightness(1.2) drop-shadow(0 10px 20px rgba(142, 255, 142, 0.6))
-            drop-shadow(0 0 15px rgba(142, 255, 142, 0.8));
+    filter: brightness(1.2) drop-shadow(0 10px 20px rgba(142, 255, 142, 0.6)) drop-shadow(0 0 15px rgba(142, 255, 142, 0.8));
   }
 }
 
@@ -291,15 +334,18 @@ select {
 .chess-board-container [style*="hsla(142, 76%, 55%"] [style*="background-image"],
 .chess-board-container [style*="hsla(142, 76%, 55%"] div[style*="cursor"] {
   animation: piece-selected 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards,
-             piece-pulse 2s ease-in-out 0.4s infinite !important;
+    piece-pulse 2s ease-in-out 0.4s infinite !important;
   transform-origin: center bottom !important;
 }
 
 /* Continuous subtle pulse after selection */
 @keyframes piece-pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     filter: brightness(1.1) drop-shadow(0 8px 16px rgba(142, 255, 142, 0.5));
   }
+
   50% {
     filter: brightness(1.25) drop-shadow(0 10px 20px rgba(142, 255, 142, 0.8));
   }
@@ -309,18 +355,20 @@ select {
 @keyframes trail-from {
   0% {
     box-shadow: 0 0 15px rgba(255, 215, 0, 0.4),
-                0 0 30px rgba(255, 215, 0, 0.2),
-                inset 0 0 10px rgba(255, 215, 0, 0.3);
+      0 0 30px rgba(255, 215, 0, 0.2),
+      inset 0 0 10px rgba(255, 215, 0, 0.3);
   }
+
   50% {
     box-shadow: 0 0 25px rgba(255, 215, 0, 0.6),
-                0 0 45px rgba(255, 215, 0, 0.3),
-                inset 0 0 15px rgba(255, 215, 0, 0.4);
+      0 0 45px rgba(255, 215, 0, 0.3),
+      inset 0 0 15px rgba(255, 215, 0, 0.4);
   }
+
   100% {
     box-shadow: 0 0 15px rgba(255, 215, 0, 0.4),
-                0 0 30px rgba(255, 215, 0, 0.2),
-                inset 0 0 10px rgba(255, 215, 0, 0.3);
+      0 0 30px rgba(255, 215, 0, 0.2),
+      inset 0 0 10px rgba(255, 215, 0, 0.3);
   }
 }
 
@@ -328,18 +376,20 @@ select {
 @keyframes trail-to {
   0% {
     box-shadow: 0 0 15px rgba(0, 255, 0, 0.4),
-                0 0 30px rgba(0, 255, 0, 0.2),
-                inset 0 0 10px rgba(0, 255, 0, 0.3);
+      0 0 30px rgba(0, 255, 0, 0.2),
+      inset 0 0 10px rgba(0, 255, 0, 0.3);
   }
+
   50% {
     box-shadow: 0 0 25px rgba(0, 255, 0, 0.6),
-                0 0 45px rgba(0, 255, 0, 0.3),
-                inset 0 0 15px rgba(0, 255, 0, 0.4);
+      0 0 45px rgba(0, 255, 0, 0.3),
+      inset 0 0 15px rgba(0, 255, 0, 0.4);
   }
+
   100% {
     box-shadow: 0 0 15px rgba(0, 255, 0, 0.4),
-                0 0 30px rgba(0, 255, 0, 0.2),
-                inset 0 0 10px rgba(0, 255, 0, 0.3);
+      0 0 30px rgba(0, 255, 0, 0.2),
+      inset 0 0 10px rgba(0, 255, 0, 0.3);
   }
 }
 
@@ -393,14 +443,17 @@ select {
 .chat-messages {
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
-  padding-bottom: 5rem; /* Space for sticky input */
-  margin-bottom: 0; /* No margin needed with sticky */
+  padding-bottom: 5rem;
+  /* Space for sticky input */
+  margin-bottom: 0;
+  /* No margin needed with sticky */
 }
 
 /* Safari viewport fix - use dynamic viewport height */
 .h-screen {
   height: 100vh;
-  height: 100dvh; /* Dynamic viewport height for Safari */
+  height: 100dvh;
+  /* Dynamic viewport height for Safari */
 }
 
 /* Safe area support for modern mobile devices */
@@ -408,7 +461,7 @@ select {
   .mobile-safe-area-bottom {
     padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
   }
-  
+
   .mobile-safe-area-top {
     padding-top: max(0.5rem, env(safe-area-inset-top));
   }
@@ -425,11 +478,15 @@ select {
 
 /* Hide scrollbars */
 .scrollbar-hide {
-  -ms-overflow-style: none;  /* Internet Explorer 10+ */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  /* Internet Explorer 10+ */
+  scrollbar-width: none;
+  /* Firefox */
 }
+
 .scrollbar-hide::-webkit-scrollbar {
-  display: none;  /* Safari and Chrome */
+  display: none;
+  /* Safari and Chrome */
 }
 
 /* High-performance animations with GPU acceleration */
@@ -439,26 +496,31 @@ select {
     transform: translate3d(0, 40px, 0) scale3d(0.9, 0.9, 1);
     filter: blur(8px);
   }
+
   15% {
     opacity: 0.1;
     transform: translate3d(0, 30px, 0) scale3d(0.93, 0.93, 1);
     filter: blur(6px);
   }
+
   40% {
     opacity: 0.4;
     transform: translate3d(0, 15px, 0) scale3d(0.96, 0.96, 1);
     filter: blur(3px);
   }
+
   70% {
     opacity: 0.7;
     transform: translate3d(0, 5px, 0) scale3d(0.985, 0.985, 1);
     filter: blur(1px);
   }
+
   85% {
     opacity: 0.9;
     transform: translate3d(0, 1px, 0) scale3d(0.995, 0.995, 1);
     filter: blur(0.5px);
   }
+
   100% {
     opacity: 1;
     transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
@@ -470,15 +532,19 @@ select {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
 }
 
 @keyframes glow-pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow: 0 0 20px hsla(var(--primary), 0.1);
   }
+
   50% {
     box-shadow: 0 0 30px hsla(var(--primary), 0.2);
   }
@@ -488,6 +554,7 @@ select {
   0% {
     background-position: -200% 0;
   }
+
   100% {
     background-position: 200% 0;
   }
@@ -508,12 +575,10 @@ select {
 }
 
 .shimmer-bg {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    hsla(var(--primary), 0.1) 50%,
-    transparent 100%
-  );
+  background: linear-gradient(90deg,
+      transparent 0%,
+      hsla(var(--primary), 0.1) 50%,
+      transparent 100%);
   background-size: 200% 100%;
   animation: shimmer 2s infinite;
 }
@@ -582,9 +647,13 @@ select {
 
 /* Loading dots animation */
 @keyframes loading-dots {
-  0%, 60%, 100% {
+
+  0%,
+  60%,
+  100% {
     opacity: 0;
   }
+
   30% {
     opacity: 1;
   }
@@ -604,6 +673,7 @@ select {
 
 /* Chrome Mobile and iOS specific fixes */
 @supports (-webkit-touch-callout: none) {
+
   /* iOS Safari and Chrome mobile */
   html {
     height: -webkit-fill-available;
@@ -611,19 +681,19 @@ select {
     margin-top: calc(-1 * env(safe-area-inset-top));
     padding-top: calc(env(safe-area-inset-top) + env(safe-area-inset-top));
   }
-  
+
   body {
     height: 100vh;
     height: -webkit-fill-available;
     /* Ensure background covers behind status bar */
     min-height: calc(100vh + env(safe-area-inset-top));
   }
-  
+
   /* Fix viewport issues */
   * {
     -webkit-tap-highlight-color: transparent;
   }
-  
+
   /* Ensure proper rendering */
   .chess-board-container,
   .chat-messages {
@@ -647,8 +717,8 @@ select {
 
 .smooth-transitions {
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              scale 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    scale 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   will-change: transform, opacity, scale;
 }
 
@@ -672,7 +742,7 @@ select {
   .high-fps {
     animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
+
   /* 120fps support for capable devices */
   @supports (animation-timeline: auto) {
     .high-fps {
@@ -684,6 +754,7 @@ select {
 
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
+
   .message-animate,
   .animate-fade-in,
   .glow-effect,
@@ -693,7 +764,7 @@ select {
     animation: none !important;
     transition: none !important;
   }
-  
+
   .smooth-transitions {
     transition: none !important;
   }
@@ -725,10 +796,13 @@ select {
 }
 
 @keyframes pulse-glow {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translate(-50%, -50%) scale(1);
     opacity: 0.8;
   }
+
   50% {
     transform: translate(-50%, -50%) scale(1.1);
     opacity: 1;
@@ -737,8 +811,10 @@ select {
 
 /* Clean mobile styling - removed old conflicting rules */
 @media screen and (max-width: 1023px) {
+
   /* Remove margins from all chat components in mobile */
-  .chat-message, .loading-indicator {
+  .chat-message,
+  .loading-indicator {
     margin-left: 0 !important;
     margin-right: 0 !important;
   }
@@ -746,19 +822,20 @@ select {
 
 /* Mobile landscape orientation optimizations */
 @media screen and (max-width: 1023px) and (orientation: landscape) {
+
   /* Ensure full viewport usage in landscape */
   .chess-board-container {
     height: 100vh !important;
     max-height: 100vh !important;
     padding-top: 0.5rem !important;
   }
-  
+
   /* Optimize chat for landscape - full height and proper overflow */
   .mobile-chat-container {
     height: 100vh !important;
     max-height: 100vh !important;
   }
-  
+
   /* Ensure chat interface uses full height in landscape */
   .chat-interface-landscape {
     height: 100vh !important;
@@ -766,14 +843,14 @@ select {
     border-top-left-radius: 0 !important;
     border-top-right-radius: 0 !important;
   }
-  
+
   /* Prevent overflow and ensure proper scrolling */
   .layout-container {
     overflow: hidden !important;
     width: 100vw !important;
     max-width: none !important;
   }
-  
+
   /* Make sure the chat messages container fills available space smoothly */
   .chat-messages {
     flex: 1 !important;
@@ -785,7 +862,7 @@ select {
     margin-top: 0 !important;
     padding-bottom: 0 !important;
   }
-  
+
   /* Ensure smooth flow from messages to input */
   .chat-interface-landscape .chat-messages {
     padding-bottom: 0.5rem !important;
@@ -798,7 +875,7 @@ select {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     will-change: width, height, transform;
   }
-  
+
   /* Smooth layout transitions on orientation change */
   .layout-container {
     transition: flex-direction 0.3s ease-out;
@@ -812,19 +889,21 @@ select {
 /* Game Layout - Main Container */
 .game-layout {
   width: 100vw;
-  height: 100dvh; /* Dynamic viewport height with fallback */
-  height: 100vh; /* Fallback for older browsers */
+  height: 100dvh;
+  /* Dynamic viewport height with fallback */
+  height: 100vh;
+  /* Fallback for older browsers */
   overflow: hidden;
   position: relative;
   margin: 0;
   padding: 0;
-  
+
   /* Default to flex for all layouts - consistent model */
   display: flex;
-  
+
   /* Smooth transitions for responsive behavior */
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  
+
   /* GPU acceleration for smooth performance */
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
@@ -876,7 +955,8 @@ select {
 
 .board-landscape-wrapper {
   display: flex;
-  flex-direction: row; /* Side-by-side Layout */
+  flex-direction: row;
+  /* Side-by-side Layout */
   flex-shrink: 0;
   width: 55%;
   border-right: 2px solid rgba(147, 51, 234, 0.3);
@@ -895,12 +975,15 @@ select {
 .controls-landscape {
   flex-shrink: 0;
   display: flex;
-  flex-direction: column; /* Stack controls vertically on the side */
-  justify-content: center; /* Center them vertically */
+  flex-direction: column;
+  /* Stack controls vertically on the side */
+  justify-content: center;
+  /* Center them vertically */
   align-items: center;
   padding: 0.5rem;
   background: rgba(0, 0, 0, 0.3);
-  border-left: 1px solid rgba(147, 51, 234, 0.2); /* Separate from board */
+  border-left: 1px solid rgba(147, 51, 234, 0.2);
+  /* Separate from board */
   border-top: none;
 }
 
@@ -935,55 +1018,61 @@ select {
 
 /* Mobile Portrait Layout - Consistent Flexbox Approach */
 @media screen and (max-width: 1023px) and (orientation: portrait) {
-  
+
   /* Use Flexbox for consistent layout model across all breakpoints */
   .game-layout {
     display: flex;
     flex-direction: column;
     width: 100vw;
-    height: 100dvh; /* Dynamic viewport height with fallback */
-    height: 100vh; /* Fallback for older browsers */
+    height: 100dvh;
+    /* Dynamic viewport height with fallback */
+    height: 100vh;
+    /* Fallback for older browsers */
     overflow: hidden;
-    
+
     /* Smooth transitions during resize */
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
+
   /* Chess Board Section - Flexbox item with fixed proportion */
   .chess-board-section {
     position: relative;
     width: 100%;
-    height: 52.5%; /* Increased from 45% for better chess board visibility */
-    flex-shrink: 0; /* Prevent shrinking */
+    height: 52.5%;
+    /* Increased from 45% for better chess board visibility */
+    flex-shrink: 0;
+    /* Prevent shrinking */
     z-index: 20;
     display: flex;
     align-items: flex-start;
     justify-content: center;
     padding: max(1rem, env(safe-area-inset-top)) 0.5rem 0.5rem;
     background: transparent;
-    overflow: hidden; /* Prevent board from overlapping chat section */
-    
+    overflow: hidden;
+    /* Prevent board from overlapping chat section */
+
     /* Smooth transitions when keyboard appears */
     transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-                transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
+
   /* Board container - responsive sizing with consistent units */
   .chess-board-container {
     width: 100%;
-    max-width: min(90vw, 55vh); /* Testing larger size to maximize space utilization */
+    max-width: min(90vw, 55vh);
+    /* Testing larger size to maximize space utilization */
     aspect-ratio: 1;
     transform: scale(1);
     transform-origin: center top;
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     will-change: transform;
-    
+
     /* Enhanced mobile styling */
     touch-action: none;
     -webkit-user-select: none;
     user-select: none;
   }
-  
+
   /* Controls Section - Between board and chat */
   .controls-section {
     flex-shrink: 0;
@@ -1001,8 +1090,10 @@ select {
   .chat-section {
     position: relative;
     width: 100%;
-    flex: 1; /* Take remaining space */
-    min-height: 0; /* Allow shrinking */
+    flex: 1;
+    /* Take remaining space */
+    min-height: 0;
+    /* Allow shrinking */
     z-index: 10;
     background: #000000;
 
@@ -1017,38 +1108,43 @@ select {
     /* Remove bottom padding - sticky input handles this */
     padding-bottom: 0;
   }
-  
+
   /* Keyboard handling - optimize space usage */
   .game-layout:focus-within .chess-board-section {
-    height: 50%; /* Keep board visible when typing (was 30%) */
+    height: 50%;
+    /* Keep board visible when typing (was 30%) */
   }
-  
+
   /* Removed scale transform - keep board at full size when typing */
-  
+
   /* Limit chat messages height when keyboard is active */
   .game-layout:focus-within .chat-messages-container {
-    max-height: 8rem; /* Show only recent messages */
+    max-height: 8rem;
+    /* Show only recent messages */
     overflow-y: auto;
   }
-  
+
   .game-layout:focus-within .chat-section {
-    padding-top: 0.25rem; /* Reduce padding to minimize empty space */
+    padding-top: 0.25rem;
+    /* Reduce padding to minimize empty space */
   }
-  
+
   /* Keyboard Dismiss Overlay - Simplified */
   .keyboard-dismiss-overlay {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    bottom: 5rem; /* Don't cover input area */
+    bottom: 5rem;
+    /* Don't cover input area */
     z-index: 15;
     background: transparent;
-    pointer-events: none; /* Only active when input is focused */
-    
+    pointer-events: none;
+    /* Only active when input is focused */
+
     transition: pointer-events 0.1s ease;
   }
-  
+
   /* Make overlay active when any input in game layout is focused */
   .game-layout:focus-within .keyboard-dismiss-overlay {
     pointer-events: auto;
@@ -1087,12 +1183,12 @@ select {
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  
+
   /* Smooth scrolling */
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
   overscroll-behavior: contain;
-  
+
   /* Performance optimizations */
   transform: translate3d(0, 0, 0);
   -webkit-transform: translate3d(0, 0, 0);
@@ -1118,9 +1214,12 @@ select {
     left: 0 !important;
     right: 0 !important;
     z-index: 999 !important;
-    display: block !important; /* Force display */
-    visibility: visible !important; /* Force visibility */
-    opacity: 1 !important; /* Force opacity */
+    display: block !important;
+    /* Force display */
+    visibility: visible !important;
+    /* Force visibility */
+    opacity: 1 !important;
+    /* Force opacity */
 
     /* Use safe-area-inset-bottom for device-specific spacing (iPhone home bar, etc) */
     /* Plus 16px padding for visual comfort */
@@ -1132,22 +1231,24 @@ select {
 
     background: #000000;
     padding: 0.25rem;
-    min-height: 4rem; /* Define consistent height */
+    min-height: 4rem;
+    /* Define consistent height */
   }
-  
+
   /* Alternative approach using :focus-within for broader support */
   .chat-section:focus-within .chat-input-container {
     transform: translateY(calc(-1 * var(--keyboard-height, 0px)));
   }
-  
+
   /* Fix chat messages visibility behind sticky input */
   .chat-messages-container {
     padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
     box-sizing: border-box;
   }
-  
+
   .chat-messages {
-    padding-bottom: 6rem; /* Increased from 5rem */
+    padding-bottom: 6rem;
+    /* Increased from 5rem */
     margin-bottom: 0;
   }
 }
@@ -1158,7 +1259,7 @@ select {
     .chat-messages-container {
       padding-bottom: calc(4rem + env(safe-area-inset-bottom, 1rem));
     }
-    
+
     .chat-messages {
       padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
     }
@@ -1212,19 +1313,20 @@ select {
   padding: 0.375rem 0.875rem;
   padding-right: 3rem;
   color: rgb(241 245 249);
-  font-size: 0.8125rem; /* Slightly smaller for mobile */
+  font-size: 0.8125rem;
+  /* Slightly smaller for mobile */
   font-weight: 500;
-  
+
   /* iOS optimizations */
   -webkit-appearance: none;
   appearance: none;
   -webkit-user-select: text;
   user-select: text;
-  
+
   /* Smooth transitions */
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  
+
   /* Touch optimizations */
   touch-action: manipulation;
   min-height: 44px;
@@ -1234,7 +1336,7 @@ select {
   outline: none;
   border-color: rgb(147 51 234);
   box-shadow: 0 0 0 2px rgba(147, 51, 234, 0.5),
-              0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
 .chat-text-input::placeholder {
@@ -1267,15 +1369,15 @@ select {
   color: white;
   border: none;
   cursor: pointer;
-  
+
   /* Smooth interactions */
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  
+
   /* Performance optimizations */
   transform: translate3d(0, 0, 0);
   will-change: transform, box-shadow;
-  
+
   /* Touch optimization */
   min-width: 44px;
   min-height: 44px;
@@ -1331,11 +1433,11 @@ select {
   color: white;
   border-radius: 50%;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  
+
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   min-width: 48px;
   min-height: 48px;
-  
+
   transform: translate3d(0, 0, 0);
   will-change: transform;
 }
@@ -1351,11 +1453,12 @@ select {
 
 /* Dynamic Keyboard Height Support */
 @supports (height: 100dvh) {
+
   /* Modern browsers with dynamic viewport support */
   .game-layout {
     height: 100dvh;
   }
-  
+
   @media screen and (max-width: 1023px) and (orientation: portrait) {
     .chat-section {
       /* Chat section adjusts automatically with dvh */
@@ -1367,6 +1470,7 @@ select {
 /* Fallback for older browsers */
 @supports not (height: 100dvh) {
   @media screen and (max-width: 1023px) and (orientation: portrait) {
+
     /* Use JavaScript-provided viewport height */
     .game-layout {
       height: calc(var(--vh, 1vh) * 100);
@@ -1378,23 +1482,26 @@ select {
 @supports (-webkit-touch-callout: none) {
   /* iOS Safari specific optimizations */
   @media screen and (max-width: 1023px) and (orientation: portrait) {
-    
+
     /* Consistent viewport approach for iOS */
     .game-layout {
-      height: 100dvh; /* Use dynamic viewport height */
-      height: 100vh; /* Fallback */
-      min-height: 100vh; /* Ensure minimum height */
+      height: 100dvh;
+      /* Use dynamic viewport height */
+      height: 100vh;
+      /* Fallback */
+      min-height: 100vh;
+      /* Ensure minimum height */
     }
-    
+
     /* Prevent iOS Safari layout shifts */
     .chat-input-container {
       position: fixed;
       bottom: env(safe-area-inset-bottom);
-      
+
       /* Use visual viewport when available */
       bottom: calc(env(safe-area-inset-bottom) + env(keyboard-height, 0px));
     }
-    
+
     /* Ensure proper safe area handling */
     .chess-board-section {
       padding-top: max(1rem, env(safe-area-inset-top));
@@ -1404,6 +1511,7 @@ select {
 
 /* High refresh rate optimization */
 @media (prefers-reduced-motion: no-preference) {
+
   .chat-text-input,
   .chat-send-button,
   .chess-board-container,
@@ -1415,6 +1523,7 @@ select {
 
 /* Reduced motion accessibility */
 @media (prefers-reduced-motion: reduce) {
+
   .chat-text-input,
   .chat-send-button,
   .chess-board-container,
@@ -1422,6 +1531,42 @@ select {
   .chess-board-section,
   .keyboard-dismiss-overlay {
     transition: none !important;
-    transform: none !important;
   }
+}
+
+/* ========================================
+   CHARACTER ANIMATIONS (PHASE 4 - ZERO RISK)
+   ======================================== */
+
+@keyframes piece-pulse {
+
+  0%,
+  100% {
+    /* Baseline */
+    filter: brightness(1.0) drop-shadow(0 0 5px rgba(255, 255, 255, 0.4));
+  }
+
+  50% {
+    /* Peak - Stronger pulse for visibility */
+    filter: brightness(1.4) drop-shadow(0 0 5px rgba(255, 255, 255, 0.4));
+  }
+}
+
+.piece-pulse {
+  /* Removed GPU hints to prevent potential filter stacking context issues */
+  animation: piece-pulse 3s ease-in-out infinite;
+  will-change: filter;
+}
+
+/* Stagger animations for organic feel */
+.piece-pulse:nth-child(odd) {
+  animation-delay: 0.5s;
+}
+
+.piece-pulse:nth-child(3n) {
+  animation-delay: 1.2s;
+}
+
+.piece-pulse:nth-child(7n) {
+  animation-delay: 2.1s;
 }
