@@ -4,6 +4,7 @@ import { ChatMessage as ChatMessageType } from '@/types';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import DynamicMarkdown from './DynamicMarkdown';
+import { King } from '../chess/pieces/King';
 
 interface ChatMessageProps {
   message: ChatMessageType;
@@ -210,9 +211,8 @@ export default function ChatMessage({ message }: ChatMessageProps) {
       initial="hidden"
       animate="visible"
       exit="exit"
-      className={`flex gap-1 lg:gap-4 px-1 lg:px-6 py-1 lg:py-6 ${
-        isUser ? 'hover:bg-purple-900/10 rounded-l-2xl' : ''
-      } mx-0 lg:mx-2`}
+      className={`flex gap-1 lg:gap-4 px-1 lg:px-6 py-1 lg:py-6 ${isUser ? 'hover:bg-purple-900/10 rounded-l-2xl' : ''
+        } mx-0 lg:mx-2`}
     >
       <div className="flex-shrink-0">
         {isEngine ? (
@@ -228,13 +228,16 @@ export default function ChatMessage({ message }: ChatMessageProps) {
           </div>
         ) : isAssistant ? (
           <div className="w-5 h-5 lg:w-10 lg:h-10 rounded-full overflow-hidden relative">
-            <Image
-              src="/Chester.svg"
-              alt="Chester"
-              width={40}
-              height={40}
-              className="absolute inset-0 w-full h-full object-cover"
-              priority
+            <King
+              style={{
+                width: '180%',
+                height: '180%',
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                filter: 'brightness(1.1) contrast(1.1) drop-shadow(0 2px 3px rgba(0,0,0,0.3))'
+              }}
             />
           </div>
         ) : (
