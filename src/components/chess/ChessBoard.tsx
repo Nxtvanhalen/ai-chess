@@ -5,6 +5,7 @@ import { Chessboard } from 'react-chessboard';
 import { Chess, Move, Square } from 'chess.js';
 import { getPieceName } from '@/lib/chess/pieceNames';
 import { customPieces } from './CustomPieces';
+// import { holographicPieces as customPieces } from './HolographicPieces';
 import { BoardTheme, defaultTheme } from '@/lib/chess/boardThemes';
 
 interface ChessBoardProps {
