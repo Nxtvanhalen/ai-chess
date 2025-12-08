@@ -375,4 +375,4 @@ export function getNextTheme(currentId: string): BoardTheme {
 }
 
 // Default theme
-export const defaultTheme = boardThemes[0];
+export const defaultTheme = boardThemes.find(theme => theme.id === 'obsidian') || boardThemes[0];
