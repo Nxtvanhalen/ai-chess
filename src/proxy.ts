@@ -1,0 +1,298 @@
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+// =============================================================================
+// THREAT DETECTION PROXY - Chester AI Chess (Next.js 16+)
+// =============================================================================
+// Blocks datacenter IPs spoofing mobile User Agents for site enumeration
+// Last updated: December 2025
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// BLOCKED IPs - Known malicious actors
+// -----------------------------------------------------------------------------
+const BLOCKED_IPS: Set<string> = new Set([
+  // Tencent Cloud - Spoofing iPhone UA
+  '119.28.89.249',
+  '129.226.174.80',
+  '43.167.245.18',
+  '170.106.143.6',
+  '49.51.73.183',
+]);
+
+// -----------------------------------------------------------------------------
+// BLOCKED SUBNETS - Known malicious ranges (CIDR notation)
+// -----------------------------------------------------------------------------
+interface BlockedSubnet {
+  base: number[];
+  mask: number;
+  reason: string;
+}
+
+const BLOCKED_SUBNETS: BlockedSubnet[] = [
+  { base: [43, 159, 140, 0], mask: 24, reason: 'Spoofed iOS UA from datacenter' },
+];
+
+// -----------------------------------------------------------------------------
+// KNOWN DATACENTER IP RANGES (partial list for high-confidence detection)
+// These are commonly used for bot attacks when combined with mobile UA spoofing
+// -----------------------------------------------------------------------------
+const DATACENTER_RANGES: { start: number[]; end: number[]; provider: string }[] = [
+  // Tencent Cloud ranges
+  { start: [43, 128, 0, 0], end: [43, 175, 255, 255], provider: 'Tencent Cloud' },
+  { start: [49, 51, 0, 0], end: [49, 51, 255, 255], provider: 'Tencent Cloud' },
+  { start: [119, 28, 0, 0], end: [119, 29, 255, 255], provider: 'Tencent Cloud' },
+  { start: [129, 226, 0, 0], end: [129, 226, 255, 255], provider: 'Tencent Cloud' },
+  { start: [170, 106, 0, 0], end: [170, 106, 255, 255], provider: 'Tencent Cloud' },
+  // Common cloud providers (extend as needed)
+  { start: [34, 64, 0, 0], end: [34, 127, 255, 255], provider: 'Google Cloud' },
+  { start: [35, 184, 0, 0], end: [35, 239, 255, 255], provider: 'Google Cloud' },
+];
+
+// -----------------------------------------------------------------------------
+// UTILITY FUNCTIONS
+// -----------------------------------------------------------------------------
+
+function parseIP(ip: string): number[] | null {
+  const parts = ip.split('.');
+  if (parts.length !== 4) return null;
+
+  const nums = parts.map(p => parseInt(p, 10));
+  if (nums.some(n => isNaN(n) || n < 0 || n > 255)) return null;
+
+  return nums;
+}
+
+function ipToNumber(ip: number[]): number {
+  return (ip[0] << 24) + (ip[1] << 16) + (ip[2] << 8) + ip[3];
+}
+
+function isIPBlocked(ip: string): boolean {
+  return BLOCKED_IPS.has(ip);
+}
+
+function isInSubnet(ip: string, subnet: BlockedSubnet): boolean {
+  const ipParts = parseIP(ip);
+  if (!ipParts) return false;
+
+  const ipNum = ipToNumber(ipParts);
+  const baseNum = ipToNumber(subnet.base);
+  const maskBits = 32 - subnet.mask;
+  const mask = (~0 << maskBits) >>> 0;
+
+  return (ipNum & mask) === (baseNum & mask);
+}
+
+function isInBlockedSubnet(ip: string): { blocked: boolean; reason?: string } {
+  for (const subnet of BLOCKED_SUBNETS) {
+    if (isInSubnet(ip, subnet)) {
+      return { blocked: true, reason: subnet.reason };
+    }
+  }
+  return { blocked: false };
+}
+
+function isDatacenterIP(ip: string): { isDatacenter: boolean; provider?: string } {
+  const ipParts = parseIP(ip);
+  if (!ipParts) return { isDatacenter: false };
+
+  const ipNum = ipToNumber(ipParts);
+
+  for (const range of DATACENTER_RANGES) {
+    const startNum = ipToNumber(range.start);
+    const endNum = ipToNumber(range.end);
+
+    if (ipNum >= startNum && ipNum <= endNum) {
+      return { isDatacenter: true, provider: range.provider };
+    }
+  }
+
+  return { isDatacenter: false };
+}
+
+function isMobileUserAgent(ua: string): boolean {
+  const mobilePatterns = [
+    /iPhone/i,
+    /iPad/i,
+    /Android/i,
+    /Mobile/i,
+    /CFNetwork/i,
+    /Darwin/i,
+  ];
+
+  return mobilePatterns.some(pattern => pattern.test(ua));
+}
+
+function isSuspiciousMobileUA(ua: string): boolean {
+  // Detect common spoofed mobile UAs from bots
+  const spoofedPatterns = [
+    // Generic iOS spoofing patterns
+    /iPhone.*?CPU.*?OS.*?like Mac OS X/i,
+  ];
+
+  // Check for signs of legitimate browser vs bot
+  const legitimateBrowserIndicators = [
+    /Safari\/\d/,
+    /Chrome\/\d/,
+    /Firefox\/\d/,
+    /CriOS\/\d/,
+    /FxiOS\/\d/,
+  ];
+
+  const isMobile = isMobileUserAgent(ua);
+  const hasLegitBrowser = legitimateBrowserIndicators.some(p => p.test(ua));
+
+  // If it claims to be mobile but has no legitimate browser signature, suspicious
+  if (isMobile && !hasLegitBrowser && ua.length > 50) {
+    return true;
+  }
+
+  return false;
+}
+
+// -----------------------------------------------------------------------------
+// REQUEST ANALYSIS
+// -----------------------------------------------------------------------------
+
+interface ThreatAnalysis {
+  isBlocked: boolean;
+  reason: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  details: {
+    ip: string;
+    userAgent: string;
+    isDatacenter: boolean;
+    provider?: string;
+    isSpoofedMobile: boolean;
+  };
+}
+
+function analyzeRequest(request: NextRequest): ThreatAnalysis {
+  // Get client IP - check various headers for proxy scenarios
+  const forwarded = request.headers.get('x-forwarded-for');
+  const realIP = request.headers.get('x-real-ip');
+  const ip = forwarded?.split(',')[0]?.trim() || realIP || 'unknown';
+
+  const userAgent = request.headers.get('user-agent') || '';
+
+  // Check if IP is directly blocked
+  if (isIPBlocked(ip)) {
+    return {
+      isBlocked: true,
+      reason: 'IP address is blocked due to malicious activity',
+      severity: 'critical',
+      details: {
+        ip,
+        userAgent,
+        isDatacenter: true,
+        isSpoofedMobile: true,
+      },
+    };
+  }
+
+  // Check if IP is in blocked subnet
+  const subnetCheck = isInBlockedSubnet(ip);
+  if (subnetCheck.blocked) {
+    return {
+      isBlocked: true,
+      reason: subnetCheck.reason || 'IP in blocked subnet',
+      severity: 'critical',
+      details: {
+        ip,
+        userAgent,
+        isDatacenter: true,
+        isSpoofedMobile: true,
+      },
+    };
+  }
+
+  // Check for datacenter IP + mobile UA spoofing
+  const datacenterCheck = isDatacenterIP(ip);
+  const isSpoofedMobile = isMobileUserAgent(userAgent) && datacenterCheck.isDatacenter;
+
+  if (isSpoofedMobile) {
+    return {
+      isBlocked: true,
+      reason: `Datacenter IP (${datacenterCheck.provider}) spoofing mobile User Agent`,
+      severity: 'high',
+      details: {
+        ip,
+        userAgent,
+        isDatacenter: true,
+        provider: datacenterCheck.provider,
+        isSpoofedMobile: true,
+      },
+    };
+  }
+
+  // Not a threat
+  return {
+    isBlocked: false,
+    reason: 'Request allowed',
+    severity: 'low',
+    details: {
+      ip,
+      userAgent,
+      isDatacenter: datacenterCheck.isDatacenter,
+      provider: datacenterCheck.provider,
+      isSpoofedMobile: false,
+    },
+  };
+}
+
+// -----------------------------------------------------------------------------
+// PROXY FUNCTION (Next.js 16+)
+// -----------------------------------------------------------------------------
+
+export function proxy(request: NextRequest) {
+  const analysis = analyzeRequest(request);
+
+  if (analysis.isBlocked) {
+    // Log the blocked request (will appear in Render logs)
+    console.warn('[SECURITY] Blocked request:', {
+      reason: analysis.reason,
+      severity: analysis.severity,
+      ip: analysis.details.ip,
+      userAgent: analysis.details.userAgent.substring(0, 100),
+      path: request.nextUrl.pathname,
+      timestamp: new Date().toISOString(),
+    });
+
+    // Return 403 Forbidden for blocked requests
+    return new NextResponse(
+      JSON.stringify({
+        error: 'Access Denied',
+        message: 'Your request has been blocked due to security policy.',
+      }),
+      {
+        status: 403,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Blocked-Reason': 'security-policy',
+        },
+      }
+    );
+  }
+
+  // Allow the request to proceed
+  const response = NextResponse.next();
+
+  // Add security headers
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('X-Frame-Options', 'DENY');
+  response.headers.set('X-XSS-Protection', '1; mode=block');
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+
+  return response;
+}
+
+// -----------------------------------------------------------------------------
+// PROXY CONFIG - Apply to all routes except static files
+// -----------------------------------------------------------------------------
+
+export const config = {
+  matcher: [
+    // Match all paths except static files and images
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)',
+  ],
+};
