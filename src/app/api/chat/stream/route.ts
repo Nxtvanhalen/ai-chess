@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
 
     // Create streaming response
     const stream = await createResponsesCompletionStream({
-      model: 'gpt-5.1',
+      model: 'gpt-5.2-2025-12-11',
       input: message,
       instructions: instructions,
       reasoning: { effort: 'low' },

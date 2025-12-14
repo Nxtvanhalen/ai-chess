@@ -77,7 +77,7 @@
 
 ### 2. Chester AI Chat System
 
-**Integration**: OpenAI GPT-5.1 Responses API
+**Integration**: OpenAI GPT-5.2 Responses API
 
 **Personality Traits**:
 - Dry wit and subtle humor

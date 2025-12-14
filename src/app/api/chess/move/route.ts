@@ -161,7 +161,7 @@ export async function POST(request: NextRequest) {
     }
 
     const completion = await createResponsesCompletion({
-      model: 'gpt-5.1',
+      model: 'gpt-5.2-2025-12-11',
       input: `I just played ${move}. React briefly.`,
       instructions: instructions + `\n\nREMEMBER: Keep your reaction to 1 sentence, maybe 2 if critical. Be witty, not eager. Examples: "Solid.", "That's brave.", "Engine won't like that.", "Interesting choice.", "Trading queens already?"`,
       reasoning: {

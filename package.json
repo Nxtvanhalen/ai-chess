@@ -21,7 +21,7 @@
     "autoprefixer": "^10.4.16",
     "chess.js": "^1.4.0",
     "framer-motion": "^12.23.12",
-    "next": "^16.0.4",
+    "next": "^16.0.10",
     "openai": "^5.5.1",
     "postcss": "^8.4.32",
     "react": "^19.2.0",

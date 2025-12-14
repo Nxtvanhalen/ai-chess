@@ -246,7 +246,7 @@ export async function POST(request: NextRequest) {
     // Use GPT-5 Responses API with reasoning control for faster responses
     // No need for response chaining - GPT-5 handles turn-by-turn naturally
     const completion = await createResponsesCompletion({
-      model: 'gpt-5.1',
+      model: 'gpt-5.2-2025-12-11',
       input: message,
       instructions: instructions,
       reasoning: {
