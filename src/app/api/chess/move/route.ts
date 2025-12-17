@@ -18,18 +18,21 @@ Keep your response conversational, under 100 words, and maintain your dignified 
 `;
 
 export async function POST(request: NextRequest) {
+  const startTime = Date.now();
+  let clientIP = 'unknown';
+
   try {
     // Check rate limit
-    const clientIP = getClientIP(request);
+    clientIP = getClientIP(request);
     const rateLimitResult = checkRateLimit(clientIP);
-    
+
     if (!rateLimitResult.allowed) {
       return NextResponse.json(
-        { 
+        {
           error: 'Rate limit exceeded. Please wait before requesting move analysis.',
           retryAfter: Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000)
-        }, 
-        { 
+        },
+        {
           status: 429,
           headers: getRateLimitHeaders(rateLimitResult)
         }
@@ -39,6 +42,7 @@ export async function POST(request: NextRequest) {
     const { move, fen, moveHistory, gameContext, gameId, userId = 'chris', moveDetails } = await request.json();
 
     if (!move || !fen) {
+      console.error('Move API - Missing required parameters:', { move: !!move, fen: !!fen });
       return NextResponse.json({ error: 'Move and FEN are required' }, { status: 400 });
     }
 
@@ -46,25 +50,38 @@ export async function POST(request: NextRequest) {
       move,
       hasGameId: !!gameId,
       hasMoveDetails: !!moveDetails,
-      totalMoves: gameContext?.totalMoves
+      totalMoves: gameContext?.totalMoves,
+      moveHistoryLength: moveHistory?.length || 0,
+      fullMoveHistoryLength: gameContext?.fullMoveHistory?.length || 0
     });
 
-    // Fetch comprehensive game memory context
+    // Fetch comprehensive game memory context with timeout
     let fullGameContext = null;
     let chesterPersonality = null;
 
     if (gameId) {
       try {
-        fullGameContext = await GameMemoryService.getGameContext(gameId);
-        chesterPersonality = await ChesterMemoryService.getPersonalityContext(userId);
+        // Add timeout to database calls (5 seconds)
+        const dbTimeout = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Database timeout after 5s')), 5000)
+        );
+
+        const contextPromise = GameMemoryService.getGameContext(gameId);
+        const personalityPromise = ChesterMemoryService.getPersonalityContext(userId);
+
+        fullGameContext = await Promise.race([contextPromise, dbTimeout]) as any;
+        chesterPersonality = await Promise.race([personalityPromise, dbTimeout]) as any;
 
         console.log('Move API - Memory context loaded:', {
           totalMovesInMemory: fullGameContext?.totalMoves || 0,
-          tacticalThemes: fullGameContext?.tacticalThemes || []
+          tacticalThemes: fullGameContext?.tacticalThemes || [],
+          loadTime: Date.now() - startTime
         });
       } catch (error) {
-        console.error('Error fetching game memory:', error);
+        console.error('Error fetching game memory (continuing with degraded context):', error);
         // Continue without memory - graceful degradation
+        fullGameContext = null;
+        chesterPersonality = null;
       }
     }
     
@@ -79,7 +96,11 @@ export async function POST(request: NextRequest) {
     // Add comprehensive game context
     if (gameContext?.fullMoveHistory && gameContext.fullMoveHistory.length > 0) {
       const moveSequence = gameContext.fullMoveHistory
-        .map((m: any) => `${m.role === 'user' ? 'Chris' : 'AI'}: ${m.move}`)
+        .map((m: any) => {
+          // Ensure move is a string, not an object
+          const moveStr = typeof m.move === 'string' ? m.move : (m.move?.san || String(m.move));
+          return `${m.role === 'user' ? 'Chris' : 'AI'}: ${moveStr}`;
+        })
         .join(', ');
       
       messages.splice(-1, 0, { 
@@ -94,10 +115,17 @@ export async function POST(request: NextRequest) {
       });
     } else if (moveHistory && moveHistory.length > 0) {
       // Fallback to limited context if full history not available
-      const recentMoves = moveHistory.map((m: any) => m.metadata?.moveContext).join(', ');
-      messages.splice(-1, 0, { 
-        role: 'system', 
-        content: `Recent moves: ${recentMoves}` 
+      const recentMoves = moveHistory
+        .map((m: any) => {
+          const moveCtx = m.metadata?.moveContext;
+          // Ensure moveContext is a string
+          return typeof moveCtx === 'string' ? moveCtx : (moveCtx?.san || String(moveCtx));
+        })
+        .filter(Boolean)
+        .join(', ');
+      messages.splice(-1, 0, {
+        role: 'system',
+        content: `Recent moves: ${recentMoves}`
       });
     }
     
@@ -113,13 +141,17 @@ export async function POST(request: NextRequest) {
 - Recent Performance: ${chesterPersonality.recentPerformance}`;
     }
 
-    // Add comprehensive game memory context
+    // Add comprehensive game memory context (limit to last 30 moves to prevent payload bloat)
+    const MAX_MOVES_IN_CONTEXT = 30;
+
     if (fullGameContext && fullGameContext.fullMoveHistory.length > 0) {
-      const moveSequence = fullGameContext.fullMoveHistory
+      const recentMoves = fullGameContext.fullMoveHistory.slice(-MAX_MOVES_IN_CONTEXT);
+      const moveSequence = recentMoves
         .map((m: any) => `${m.move_number}. ${m.player_type === 'human' ? 'Chris' : 'AI'}: ${m.san}${m.captured ? ' (x' + m.captured + ')' : ''}`)
         .join(', ');
 
-      instructions += `\n\nComplete game move history: ${moveSequence}`;
+      const isFullHistory = fullGameContext.fullMoveHistory.length <= MAX_MOVES_IN_CONTEXT;
+      instructions += `\n\n${isFullHistory ? 'Complete' : 'Recent'} game move history (${recentMoves.length} moves): ${moveSequence}`;
 
       // Add tactical themes
       if (fullGameContext.tacticalThemes.length > 0) {
@@ -130,117 +162,170 @@ export async function POST(request: NextRequest) {
       const recentCommentary = fullGameContext.chesterCommentary.slice(-3);
       if (recentCommentary.length > 0) {
         instructions += `\nYour recent commentary:`;
-        recentCommentary.forEach(c => {
+        recentCommentary.forEach((c: any) => {
           instructions += `\n- Move ${c.move_number}: ${c.content}`;
         });
       }
 
-      instructions += `\n\nUse this full context to provide accurate strategic analysis considering:
+      instructions += `\n\nUse this context to provide accurate strategic analysis considering:
       - The opening progression and development patterns
       - Previous tactical sequences and their outcomes
       - The overall strategic direction of the game
       - How this move fits into the broader game plan
       - Patterns you've previously noticed`;
     } else if (gameContext?.fullMoveHistory && gameContext.fullMoveHistory.length > 0) {
-      // Fallback to gameContext if game memory not available
-      const moveSequence = gameContext.fullMoveHistory
-        .map((m: any) => `${m.role === 'user' ? 'Chris' : 'AI'}: ${m.move}`)
+      // Fallback to gameContext if game memory not available (also limit to last 30)
+      const recentMoves = gameContext.fullMoveHistory.slice(-MAX_MOVES_IN_CONTEXT);
+      const moveSequence = recentMoves
+        .map((m: any) => {
+          // Ensure move is a string, not an object
+          const moveStr = typeof m.move === 'string' ? m.move : (m.move?.san || String(m.move));
+          return `${m.role === 'user' ? 'Chris' : 'AI'}: ${moveStr}`;
+        })
         .join(', ');
 
-      instructions += `\n\nComplete game move history: ${moveSequence}
+      const isFullHistory = gameContext.fullMoveHistory.length <= MAX_MOVES_IN_CONTEXT;
+      instructions += `\n\n${isFullHistory ? 'Complete' : 'Recent'} game move history (${recentMoves.length} moves): ${moveSequence}
 
-      Use this full context to provide accurate strategic analysis of Chris's move considering:
+      Use this context to provide accurate strategic analysis of Chris's move considering:
       - The opening progression and development patterns
       - Previous tactical sequences and their outcomes
       - The overall strategic direction of the game
       - How this move fits into the broader game plan`;
     } else if (moveHistory && moveHistory.length > 0) {
       // Fallback to limited context if full history not available
-      const recentMoves = moveHistory.map((m: any) => m.metadata?.moveContext).join(', ');
-      instructions += `\n\nRecent moves: ${recentMoves}`;
+      const recentMoves = moveHistory.slice(-15);
+      const recentMovesText = recentMoves
+        .map((m: any) => {
+          const moveCtx = m.metadata?.moveContext;
+          // Ensure moveContext is a string
+          return typeof moveCtx === 'string' ? moveCtx : (moveCtx?.san || String(moveCtx));
+        })
+        .filter(Boolean) // Remove any undefined/null values
+        .join(', ');
+      instructions += `\n\nRecent moves: ${recentMovesText}`;
     }
 
-    const completion = await createResponsesCompletion({
-      model: 'gpt-5.2-2025-12-11',
-      input: `I just played ${move}. React briefly.`,
-      instructions: instructions + `\n\nREMEMBER: Keep your reaction to 1 sentence, maybe 2 if critical. Be witty, not eager. Examples: "Solid.", "That's brave.", "Engine won't like that.", "Interesting choice.", "Trading queens already?"`,
-      reasoning: {
-        effort: 'low' // Fast move analysis
-      },
-      max_output_tokens: 100, // Reduced for brevity
-    });
-    
-    // Parse Responses API format
-    const messageOutput = completion.output.find((item: any) => item.type === 'message');
-    const textContent = messageOutput?.content.find((content: any) => content.type === 'output_text');
-    const content = textContent?.text || 'Sorry, I encountered an issue analyzing your move.';
+    // Call OpenAI with error handling
+    let content = '';
+    try {
+      console.log('Move API - Calling OpenAI Responses API...');
+      const aiStartTime = Date.now();
 
-    // Save move and commentary to game memory
+      const completion = await createResponsesCompletion({
+        model: 'gpt-5.2-2025-12-11',
+        input: `I just played ${move}. React briefly.`,
+        instructions: instructions + `\n\nREMEMBER: Keep your reaction to 1 sentence, maybe 2 if critical. Be witty, not eager. Examples: "Solid.", "That's brave.", "Engine won't like that.", "Interesting choice.", "Trading queens already?"`,
+        reasoning: {
+          effort: 'low' // Fast move analysis
+        },
+        max_output_tokens: 100, // Reduced for brevity
+      });
+
+      const aiDuration = Date.now() - aiStartTime;
+      console.log(`Move API - OpenAI responded in ${aiDuration}ms`);
+
+      // Parse Responses API format
+      const messageOutput = completion.output.find((item: any) => item.type === 'message');
+      const textContent = messageOutput?.content.find((content: any) => content.type === 'output_text');
+      content = textContent?.text || 'Interesting move.';
+    } catch (aiError: any) {
+      console.error('Move API - OpenAI API error:', {
+        error: aiError.message,
+        status: aiError.status,
+        code: aiError.code,
+        duration: Date.now() - startTime
+      });
+
+      // Provide fallback commentary based on move type
+      content = 'Noted.';
+    }
+
+    // Save move and commentary to game memory (non-blocking - don't wait for completion)
     if (gameId && moveDetails) {
-      try {
-        const moveNumber = gameContext?.totalMoves || 1;
+      const moveNumber = gameContext?.totalMoves || 1;
 
-        // Save the move to game memory
-        await GameMemoryService.addMove(gameId, {
-          move_number: moveNumber,
-          san: moveDetails.san || move,
-          from: moveDetails.from || '',
-          to: moveDetails.to || '',
-          piece: moveDetails.piece || '',
-          captured: moveDetails.captured,
-          fen_after: fen,
-          timestamp: new Date().toISOString(),
-          player_type: moveDetails.player_type || 'human',
-          evaluation: moveDetails.evaluation
-        });
+      // Fire and forget - save in background
+      (async () => {
+        try {
+          // Save the move to game memory
+          await GameMemoryService.addMove(gameId, {
+            move_number: moveNumber,
+            san: moveDetails.san || move,
+            from: moveDetails.from || '',
+            to: moveDetails.to || '',
+            piece: moveDetails.piece || '',
+            captured: moveDetails.captured,
+            fen_after: fen,
+            timestamp: new Date().toISOString(),
+            player_type: moveDetails.player_type || 'human',
+            evaluation: moveDetails.evaluation
+          });
 
-        // Save Chester's commentary
-        await GameMemoryService.addCommentary(gameId, {
-          move_number: moveNumber,
-          type: 'post_move',
-          content: content,
-          timestamp: new Date().toISOString(),
-          metadata: {}
-        });
+          // Save Chester's commentary
+          await GameMemoryService.addCommentary(gameId, {
+            move_number: moveNumber,
+            type: 'post_move',
+            content: content,
+            timestamp: new Date().toISOString(),
+            metadata: {}
+          });
 
-        // Detect and save tactical themes from commentary
-        const tacticalKeywords = {
-          'fork': 'fork',
-          'pin': 'pin',
-          'skewer': 'skewer',
-          'discovery': 'discovered_attack',
-          'sacrifice': 'sacrifice',
-          'mate threat': 'mate_threat',
-          'zugzwang': 'zugzwang',
-          'overload': 'overload',
-          'deflection': 'deflection',
-          'decoy': 'decoy'
-        };
+          // Detect and save tactical themes from commentary
+          const tacticalKeywords = {
+            'fork': 'fork',
+            'pin': 'pin',
+            'skewer': 'skewer',
+            'discovery': 'discovered_attack',
+            'sacrifice': 'sacrifice',
+            'mate threat': 'mate_threat',
+            'zugzwang': 'zugzwang',
+            'overload': 'overload',
+            'deflection': 'deflection',
+            'decoy': 'decoy'
+          };
 
-        const lowercaseContent = content.toLowerCase();
-        for (const [keyword, theme] of Object.entries(tacticalKeywords)) {
-          if (lowercaseContent.includes(keyword)) {
-            await GameMemoryService.addTacticalTheme(gameId, theme);
+          const lowercaseContent = content.toLowerCase();
+          for (const [keyword, theme] of Object.entries(tacticalKeywords)) {
+            if (lowercaseContent.includes(keyword)) {
+              await GameMemoryService.addTacticalTheme(gameId, theme);
+            }
           }
-        }
 
-        console.log('Move and commentary saved to game memory');
-      } catch (error) {
-        console.error('Error saving to game memory:', error);
-        // Don't fail the request if memory save fails
-      }
+          console.log('Move and commentary saved to game memory');
+        } catch (error) {
+          console.error('Error saving to game memory (background):', error);
+          // This is non-blocking, so we just log the error
+        }
+      })();
     }
+
+    const totalDuration = Date.now() - startTime;
+    console.log(`Move API - Total request duration: ${totalDuration}ms`);
 
     return new Response(content, {
       headers: {
         'Content-Type': 'text/plain',
         'Cache-Control': 'no-cache',
+        'X-Response-Time': `${totalDuration}ms`
       },
     });
-  } catch (error) {
-    console.error('Move analysis error:', error);
+  } catch (error: any) {
+    const totalDuration = Date.now() - startTime;
+    console.error('Move analysis error:', {
+      error: error.message,
+      stack: error.stack,
+      duration: totalDuration,
+      clientIP
+    });
+
+    // Return a friendly error message
     return NextResponse.json(
-      { error: 'Failed to analyze move' },
+      {
+        error: 'Failed to analyze move',
+        message: error.message || 'Unknown error',
+        retryable: true
+      },
       { status: 500 }
     );
   }

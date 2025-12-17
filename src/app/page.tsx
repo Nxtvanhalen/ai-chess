@@ -298,37 +298,85 @@ export default function Home() {
 
       setIsLoading(true);
 
-      // Get AI commentary on the move
-      const response = await fetch('/api/chess/move', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          move: move.san,
-          fen: move.after,
-          moveHistory: messages.filter(m => m.metadata?.moveContext),
-          gameContext: {
-            fen: move.after,
-            totalMoves: newMoveCount,
-            fullMoveHistory: messages.filter(m => m.metadata?.moveContext).map(m => ({
-              role: m.role,
-              move: m.metadata?.moveContext,
-              position: m.metadata?.position
-            }))
-          },
-          gameId: currentGameId,
-          userId: 'chris',
-          moveDetails: {
-            san: move.san,
-            from: move.from,
-            to: move.to,
-            piece: move.piece,
-            captured: move.captured,
-            player_type: 'human'
+      // Get AI commentary on the move with retry logic
+      const makeApiCall = async (attempt: number = 1): Promise<Response> => {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+
+        try {
+          const response = await fetch('/api/chess/move', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            signal: controller.signal,
+            body: JSON.stringify({
+              move: move.san,
+              fen: move.after,
+              moveHistory: messages.filter(m => m.metadata?.moveContext).slice(-15), // Only last 15 moves
+              gameContext: {
+                fen: move.after,
+                totalMoves: newMoveCount,
+                fullMoveHistory: messages.filter(m => m.metadata?.moveContext).slice(-30).map(m => ({
+                  role: m.role,
+                  move: m.metadata?.moveContext,
+                  position: m.metadata?.position
+                }))
+              },
+              gameId: currentGameId,
+              userId: 'chris',
+              moveDetails: {
+                san: move.san,
+                from: move.from,
+                to: move.to,
+                piece: move.piece,
+                captured: move.captured,
+                player_type: 'human'
+              }
+            }),
+          });
+
+          clearTimeout(timeoutId);
+
+          // Retry on 500 errors
+          if (!response.ok && response.status === 500 && attempt < 3) {
+            console.warn(`Move API failed (attempt ${attempt}/3), retrying...`);
+            await new Promise(resolve => setTimeout(resolve, 1000 * attempt)); // Exponential backoff
+            return makeApiCall(attempt + 1);
           }
-        }),
-      });
+
+          return response;
+        } catch (fetchError: any) {
+          clearTimeout(timeoutId);
+
+          // Retry on timeout or network errors
+          if (attempt < 3 && (fetchError.name === 'AbortError' || fetchError.message?.includes('fetch'))) {
+            console.warn(`Move API timed out/failed (attempt ${attempt}/3), retrying...`);
+            await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+            return makeApiCall(attempt + 1);
+          }
+
+          throw fetchError;
+        }
+      };
+
+      let response: Response;
+      try {
+        response = await makeApiCall();
+      } catch (apiError) {
+        console.error('Move API failed after retries:', apiError);
+        // Show fallback commentary
+        const fallbackMessage: ChatMessage = {
+          id: generateSimpleId(),
+          role: 'assistant',
+          content: "I'm having trouble analyzing that move right now. Let's continue!",
+          timestamp: new Date(),
+          metadata: { isThinking: false }
+        };
+        setMessages(prev => [...prev, fallbackMessage]);
+        setIsLoading(false);
+        return; // Exit early but don't freeze the game
+      }
 
       if (response.ok) {
         const reader = response.body?.getReader();
@@ -350,9 +398,12 @@ export default function Home() {
             while (true) {
               const { done, value } = await reader.read();
               if (done) break;
-              const chunk = decoder.decode(value);
+              // Use stream: true to handle multi-byte UTF-8 characters properly
+              const chunk = decoder.decode(value, { stream: true });
               fullContent += chunk;
             }
+            // Final decode without stream flag to flush any remaining bytes
+            fullContent += decoder.decode();
             aiResponse.content = fullContent;
 
             // Use typing effect to display the content
@@ -371,14 +422,26 @@ export default function Home() {
 
         // Save AI commentary to database
         await saveMessage(conversationId, 'assistant', aiResponse.content);
+      } else {
+        // Response not ok after all retries
+        console.error('Move API returned non-ok status:', response.status);
+        const fallbackMessage: ChatMessage = {
+          id: generateSimpleId(),
+          role: 'assistant',
+          content: "Having a bit of trouble analyzing that one. Keep playing!",
+          timestamp: new Date(),
+          metadata: { isThinking: false }
+        };
+        setMessages(prev => [...prev, fallbackMessage]);
+      }
 
-        // After AI commentary, get AI's move (only if it's AI's turn to play)
-        // Check if it's black's turn (AI plays black)
-        const isAiTurn = move.after.includes(' b '); // FEN notation: 'b' means black to move
+      // After AI commentary, get AI's move (only if it's AI's turn to play)
+      // Check if it's black's turn (AI plays black)
+      const isAiTurn = move.after.includes(' b '); // FEN notation: 'b' means black to move
 
-        if (isAiTurn) {
-          // Get player move history for engine adaptation
-          const playerMoveHistory = messages.filter(m =>
+      if (isAiTurn) {
+        // Get player move history for engine adaptation
+        const playerMoveHistory = messages.filter(m =>
             m.role === 'user' && m.metadata?.moveContext
           ).map(m => m.metadata?.moveContext || '').slice(-10);
 
@@ -542,7 +605,6 @@ export default function Home() {
           } catch (error) {
             console.error('Error getting AI move:', error);
           }
-        }
       }
     } catch (error) {
       console.error('Error getting AI move commentary:', error);
