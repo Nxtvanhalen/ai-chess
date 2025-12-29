@@ -18,6 +18,15 @@ const BLOCKED_IPS: Set<string> = new Set([
   '43.167.245.18',
   '170.106.143.6',
   '49.51.73.183',
+  // Guardian detected threats - December 2025
+  '43.157.156.190',
+  '43.131.45.213',
+  '43.157.179.227',
+  // Cross-deployment threats - December 2025
+  '68.218.100.201',   // Web shell/script scanning (14 req/5s)
+  '43.135.183.82',    // Tencent Cloud - iPhone UA spoofing
+  '197.156.242.209',  // Credential hunting attempts
+  '104.23.160.84',    // Credential hunting attempts
 ]);
 
 // -----------------------------------------------------------------------------
@@ -31,6 +40,10 @@ interface BlockedSubnet {
 
 const BLOCKED_SUBNETS: BlockedSubnet[] = [
   { base: [43, 159, 140, 0], mask: 24, reason: 'Spoofed iOS UA from datacenter' },
+  // Guardian recommended - High severity Tencent Cloud ranges (December 2025)
+  { base: [43, 157, 0, 0], mask: 16, reason: 'Tencent 43.157.x.x - Repeated mobile UA spoofing' },
+  { base: [43, 131, 0, 0], mask: 16, reason: 'Tencent 43.131.x.x - Repeated mobile UA spoofing' },
+  { base: [43, 135, 0, 0], mask: 16, reason: 'Tencent 43.135.x.x - iPhone UA spoofing' },
 ];
 
 // -----------------------------------------------------------------------------
