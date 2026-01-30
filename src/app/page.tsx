@@ -28,6 +28,7 @@ import ThemeSelector from '@/components/chess/ThemeSelector';
 import ErrorBoundary from '@/components/utils/ErrorBoundary';
 import UsageDisplay from '@/components/subscription/UsageDisplay';
 import UpgradeModal from '@/components/subscription/UpgradeModal';
+import LoginGate from '@/components/auth/LoginGate';
 
 export default function Home() {
   const { user } = useAuth();
@@ -850,62 +851,64 @@ export default function Home() {
   }, []);
 
   return (
-    <ErrorBoundary>
-      <GameLayout
-        chessBoard={
-          <div className="relative h-full">
-            <ChessBoardLazy
-              onMove={handleMove}
-              position={currentPosition}
-              orientation="white"
-              interactive={!gameOver.checkmate}
-              onCheckmate={handleCheckmate}
-              theme={boardTheme}
-            />
-            {gameOver.checkmate && (
-              <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-2xl backdrop-blur-sm">
-                <div className="bg-gradient-to-br from-purple-900 to-blue-900 p-8 rounded-2xl shadow-2xl text-center">
-                  <h2 className="text-3xl font-bold text-white mb-4">
-                    Checkmate!
-                  </h2>
-                  <p className="text-xl text-gray-200 mb-6">
-                    {gameOver.winner === 'white' ? 'White Wins!' : 'Black Wins!'}
-                  </p>
-                  <button
-                    onClick={handleRestart}
-                    className="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all transform hover:scale-105 shadow-lg"
-                  >
-                    Start New Game
-                  </button>
+    <LoginGate>
+      <ErrorBoundary>
+        <GameLayout
+          chessBoard={
+            <div className="relative h-full">
+              <ChessBoardLazy
+                onMove={handleMove}
+                position={currentPosition}
+                orientation="white"
+                interactive={!gameOver.checkmate}
+                onCheckmate={handleCheckmate}
+                theme={boardTheme}
+              />
+              {gameOver.checkmate && (
+                <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-2xl backdrop-blur-sm">
+                  <div className="bg-gradient-to-br from-purple-900 to-blue-900 p-8 rounded-2xl shadow-2xl text-center">
+                    <h2 className="text-3xl font-bold text-white mb-4">
+                      Checkmate!
+                    </h2>
+                    <p className="text-xl text-gray-200 mb-6">
+                      {gameOver.winner === 'white' ? 'White Wins!' : 'Black Wins!'}
+                    </p>
+                    <button
+                      onClick={handleRestart}
+                      className="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all transform hover:scale-105 shadow-lg"
+                    >
+                      Start New Game
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
-        }
-        controls={
-          <div className="flex items-center gap-4 flex-wrap">
-            <ThemeSelector
-              currentTheme={boardTheme}
-              onThemeChange={setBoardTheme}
+              )}
+            </div>
+          }
+          controls={
+            <div className="flex items-center gap-4 flex-wrap">
+              <ThemeSelector
+                currentTheme={boardTheme}
+                onThemeChange={setBoardTheme}
+              />
+              <UsageDisplay />
+            </div>
+          }
+          chat={
+            <ChatInterfaceLazy
+              messages={messages}
+              onSendMessage={handleSendMessage}
+              isLoading={isLoading || isStreaming}
             />
-            <UsageDisplay />
-          </div>
-        }
-        chat={
-          <ChatInterfaceLazy
-            messages={messages}
-            onSendMessage={handleSendMessage}
-            isLoading={isLoading || isStreaming}
-          />
-        }
-      />
-      <UpgradeModal
-        isOpen={upgradeModal.isOpen}
-        onClose={() => setUpgradeModal(prev => ({ ...prev, isOpen: false }))}
-        type={upgradeModal.type}
-        resetAt={upgradeModal.resetAt}
-      />
-    </ErrorBoundary>
+          }
+        />
+        <UpgradeModal
+          isOpen={upgradeModal.isOpen}
+          onClose={() => setUpgradeModal(prev => ({ ...prev, isOpen: false }))}
+          type={upgradeModal.type}
+          resetAt={upgradeModal.resetAt}
+        />
+      </ErrorBoundary>
+    </LoginGate>
   );
 }
 
