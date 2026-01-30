@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 import { EnhancedChessEngine } from '@/lib/chess/engineEnhanced';
 import { Chess } from 'chess.js';
+import { aiMoveSchema, validateRequest } from '@/lib/validation/schemas';
+import { checkRateLimitRedis, getRateLimitHeadersRedis, getClientIPFromRequest } from '@/lib/redis';
+import { canUseAIMove, incrementAIMoveUsage, createUsageLimitError, getUsageHeaders } from '@/lib/supabase/subscription';
 
 // Singleton engine instance for API route (maintains transposition table)
 let engineInstance: EnhancedChessEngine | null = null;
@@ -15,11 +20,72 @@ function getEngine(): EnhancedChessEngine {
 
 export async function POST(request: NextRequest) {
   try {
-    const { fen, difficulty = 'medium', playerMoveHistory = [], newGame = false } = await request.json();
+    // Check rate limit (Redis-based, falls back to in-memory)
+    const clientIP = getClientIPFromRequest(request);
+    const rateLimitResult = await checkRateLimitRedis(clientIP, 'aiMove');
 
-    if (!fen) {
-      return NextResponse.json({ error: 'FEN is required' }, { status: 400 });
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        {
+          error: 'Rate limit exceeded. Please wait before requesting another AI move.',
+          retryAfter: Math.ceil((rateLimitResult.reset - Date.now()) / 1000)
+        },
+        {
+          status: 429,
+          headers: getRateLimitHeadersRedis(rateLimitResult)
+        }
+      );
     }
+
+    // Get authenticated user for subscription check
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll(cookiesToSet) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) => {
+                cookieStore.set(name, value, options);
+              });
+            } catch {
+              // Server Component context
+            }
+          },
+        },
+      }
+    );
+
+    const { data: { user } } = await supabase.auth.getUser();
+
+    // Check subscription usage limit (only for authenticated users with subscriptions)
+    let usageCheck: { allowed: boolean; remaining: number; limit: number; unlimited: boolean } | null = null;
+    if (user) {
+      usageCheck = await canUseAIMove(user.id);
+      if (!usageCheck.allowed) {
+        return NextResponse.json(
+          createUsageLimitError('ai_move', usageCheck),
+          {
+            status: 429,
+            headers: getUsageHeaders('ai_move', usageCheck)
+          }
+        );
+      }
+    }
+
+    const body = await request.json();
+
+    // Validate input with Zod schema
+    const validation = validateRequest(aiMoveSchema, body);
+    if (!validation.success) {
+      return NextResponse.json({ error: validation.error }, { status: 400 });
+    }
+
+    const { fen, difficulty, playerMoveHistory, newGame } = validation.data;
 
     const engine = getEngine();
 
@@ -52,6 +118,21 @@ export async function POST(request: NextRequest) {
           thinkingTime: `${result.thinkingTime}ms`
         });
 
+        // Increment usage counter for authenticated users
+        if (user) {
+          await incrementAIMoveUsage(user.id);
+        }
+
+        // Build response with usage headers
+        const responseHeaders: Record<string, string> = {};
+        if (usageCheck) {
+          Object.assign(responseHeaders, getUsageHeaders('ai_move', {
+            remaining: usageCheck.unlimited ? Infinity : usageCheck.remaining - 1,
+            limit: usageCheck.limit,
+            unlimited: usageCheck.unlimited
+          }));
+        }
+
         return NextResponse.json({
           move: result.move,
           san: move.san,
@@ -69,7 +150,7 @@ export async function POST(request: NextRequest) {
             nodesSearched: result.nodesSearched,
             ttHitRate: result.ttHitRate
           }
-        });
+        }, { headers: responseHeaders });
       }
     }
 

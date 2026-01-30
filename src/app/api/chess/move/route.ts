@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createResponsesCompletion } from '@/lib/openai/client';
 import { CHESS_BUTLER_SYSTEM_PROMPT } from '@/lib/openai/chess-butler-prompt';
-import { checkRateLimit, getRateLimitHeaders, getClientIP } from '@/lib/middleware/rate-limit';
+import { checkRateLimitRedis, getRateLimitHeadersRedis, getClientIPFromRequest } from '@/lib/redis';
 import { GameMemoryService } from '@/lib/services/GameMemoryService';
 import { ChesterMemoryService } from '@/lib/services/ChesterMemoryService';
+import { chessMoveSchema, validateRequest } from '@/lib/validation/schemas';
+import { getAuthenticatedUser } from '@/lib/auth/getUser';
 
 const MOVE_ANALYSIS_PROMPT = `
 You are Chester analyzing a move. Provide brief but insightful commentary on:
@@ -22,29 +24,37 @@ export async function POST(request: NextRequest) {
   let clientIP = 'unknown';
 
   try {
-    // Check rate limit
-    clientIP = getClientIP(request);
-    const rateLimitResult = checkRateLimit(clientIP);
+    // Check rate limit (Redis-based, falls back to in-memory)
+    clientIP = getClientIPFromRequest(request);
+    const rateLimitResult = await checkRateLimitRedis(clientIP, 'moveAnalysis');
 
-    if (!rateLimitResult.allowed) {
+    if (!rateLimitResult.success) {
       return NextResponse.json(
         {
           error: 'Rate limit exceeded. Please wait before requesting move analysis.',
-          retryAfter: Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000)
+          retryAfter: Math.ceil((rateLimitResult.reset - Date.now()) / 1000)
         },
         {
           status: 429,
-          headers: getRateLimitHeaders(rateLimitResult)
+          headers: getRateLimitHeadersRedis(rateLimitResult)
         }
       );
     }
 
-    const { move, fen, moveHistory, gameContext, gameId, userId = 'chris', moveDetails } = await request.json();
+    const body = await request.json();
 
-    if (!move || !fen) {
-      console.error('Move API - Missing required parameters:', { move: !!move, fen: !!fen });
-      return NextResponse.json({ error: 'Move and FEN are required' }, { status: 400 });
+    // Validate input with Zod schema
+    const validation = validateRequest(chessMoveSchema, body);
+    if (!validation.success) {
+      console.error('Move API - Validation failed:', validation.error);
+      return NextResponse.json({ error: validation.error }, { status: 400 });
     }
+
+    const { move, fen, moveHistory, gameContext, gameId, moveDetails } = validation.data;
+
+    // Get authenticated user, fall back to anonymous for unauthenticated requests
+    const authUser = await getAuthenticatedUser();
+    const userId = authUser?.id || 'anonymous';
 
     console.log('Move API - Processing move:', {
       move,

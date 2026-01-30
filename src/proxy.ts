@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { createServerClient } from '@supabase/ssr';
 
 // =============================================================================
 // THREAT DETECTION PROXY - Chester AI Chess (Next.js 16+)
@@ -257,7 +258,7 @@ function analyzeRequest(request: NextRequest): ThreatAnalysis {
 // PROXY FUNCTION (Next.js 16+)
 // -----------------------------------------------------------------------------
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const analysis = analyzeRequest(request);
 
   if (analysis.isBlocked) {
@@ -287,16 +288,71 @@ export function proxy(request: NextRequest) {
     );
   }
 
-  // Allow the request to proceed
-  const response = NextResponse.next();
+  // -----------------------------------------------------------------------------
+  // SUPABASE AUTH - Session refresh and route protection
+  // -----------------------------------------------------------------------------
+
+  let supabaseResponse = NextResponse.next({
+    request,
+  });
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+          supabaseResponse = NextResponse.next({
+            request,
+          });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            supabaseResponse.cookies.set(name, value, options)
+          );
+        },
+      },
+    }
+  );
+
+  // Refresh session if expired - important for Server Components
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // Public routes that don't require authentication
+  const publicRoutes = ['/login', '/signup', '/auth'];
+  const isPublicRoute = publicRoutes.some(route =>
+    request.nextUrl.pathname.startsWith(route)
+  );
+
+  // API routes - let them handle their own auth
+  const isApiRoute = request.nextUrl.pathname.startsWith('/api/');
+
+  // If not logged in and trying to access protected route, redirect to login
+  if (!user && !isPublicRoute && !isApiRoute) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/login';
+    url.searchParams.set('redirectTo', request.nextUrl.pathname);
+    return NextResponse.redirect(url);
+  }
+
+  // If logged in and trying to access login/signup, redirect to home
+  if (user && (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/signup')) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/';
+    return NextResponse.redirect(url);
+  }
 
   // Add security headers
-  response.headers.set('X-Content-Type-Options', 'nosniff');
-  response.headers.set('X-Frame-Options', 'DENY');
-  response.headers.set('X-XSS-Protection', '1; mode=block');
-  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  supabaseResponse.headers.set('X-Content-Type-Options', 'nosniff');
+  supabaseResponse.headers.set('X-Frame-Options', 'DENY');
+  supabaseResponse.headers.set('X-XSS-Protection', '1; mode=block');
+  supabaseResponse.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
 
-  return response;
+  return supabaseResponse;
 }
 
 // -----------------------------------------------------------------------------

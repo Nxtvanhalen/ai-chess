@@ -203,6 +203,18 @@ The architecture is designed to easily add:
 - Chess puzzles and training
 - Social features (when multi-user)
 
+### Runtime Optimization (Post-Auth)
+
+**Bun Migration** - After auth/payments are stable, consider migrating from Node.js to Bun:
+- Render supports Bun natively (no Docker needed) - just set `BUN_VERSION` env var
+- Expected gains: 3-4x HTTP throughput, 40-60% faster API responses
+- Faster cold starts on Render (important for serverless-style deployments)
+- Native TypeScript execution (no build step in dev)
+- OpenAI API calls benefit from Bun's faster HTTP client and reduced memory overhead
+- Test locally first: `bun run dev` instead of `npm run dev`
+
+*Note: Anthropic acquired Bun in Dec 2025, so long-term support is strong.*
+
 ## Contributing
 
 This is currently a private project for Chris (nxtvanhalen). The codebase maintains production standards for potential future open-sourcing.

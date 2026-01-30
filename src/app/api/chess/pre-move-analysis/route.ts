@@ -5,14 +5,43 @@ import { PositionAnalyzer } from '@/lib/chess/positionAnalyzer';
 import { MoveSuggestion } from '@/types';
 import { GameMemoryService } from '@/lib/services/GameMemoryService';
 import { ChesterMemoryService } from '@/lib/services/ChesterMemoryService';
+import { preMoveAnalysisSchema, validateRequest } from '@/lib/validation/schemas';
+import { checkRateLimitRedis, getRateLimitHeadersRedis, getClientIPFromRequest } from '@/lib/redis';
+import { getAuthenticatedUser } from '@/lib/auth/getUser';
 
 export async function POST(request: NextRequest) {
   try {
-    const { fen, moveHistory, gamePhase, gameId, userId = 'chris', gameContext } = await request.json();
+    // Check rate limit (Redis-based, falls back to in-memory)
+    const clientIP = getClientIPFromRequest(request);
+    const rateLimitResult = await checkRateLimitRedis(clientIP, 'preMoveAnalysis');
 
-    if (!fen) {
-      return NextResponse.json({ error: 'FEN is required' }, { status: 400 });
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        {
+          error: 'Rate limit exceeded. Please wait before requesting analysis.',
+          retryAfter: Math.ceil((rateLimitResult.reset - Date.now()) / 1000)
+        },
+        {
+          status: 429,
+          headers: getRateLimitHeadersRedis(rateLimitResult)
+        }
+      );
     }
+
+    const body = await request.json();
+
+    // Validate input with Zod schema
+    const validation = validateRequest(preMoveAnalysisSchema, body);
+    if (!validation.success) {
+      console.error('Pre-move analysis - Validation failed:', validation.error);
+      return NextResponse.json({ error: validation.error }, { status: 400 });
+    }
+
+    const { fen, moveHistory, gamePhase, gameId, gameContext } = validation.data;
+
+    // Get authenticated user, fall back to anonymous for unauthenticated requests
+    const authUser = await getAuthenticatedUser();
+    const userId = authUser?.id || 'anonymous';
 
     console.log('Pre-move analysis - Starting:', {
       hasGameId: !!gameId,

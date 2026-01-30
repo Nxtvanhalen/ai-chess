@@ -1,31 +1,62 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createResponsesCompletion } from '@/lib/openai/client';
 import { CHESS_BUTLER_SYSTEM_PROMPT, formatMoveContext } from '@/lib/openai/chess-butler-prompt';
-import { checkRateLimit, getRateLimitHeaders, getClientIP } from '@/lib/middleware/rate-limit';
+import { checkRateLimitRedis, getRateLimitHeadersRedis, getClientIPFromRequest } from '@/lib/redis';
 import { extractMoveSuggestions, validateMoveSuggestion } from '@/lib/chess/board-validator';
 import { GameMemoryService } from '@/lib/services/GameMemoryService';
 import { ChesterMemoryService } from '@/lib/services/ChesterMemoryService';
+import { chatSchema, validateRequest } from '@/lib/validation/schemas';
+import { getAuthenticatedUser } from '@/lib/auth/getUser';
+import { canUseChat, incrementChatUsage, createUsageLimitError, getUsageHeaders } from '@/lib/supabase/subscription';
 
 export async function POST(request: NextRequest) {
   try {
-    // Check rate limit
-    const clientIP = getClientIP(request);
-    const rateLimitResult = checkRateLimit(clientIP);
+    // Check rate limit (Redis-based, falls back to in-memory)
+    const clientIP = getClientIPFromRequest(request);
+    const rateLimitResult = await checkRateLimitRedis(clientIP, 'chat');
 
-    if (!rateLimitResult.allowed) {
+    if (!rateLimitResult.success) {
       return NextResponse.json(
         {
           error: 'Rate limit exceeded. Please wait before sending another message.',
-          retryAfter: Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000)
+          retryAfter: Math.ceil((rateLimitResult.reset - Date.now()) / 1000)
         },
         {
           status: 429,
-          headers: getRateLimitHeaders(rateLimitResult)
+          headers: getRateLimitHeadersRedis(rateLimitResult)
         }
       );
     }
 
-    const { message, gameContext, moveHistory, gameId, userId = 'chris' } = await request.json();
+    const body = await request.json();
+
+    // Validate input with Zod schema
+    const validation = validateRequest(chatSchema, body);
+    if (!validation.success) {
+      console.error('Chat API - Validation failed:', validation.error);
+      return NextResponse.json({ error: validation.error }, { status: 400 });
+    }
+
+    const { message, gameContext, moveHistory, gameId } = validation.data;
+
+    // Get authenticated user, fall back to anonymous for unauthenticated requests
+    const authUser = await getAuthenticatedUser();
+    const userId = authUser?.id || 'anonymous';
+
+    // Check subscription usage limit (only for authenticated users with subscriptions)
+    let usageCheck: { allowed: boolean; remaining: number; limit: number; unlimited: boolean } | null = null;
+    if (authUser) {
+      usageCheck = await canUseChat(authUser.id);
+      if (!usageCheck.allowed) {
+        return NextResponse.json(
+          createUsageLimitError('chat', usageCheck),
+          {
+            status: 429,
+            headers: getUsageHeaders('chat', usageCheck)
+          }
+        );
+      }
+    }
 
     // Debug: Log game context to help troubleshoot Chester's board visibility
     console.log('Chester Chat API - Game Context:', {
@@ -36,10 +67,6 @@ export async function POST(request: NextRequest) {
       messageLength: message.length,
       hasGameId: !!gameId
     });
-
-    if (!message) {
-      return NextResponse.json({ error: 'Message is required' }, { status: 400 });
-    }
 
     // Fetch comprehensive game memory context
     let fullGameContext = null;
@@ -310,13 +337,26 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Increment usage counter for authenticated users
+    if (authUser) {
+      await incrementChatUsage(authUser.id);
+    }
+
+    // Build response headers with usage info
+    const responseHeaders: Record<string, string> = {
+      'Content-Type': 'text/plain',
+      'Cache-Control': 'no-cache',
+    };
+    if (usageCheck) {
+      Object.assign(responseHeaders, getUsageHeaders('chat', {
+        remaining: usageCheck.unlimited ? Infinity : usageCheck.remaining - 1,
+        limit: usageCheck.limit,
+        unlimited: usageCheck.unlimited
+      }));
+    }
+
     // Return simple response - GPT-5 handles conversation naturally
-    return new Response(content, {
-      headers: {
-        'Content-Type': 'text/plain',
-        'Cache-Control': 'no-cache',
-      },
-    });
+    return new Response(content, { headers: responseHeaders });
   } catch (error) {
     console.error('Chat API error:', error);
     return NextResponse.json(

@@ -1,10 +1,17 @@
 // Quick database setup script
+// Run with: node -r dotenv/config setup-database.js
 const { createClient } = require('@supabase/supabase-js');
 const fs = require('fs');
 const path = require('path');
 
-const supabaseUrl = 'https://gszdsbzeydvvvzeeqgdn.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzemRzYnpleWR2dnZ6ZWVxZ2RuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAzNzYyMzEsImV4cCI6MjA2NTk1MjIzMX0.XgTBVpKTyg6IBg6ZedmIDlUMjD2FVxxKkjoRKAzZp3w';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+  console.error('❌ Missing environment variables.');
+  console.error('Please set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in .env.local');
+  process.exit(1);
+}
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 

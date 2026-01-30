@@ -1,19 +1,42 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getOpenAIClient } from '@/lib/openai/client';
 import { formatMoveContext } from '@/lib/openai/chess-butler-prompt';
+import { engineMoveAnalysisSchema, validateRequest } from '@/lib/validation/schemas';
+import { checkRateLimitRedis, getRateLimitHeadersRedis, getClientIPFromRequest } from '@/lib/redis';
 
 export async function POST(request: NextRequest) {
   try {
-    const { engineMove, fen, engineEvaluation, alternatives } = await request.json();
-    
-    if (!engineMove || !fen) {
+    // Check rate limit (Redis-based, falls back to in-memory)
+    const clientIP = getClientIPFromRequest(request);
+    const rateLimitResult = await checkRateLimitRedis(clientIP, 'moveAnalysis');
+
+    if (!rateLimitResult.success) {
       return NextResponse.json(
-        { error: 'Engine move and FEN are required' }, 
-        { status: 400 }
+        {
+          error: 'Rate limit exceeded. Please wait before requesting analysis.',
+          retryAfter: Math.ceil((rateLimitResult.reset - Date.now()) / 1000)
+        },
+        {
+          status: 429,
+          headers: getRateLimitHeadersRedis(rateLimitResult)
+        }
       );
     }
-    
-    const context = formatMoveContext(fen, engineMove.san || engineMove);
+
+    const body = await request.json();
+
+    // Validate input with Zod schema
+    const validation = validateRequest(engineMoveAnalysisSchema, body);
+    if (!validation.success) {
+      console.error('Engine move analysis - Validation failed:', validation.error);
+      return NextResponse.json({ error: validation.error }, { status: 400 });
+    }
+
+    const { engineMove, fen, engineEvaluation, alternatives } = validation.data;
+
+    // Handle engineMove being either a string or an object with san property
+    const moveStr = typeof engineMove === 'string' ? engineMove : (engineMove.san || '');
+    const context = formatMoveContext(fen, moveStr);
     
     const systemPrompt = `You are Chester, Chris's chess buddy watching him play against a chess engine.
 
@@ -52,18 +75,18 @@ export async function POST(request: NextRequest) {
         { role: 'system', content: systemPrompt },
         {
           role: 'user',
-          content: `${context}${evaluationContext}\n\nThe engine just played: ${engineMove.san || engineMove}\n\nWhat's your casual take on this move?`
+          content: `${context}${evaluationContext}\n\nThe engine just played: ${moveStr}\n\nWhat's your casual take on this move?`
         }
       ],
       max_completion_tokens: 50, // One sentence
     });
-    
+
     const commentary = completion.choices[0].message.content || "Interesting move by the engine.";
-    
+
     return NextResponse.json({
       commentary,
       analysis: {
-        move: engineMove.san || engineMove,
+        move: moveStr,
         evaluation: engineEvaluation || 0,
         depth: 10, // You could get this from the engine
       }
