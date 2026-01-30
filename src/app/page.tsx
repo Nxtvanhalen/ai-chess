@@ -195,7 +195,7 @@ export default function Home() {
           moveHistory: messagesRef.current.filter(m => m.metadata?.moveContext).map(m => m.metadata?.moveContext),
           gamePhase: detectGamePhase(fen),
           gameId: gameId || currentGameId,
-          userId: 'chris',
+          userId: user?.id || null,
           gameContext: {
             fen,
             totalMoves: messagesRef.current.filter(m => m.metadata?.moveContext).length
@@ -326,7 +326,7 @@ export default function Home() {
                 }))
               },
               gameId: currentGameId,
-              userId: 'chris',
+              userId: user?.id || null,
               moveDetails: {
                 san: move.san,
                 from: move.from,
