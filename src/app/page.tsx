@@ -26,6 +26,8 @@ import { useChesterStream } from '@/hooks/useChesterStream';
 import { BoardTheme, boardThemes, defaultTheme } from '@/lib/chess/boardThemes';
 import ThemeSelector from '@/components/chess/ThemeSelector';
 import ErrorBoundary from '@/components/utils/ErrorBoundary';
+import UsageDisplay from '@/components/subscription/UsageDisplay';
+import UpgradeModal from '@/components/subscription/UpgradeModal';
 
 export default function Home() {
   const { user } = useAuth();
@@ -37,6 +39,10 @@ export default function Home() {
   const [moveCount, setMoveCount] = useState(0);
   const [gameOver, setGameOver] = useState<{ checkmate: boolean, winner?: 'white' | 'black' }>({ checkmate: false });
   const [boardTheme, setBoardTheme] = useState<BoardTheme>(defaultTheme);
+  const [upgradeModal, setUpgradeModal] = useState<{ isOpen: boolean; type: 'ai_move' | 'chat'; resetAt?: string }>({
+    isOpen: false,
+    type: 'ai_move'
+  });
   const timeoutRefs = useRef<Set<NodeJS.Timeout>>(new Set());
   const messagesRef = useRef<ChatMessage[]>([]);
   const performanceMonitor = useRef<PerformanceMonitor>(PerformanceMonitor.getInstance());
@@ -476,6 +482,21 @@ export default function Home() {
               }),
             });
 
+            // Handle usage limit exceeded
+            if (aiMoveResponse.status === 429) {
+              const errorData = await aiMoveResponse.json();
+              if (errorData.code === 'USAGE_LIMIT_EXCEEDED') {
+                setUpgradeModal({
+                  isOpen: true,
+                  type: 'ai_move',
+                  resetAt: errorData.details?.resetAt
+                });
+                // Remove the thinking message
+                setMessages(prev => prev.filter(msg => msg.id !== engineMoveMessage.id));
+                return;
+              }
+            }
+
             if (aiMoveResponse.ok) {
               const aiMoveData = await aiMoveResponse.json();
 
@@ -862,10 +883,13 @@ export default function Home() {
           </div>
         }
         controls={
-          <ThemeSelector
-            currentTheme={boardTheme}
-            onThemeChange={setBoardTheme}
-          />
+          <div className="flex items-center gap-4 flex-wrap">
+            <ThemeSelector
+              currentTheme={boardTheme}
+              onThemeChange={setBoardTheme}
+            />
+            <UsageDisplay />
+          </div>
         }
         chat={
           <ChatInterfaceLazy
@@ -874,6 +898,12 @@ export default function Home() {
             isLoading={isLoading || isStreaming}
           />
         }
+      />
+      <UpgradeModal
+        isOpen={upgradeModal.isOpen}
+        onClose={() => setUpgradeModal(prev => ({ ...prev, isOpen: false }))}
+        type={upgradeModal.type}
+        resetAt={upgradeModal.resetAt}
       />
     </ErrorBoundary>
   );

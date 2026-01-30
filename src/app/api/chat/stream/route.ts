@@ -1,9 +1,12 @@
 import { NextRequest } from 'next/server';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 import { createResponsesCompletionStream, parseResponsesStream } from '@/lib/openai/client';
 import { CHESS_BUTLER_SYSTEM_PROMPT, formatMoveContext } from '@/lib/openai/chess-butler-prompt';
 import { checkRateLimit, getRateLimitHeaders, getClientIP } from '@/lib/middleware/rate-limit';
 import { GameMemoryService } from '@/lib/services/GameMemoryService';
 import { ChesterMemoryService } from '@/lib/services/ChesterMemoryService';
+import { canUseChat, incrementChatUsage, createUsageLimitError, getUsageHeaders } from '@/lib/supabase/subscription';
 
 /**
  * Streaming Chat API for Chester
@@ -32,6 +35,43 @@ export async function POST(request: NextRequest) {
 
   try {
     const { message, gameContext, gameId, userId } = await request.json();
+
+    // Check subscription usage limit for authenticated users
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() { return cookieStore.getAll(); },
+          setAll(cookiesToSet) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) => {
+                cookieStore.set(name, value, options);
+              });
+            } catch { /* Server Component context */ }
+          },
+        },
+      }
+    );
+
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (user) {
+      const usageCheck = await canUseChat(user.id);
+      if (!usageCheck.allowed) {
+        return new Response(
+          JSON.stringify(createUsageLimitError('chat', usageCheck)),
+          {
+            status: 429,
+            headers: {
+              'Content-Type': 'application/json',
+              ...getUsageHeaders('chat', usageCheck)
+            }
+          }
+        );
+      }
+    }
 
     if (!message) {
       return new Response(JSON.stringify({ error: 'Message is required' }), {
@@ -145,6 +185,11 @@ export async function POST(request: NextRequest) {
             } catch (error) {
               console.error('[Chester Stream] Error saving to memory:', error);
             }
+          }
+
+          // Increment chat usage for authenticated users
+          if (user) {
+            await incrementChatUsage(user.id);
           }
         } catch (error) {
           console.error('[Chester Stream] Stream error:', error);
