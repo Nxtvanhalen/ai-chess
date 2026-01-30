@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { message, gameContext, gameId, userId = 'chris' } = await request.json();
+    const { message, gameContext, gameId, userId } = await request.json();
 
     if (!message) {
       return new Response(JSON.stringify({ error: 'Message is required' }), {

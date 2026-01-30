@@ -17,7 +17,12 @@ export class ChesterMemoryService {
   /**
    * Get or create Chester's long-term memory for a user
    */
-  static async getOrCreateMemory(userId: string = 'chris'): Promise<ChesterLongTermMemory> {
+  static async getOrCreateMemory(userId?: string | null): Promise<ChesterLongTermMemory | null> {
+    // Anonymous users don't get long-term memory
+    if (!userId) {
+      return null;
+    }
+
     const { data, error } = await supabase
       .from('chester_long_term_memory')
       .select('*')
@@ -30,7 +35,7 @@ export class ChesterMemoryService {
         return await this.createInitialMemory(userId);
       }
       console.error('Error fetching Chester memory:', error);
-      throw error;
+      return null; // Graceful degradation instead of throwing
     }
 
     return data as ChesterLongTermMemory;
@@ -93,6 +98,9 @@ export class ChesterMemoryService {
   ): Promise<void> {
     const memory = await this.getOrCreateMemory(userId);
 
+    // Skip if no memory (anonymous user)
+    if (!memory) return;
+
     const updates: Partial<ChesterLongTermMemory> = {
       total_games: memory.total_games + 1,
       last_played_at: new Date().toISOString()
@@ -136,6 +144,7 @@ export class ChesterMemoryService {
    */
   static async learnFromGame(userId: string, gameMemory: GameMemory): Promise<void> {
     const memory = await this.getOrCreateMemory(userId);
+    if (!memory) return;
     const profile = memory.play_style_profile || {};
 
     // Analyze opening preferences
@@ -188,6 +197,7 @@ export class ChesterMemoryService {
    */
   static async addRecentGame(userId: string, gameSummary: RecentGameSummary): Promise<void> {
     const memory = await this.getOrCreateMemory(userId);
+    if (!memory) return;
 
     // Keep only last 10 games
     const recentGames = [...memory.recent_games, gameSummary].slice(-10);
@@ -210,6 +220,7 @@ export class ChesterMemoryService {
    */
   static async addMemorableMoment(userId: string, moment: MemorableMoment): Promise<void> {
     const memory = await this.getOrCreateMemory(userId);
+    if (!memory) return;
 
     // Keep only last 20 memorable moments
     const moments = [...memory.memorable_moments, moment].slice(-20);
@@ -235,6 +246,7 @@ export class ChesterMemoryService {
     updates: Partial<RelationshipMetrics>
   ): Promise<void> {
     const memory = await this.getOrCreateMemory(userId);
+    if (!memory) return;
 
     const updatedMetrics = {
       ...memory.relationship_metrics,
@@ -259,6 +271,7 @@ export class ChesterMemoryService {
    */
   static async incrementGamesPlayed(userId: string): Promise<void> {
     const memory = await this.getOrCreateMemory(userId);
+    if (!memory) return;
 
     const metrics = memory.relationship_metrics;
     metrics.games_together += 1;
@@ -280,6 +293,7 @@ export class ChesterMemoryService {
     suggestionsFollowed: number
   ): Promise<void> {
     const memory = await this.getOrCreateMemory(userId);
+    if (!memory) return;
 
     const totalSuggestions = memory.total_suggestions_given + suggestionsGiven;
     const followedPercentage = totalSuggestions > 0
@@ -309,6 +323,7 @@ export class ChesterMemoryService {
     won: boolean
   ): Promise<void> {
     const memory = await this.getOrCreateMemory(userId);
+    if (!memory) return;
 
     const rates = memory.win_rate_by_color || {};
     const currentRate = rates[color] || 0;
@@ -337,15 +352,16 @@ export class ChesterMemoryService {
   /**
    * Get Chester's personality context for AI prompts
    */
-  static async getPersonalityContext(userId: string): Promise<{
+  static async getPersonalityContext(userId?: string | null): Promise<{
     rapportLevel: number;
     gamesPlayed: number;
     currentStreak: number;
     recentPerformance: string;
     commonMistakes: string[];
     strongAreas: string[];
-  }> {
+  } | null> {
     const memory = await this.getOrCreateMemory(userId);
+    if (!memory) return null;
 
     const recentGames = memory.recent_games.slice(-5);
     const recentWins = recentGames.filter(g => g.result === 'win').length;
@@ -368,7 +384,7 @@ export class ChesterMemoryService {
   /**
    * Get full context for AI calls (for Chester's awareness)
    */
-  static async getFullContext(userId: string): Promise<ChesterLongTermMemory> {
+  static async getFullContext(userId?: string | null): Promise<ChesterLongTermMemory | null> {
     return await this.getOrCreateMemory(userId);
   }
 

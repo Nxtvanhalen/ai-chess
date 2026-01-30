@@ -21,12 +21,14 @@ import {
 } from '@/lib/supabase/database';
 import { supabase } from '@/lib/supabase/client';
 import { GameMemoryService } from '@/lib/services/GameMemoryService';
+import { useAuth } from '@/contexts/AuthContext';
 import { useChesterStream } from '@/hooks/useChesterStream';
 import { BoardTheme, boardThemes, defaultTheme } from '@/lib/chess/boardThemes';
 import ThemeSelector from '@/components/chess/ThemeSelector';
 import ErrorBoundary from '@/components/utils/ErrorBoundary';
 
 export default function Home() {
+  const { user } = useAuth();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [currentPosition, setCurrentPosition] = useState<string | undefined>();
@@ -120,7 +122,7 @@ export default function Home() {
 
         // Initialize game memory
         try {
-          await GameMemoryService.createGameMemory(newGame.id, 'chris');
+          await GameMemoryService.createGameMemory(newGame.id, user?.id);
           console.log('Game memory initialized for game:', newGame.id);
         } catch (error) {
           console.error('Error initializing game memory:', error);
@@ -800,7 +802,7 @@ export default function Home() {
 
       // Initialize game memory
       try {
-        await GameMemoryService.createGameMemory(newGame.id, 'chris');
+        await GameMemoryService.createGameMemory(newGame.id, user?.id);
         console.log('Game memory initialized for restarted game:', newGame.id);
       } catch (error) {
         console.error('Error initializing game memory:', error);

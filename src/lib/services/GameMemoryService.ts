@@ -18,20 +18,26 @@ export class GameMemoryService {
   /**
    * Initialize game memory for a new game
    */
-  static async createGameMemory(gameId: string, userId: string = 'chris'): Promise<GameMemory> {
+  static async createGameMemory(gameId: string, userId?: string | null): Promise<GameMemory> {
+    const insertData: Record<string, unknown> = {
+      game_id: gameId,
+      full_move_history: [],
+      chester_commentary: [],
+      suggestions_given: [],
+      tactical_themes: [],
+      position_evaluations: {},
+      game_phase_transitions: [],
+      total_moves: 0
+    };
+
+    // Only include user_id if it's a valid UUID
+    if (userId) {
+      insertData.user_id = userId;
+    }
+
     const { data, error } = await supabase
       .from('game_memory')
-      .insert({
-        game_id: gameId,
-        user_id: userId,
-        full_move_history: [],
-        chester_commentary: [],
-        suggestions_given: [],
-        tactical_themes: [],
-        position_evaluations: {},
-        game_phase_transitions: [],
-        total_moves: 0
-      })
+      .insert(insertData)
       .select()
       .single();
 
@@ -68,7 +74,7 @@ export class GameMemoryService {
   /**
    * Get or create game memory (ensures it exists)
    */
-  static async getOrCreateGameMemory(gameId: string, userId: string = 'chris'): Promise<GameMemory> {
+  static async getOrCreateGameMemory(gameId: string, userId?: string | null): Promise<GameMemory> {
     let memory = await this.getGameMemory(gameId);
 
     if (!memory) {
@@ -438,7 +444,7 @@ export class GameMemoryService {
   /**
    * Get recent games for a user (for past game analysis)
    */
-  static async getRecentGames(userId: string = 'chris', limit: number = 5): Promise<GameMemory[]> {
+  static async getRecentGames(userId?: string | null, limit: number = 5): Promise<GameMemory[]> {
     const { data, error } = await supabase
       .from('game_memory')
       .select('*')
@@ -457,7 +463,7 @@ export class GameMemoryService {
   /**
    * Get the last game (not the current one) - doesn't require finalization
    */
-  static async getLastCompletedGame(userId: string = 'chris', currentGameId?: string): Promise<GameMemory | null> {
+  static async getLastCompletedGame(userId?: string | null, currentGameId?: string): Promise<GameMemory | null> {
     let query = supabase
       .from('game_memory')
       .select('*')
