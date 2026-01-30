@@ -3,7 +3,10 @@
  * Manages per-game context and Chester's awareness during gameplay
  */
 
-import { supabase } from '../supabase/client';
+import { createAdminClient } from '../supabase/client';
+
+// Use admin client for server-side operations (bypasses RLS)
+const getSupabase = () => createAdminClient();
 import {
   GameMemory,
   GameMoveEntry,
@@ -44,7 +47,7 @@ export class GameMemoryService {
       console.log('[GameMemory] Ignoring invalid userId format:', userId);
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from('game_memory')
       .insert(insertData)
       .select()
@@ -62,7 +65,7 @@ export class GameMemoryService {
    * Get game memory for a specific game
    */
   static async getGameMemory(gameId: string): Promise<GameMemory | null> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from('game_memory')
       .select('*')
       .eq('game_id', gameId)
@@ -104,7 +107,7 @@ export class GameMemoryService {
 
     const updatedHistory = [...memory.full_move_history, moveEntry];
 
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from('game_memory')
       .update({
         full_move_history: updatedHistory,
@@ -134,7 +137,7 @@ export class GameMemoryService {
 
     const updatedCommentary = [...memory.chester_commentary, commentary];
 
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from('game_memory')
       .update({
         chester_commentary: updatedCommentary
@@ -158,7 +161,7 @@ export class GameMemoryService {
 
     const updatedSuggestions = [...memory.suggestions_given, suggestion];
 
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from('game_memory')
       .update({
         suggestions_given: updatedSuggestions
@@ -196,7 +199,7 @@ export class GameMemoryService {
         : s
     );
 
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from('game_memory')
       .update({
         suggestions_given: updatedSuggestions
@@ -221,7 +224,7 @@ export class GameMemoryService {
 
     const updatedThemes = [...memory.tactical_themes, theme];
 
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from('game_memory')
       .update({
         tactical_themes: updatedThemes
@@ -256,7 +259,7 @@ export class GameMemoryService {
       [moveNumber]: evaluation
     };
 
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from('game_memory')
       .update({
         position_evaluations: updatedEvaluations
@@ -281,7 +284,7 @@ export class GameMemoryService {
 
     const updatedTransitions = [...memory.game_phase_transitions, transition];
 
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from('game_memory')
       .update({
         game_phase_transitions: updatedTransitions
@@ -303,7 +306,7 @@ export class GameMemoryService {
    * Update game narrative
    */
   static async updateGameNarrative(gameId: string, narrative: string): Promise<void> {
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from('game_memory')
       .update({
         game_narrative: narrative
@@ -324,7 +327,7 @@ export class GameMemoryService {
     result: string,
     durationSeconds: number
   ): Promise<void> {
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from('game_memory')
       .update({
         final_result: result,
@@ -394,7 +397,7 @@ export class GameMemoryService {
     type: GameMemorySnapshot['snapshot_type'],
     data: Record<string, any>
   ): Promise<void> {
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from('game_memory_snapshots')
       .insert({
         game_memory_id: gameMemoryId,
@@ -415,7 +418,7 @@ export class GameMemoryService {
     gameMemoryId: string,
     type?: GameMemorySnapshot['snapshot_type']
   ): Promise<GameMemorySnapshot[]> {
-    let query = supabase
+    let query = getSupabase()
       .from('game_memory_snapshots')
       .select('*')
       .eq('game_memory_id', gameMemoryId)
@@ -439,7 +442,7 @@ export class GameMemoryService {
    * Delete game memory (cleanup)
    */
   static async deleteGameMemory(gameId: string): Promise<void> {
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from('game_memory')
       .delete()
       .eq('game_id', gameId);
@@ -454,7 +457,7 @@ export class GameMemoryService {
    * Get recent games for a user (for past game analysis)
    */
   static async getRecentGames(userId?: string | null, limit: number = 5): Promise<GameMemory[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from('game_memory')
       .select('*')
       .eq('user_id', userId)
@@ -473,7 +476,7 @@ export class GameMemoryService {
    * Get the last game (not the current one) - doesn't require finalization
    */
   static async getLastCompletedGame(userId?: string | null, currentGameId?: string): Promise<GameMemory | null> {
-    let query = supabase
+    let query = getSupabase()
       .from('game_memory')
       .select('*')
       .eq('user_id', userId)

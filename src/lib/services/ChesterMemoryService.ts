@@ -3,7 +3,10 @@
  * Manages Chester's long-term learning and personality evolution
  */
 
-import { supabase } from '../supabase/client';
+import { createAdminClient } from '../supabase/client';
+
+// Use admin client for server-side operations (bypasses RLS)
+const getSupabase = () => createAdminClient();
 import {
   ChesterLongTermMemory,
   PlayStyleProfile,
@@ -34,7 +37,7 @@ export class ChesterMemoryService {
       return null;
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from('chester_long_term_memory')
       .select('*')
       .eq('user_id', userId)
@@ -85,7 +88,7 @@ export class ChesterMemoryService {
       last_played_at: null
     };
 
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from('chester_long_term_memory')
       .insert(initialMemory)
       .select()
@@ -139,7 +142,7 @@ export class ChesterMemoryService {
       updates.average_game_duration = Math.round(totalDuration / (memory.total_games + 1));
     }
 
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from('chester_long_term_memory')
       .update(updates)
       .eq('user_id', userId);
@@ -189,7 +192,7 @@ export class ChesterMemoryService {
     });
     profile.common_mistakes = mistakes.slice(-5); // Keep last 5
 
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from('chester_long_term_memory')
       .update({
         play_style_profile: profile,
@@ -213,7 +216,7 @@ export class ChesterMemoryService {
     // Keep only last 10 games
     const recentGames = [...memory.recent_games, gameSummary].slice(-10);
 
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from('chester_long_term_memory')
       .update({
         recent_games: recentGames
@@ -236,7 +239,7 @@ export class ChesterMemoryService {
     // Keep only last 20 memorable moments
     const moments = [...memory.memorable_moments, moment].slice(-20);
 
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from('chester_long_term_memory')
       .update({
         memorable_moments: moments
@@ -264,7 +267,7 @@ export class ChesterMemoryService {
       ...updates
     };
 
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from('chester_long_term_memory')
       .update({
         relationship_metrics: updatedMetrics
@@ -311,7 +314,7 @@ export class ChesterMemoryService {
       ? (suggestionsFollowed / totalSuggestions) * 100
       : 0;
 
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from('chester_long_term_memory')
       .update({
         total_suggestions_given: totalSuggestions,
@@ -347,7 +350,7 @@ export class ChesterMemoryService {
 
     rates[color] = newRate;
 
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from('chester_long_term_memory')
       .update({
         win_rate_by_color: rates
@@ -403,7 +406,7 @@ export class ChesterMemoryService {
    * Reset memory (for testing)
    */
   static async resetMemory(userId: string): Promise<void> {
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from('chester_long_term_memory')
       .delete()
       .eq('user_id', userId);
