@@ -13,10 +13,12 @@ if (!supabaseUrl || !supabaseAnonKey) {
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // For server-side operations that need elevated permissions
+// Returns null if service role key not available (e.g., client-side)
 export const createAdminClient = () => {
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!serviceRoleKey) {
-    throw new Error('SUPABASE_SERVICE_ROLE_KEY is required for admin operations');
+    // Return null instead of throwing - allows graceful handling on client-side
+    return null;
   }
   return createClient(supabaseUrl, serviceRoleKey);
 };
