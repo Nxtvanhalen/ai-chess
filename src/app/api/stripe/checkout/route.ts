@@ -11,10 +11,16 @@ import { z } from 'zod';
 // =============================================================================
 
 const checkoutSchema = z.object({
-  priceId: z.string().min(1, 'Price ID is required'),
+  // Support both direct priceId or plan+interval
+  priceId: z.string().min(1).optional(),
+  plan: z.enum(['pro', 'premium']).optional(),
+  interval: z.enum(['monthly', 'yearly']).optional(),
   successUrl: z.string().url().optional(),
   cancelUrl: z.string().url().optional(),
-});
+}).refine(
+  data => data.priceId || (data.plan && data.interval),
+  { message: 'Either priceId or both plan and interval are required' }
+);
 
 export async function POST(request: NextRequest) {
   try {
@@ -61,7 +67,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { priceId, successUrl, cancelUrl } = validation.data;
+    const { priceId: directPriceId, plan, interval, successUrl, cancelUrl } = validation.data;
+
+    // Resolve price ID from plan+interval or use direct priceId
+    let priceId = directPriceId;
+    if (!priceId && plan && interval) {
+      priceId = STRIPE_PRICES[plan][interval];
+    }
 
     // Validate price ID is one of our configured prices
     const validPrices = [
@@ -71,9 +83,9 @@ export async function POST(request: NextRequest) {
       STRIPE_PRICES.premium.yearly,
     ];
 
-    if (!validPrices.includes(priceId)) {
+    if (!priceId || !validPrices.includes(priceId)) {
       return NextResponse.json(
-        { error: 'Invalid price ID' },
+        { error: 'Invalid price ID or plan selection' },
         { status: 400 }
       );
     }
