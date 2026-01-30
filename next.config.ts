@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -53,12 +54,13 @@ const securityHeaders = [
     key: 'Content-Security-Policy',
     value: [
       "default-src 'self';",
-      "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://va.vercel-scripts.com;",
+      "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://va.vercel-scripts.com https://*.sentry.io;",
       "style-src 'self' 'unsafe-inline';",
       "img-src 'self' blob: data: https://*.supabase.co;",
       "font-src 'self';",
-      "connect-src 'self' https://*.supabase.co https://api.openai.com;",
+      "connect-src 'self' https://*.supabase.co https://api.openai.com https://*.sentry.io https://*.ingest.sentry.io;",
       "frame-ancestors 'none';",
+      "worker-src 'self' blob:;",
       // Only upgrade requests in production
       ...(isProd ? ["upgrade-insecure-requests;"] : [])
     ].join(' ').replace(/\s{2,}/g, ' ').trim()
@@ -78,4 +80,25 @@ const configWithHeaders: NextConfig = {
   },
 };
 
-export default configWithHeaders;
+// Wrap with Sentry (only if DSN is configured)
+const sentryConfig = withSentryConfig(configWithHeaders, {
+  // Sentry webpack plugin options
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+
+  // Only upload source maps in production builds
+  silent: !process.env.CI,
+
+  // Upload a larger set of source maps for prettier stack traces
+  widenClientFileUpload: true,
+
+  // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers
+  tunnelRoute: "/monitoring",
+
+  // Source maps configuration
+  sourcemaps: {
+    deleteSourcemapsAfterUpload: true,
+  },
+});
+
+export default sentryConfig;
