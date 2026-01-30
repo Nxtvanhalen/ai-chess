@@ -39,9 +39,9 @@ export async function POST(request: NextRequest) {
 
     const { message, gameContext, moveHistory, gameId } = validation.data;
 
-    // Get authenticated user, fall back to anonymous for unauthenticated requests
+    // Get authenticated user, fall back to null for unauthenticated requests
     const authUser = await getAuthenticatedUser();
-    const userId = authUser?.id || 'anonymous';
+    const userId = authUser?.id || null;
 
     // Check subscription usage limit (only for authenticated users with subscriptions)
     let usageCheck: { allowed: boolean; remaining: number; limit: number; unlimited: boolean } | null = null;
