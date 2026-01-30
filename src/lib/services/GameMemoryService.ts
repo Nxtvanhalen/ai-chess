@@ -14,6 +14,13 @@ import {
   GameMemorySnapshot
 } from '@/types';
 
+// UUID v4 regex pattern
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function isValidUUID(str: string): boolean {
+  return UUID_REGEX.test(str);
+}
+
 export class GameMemoryService {
   /**
    * Initialize game memory for a new game
@@ -31,8 +38,10 @@ export class GameMemoryService {
     };
 
     // Only include user_id if it's a valid UUID
-    if (userId) {
+    if (userId && isValidUUID(userId)) {
       insertData.user_id = userId;
+    } else if (userId) {
+      console.log('[GameMemory] Ignoring invalid userId format:', userId);
     }
 
     const { data, error } = await supabase

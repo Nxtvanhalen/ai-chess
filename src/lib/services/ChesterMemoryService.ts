@@ -13,13 +13,24 @@ import {
   GameMemory
 } from '@/types';
 
+// UUID v4 regex pattern
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function isValidUUID(str: string): boolean {
+  return UUID_REGEX.test(str);
+}
+
 export class ChesterMemoryService {
   /**
    * Get or create Chester's long-term memory for a user
    */
   static async getOrCreateMemory(userId?: string | null): Promise<ChesterLongTermMemory | null> {
     // Anonymous users don't get long-term memory
-    if (!userId) {
+    // Also validate that userId is a proper UUID to prevent RLS failures
+    if (!userId || !isValidUUID(userId)) {
+      if (userId) {
+        console.log('[ChesterMemory] Skipping - invalid userId format:', userId);
+      }
       return null;
     }
 
