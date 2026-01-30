@@ -60,3 +60,9 @@ CREATE POLICY "Users can insert game_memory_snapshots to own game_memory"
       AND (game_memory.user_id = auth.uid() OR game_memory.user_id IS NULL)
     )
   );
+
+-- chester_long_term_memory - allow anonymous users to create entries
+DROP POLICY IF EXISTS "Users can create chester_memory entries" ON chester_long_term_memory;
+CREATE POLICY "Users can create chester_memory entries"
+  ON chester_long_term_memory FOR INSERT
+  WITH CHECK (auth.uid() = user_id OR user_id IS NULL);
