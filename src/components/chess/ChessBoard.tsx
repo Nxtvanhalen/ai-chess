@@ -62,8 +62,9 @@ export default function ChessBoard({
         // Mobile landscape: use available height minus some padding
         maxSize = Math.min(viewportHeight - 40, viewportWidth * 0.55 - 40);
       } else if (mobile && !landscape) {
-        // Mobile portrait: optimize for available space in container (52.5% of viewport)
-        maxSize = Math.min(viewportWidth - 20, (viewportHeight * 0.525) - 36);
+        // Mobile portrait: use ONLY viewport width (90vw) - never use height
+        // This prevents resize when iOS address bar hides/shows
+        maxSize = viewportWidth * 0.9;
       } else {
         // Desktop: responsive to container width
         maxSize = Math.min(viewportWidth * 0.55 - 48, viewportHeight - 120);

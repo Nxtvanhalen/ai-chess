@@ -176,7 +176,7 @@ export default function ChatInterface({
 
   return (
     <div className={`chat-interface ${isLandscape ? 'landscape' : 'portrait'}`}>
-      <div 
+      <div
         ref={scrollContainerRef}
         className="chat-messages-container"
         onScroll={handleScroll}
@@ -226,7 +226,7 @@ export default function ChatInterface({
         </button>
       )}
 
-      {/* Input - CSS-only positioning */}
+      {/* Input */}
       <div className="chat-input-container">
         <ChatInput onSendMessage={onSendMessage} disabled={isLoading} />
       </div>

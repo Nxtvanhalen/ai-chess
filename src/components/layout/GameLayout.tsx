@@ -50,7 +50,7 @@ export default function GameLayout({ chessBoard, chat, controls }: GameLayoutPro
             </div>
           )}
 
-          {/* Chat Section - CSS controlled positioning above input */}
+          {/* Chat Section */}
           <div className="chat-section">
             {chat}
           </div>

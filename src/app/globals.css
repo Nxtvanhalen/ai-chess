@@ -3,74 +3,10 @@
 @tailwind utilities;
 
 /* ========================================
-   CHARACTER ANIMATIONS (PHASE 4 - ZERO RISK)
+   CSS VARIABLES
    ======================================== */
 
-@keyframes pawn-pulse {
-
-  0%,
-  100% {
-    filter: brightness(1);
-  }
-
-  50% {
-    filter: brightness(1.25) drop-shadow(0 0 5px rgba(255, 255, 255, 0.4));
-  }
-}
-
-.pawn-pulse {
-  /* No transform! Only light. */
-  animation: pawn-pulse 4s ease-in-out infinite;
-  will-change: filter;
-}
-
-/* Stagger animations for organic feel */
-.pawn-pulse:nth-child(odd) {
-  animation-delay: 0.5s;
-}
-
-.pawn-pulse:nth-child(3n) {
-  animation-delay: 1.2s;
-}
-
-.pawn-pulse:nth-child(7n) {
-  animation-delay: 2.1s;
-}
-
-/* Thinking animation - smooth and mobile-friendly */
-@keyframes thinking-bounce {
-
-  0%,
-  60%,
-  100% {
-    transform: translateY(0);
-    opacity: 0.4;
-  }
-
-  30% {
-    transform: translateY(-8px);
-    opacity: 1;
-  }
-}
-
-.thinking-dot {
-  animation: thinking-bounce 1.4s infinite ease-in-out;
-}
-
-.thinking-dot:nth-child(1) {
-  animation-delay: 0s;
-}
-
-.thinking-dot:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.thinking-dot:nth-child(3) {
-  animation-delay: 0.4s;
-}
-
 :root {
-  /* Futuristic OpenAI colors */
   --background: 0 0% 98%;
   --foreground: 0 0% 8%;
   --card: 0 0% 100%;
@@ -89,8 +25,6 @@
   --input: 220 13% 91%;
   --ring: 215 100% 60%;
   --radius: 1rem;
-
-  /* Futuristic chess colors */
   --chess-dark: 234 25% 15%;
   --chess-light: 45 15% 25%;
   --chess-highlight: 45 93% 58%;
@@ -115,13 +49,11 @@
   --border: 215 27% 12%;
   --input: 215 27% 12%;
   --ring: 215 100% 65%;
-
-  /* Futuristic chess colors dark */
-  --chess-dark: 234 25% 15%;
-  --chess-light: 45 15% 25%;
-  --chess-highlight: 45 93% 58%;
-  --chess-accent: 142 76% 55%;
 }
+
+/* ========================================
+   BASE STYLES
+   ======================================== */
 
 * {
   box-sizing: border-box;
@@ -129,787 +61,90 @@
   margin: 0;
 }
 
-html,
-body {
+html, body {
   max-width: 100vw;
-  overflow-x: hidden;
+  overflow: hidden;
   height: 100%;
-  height: 100dvh;
-  /* Dynamic viewport height - handles keyboard automatically */
   margin: 0;
   padding: 0;
   color-scheme: dark;
-  /* Force dark keyboard on iOS */
-
-  /* ChatGPT-style fixed viewport approach */
   overscroll-behavior: none;
   touch-action: manipulation;
-}
-
-/* Trigger Safari minimal-ui behavior */
-@supports (-webkit-touch-callout: none) {
-  html {
-    height: 100vh;
-    height: -webkit-fill-available;
-  }
-
-  body {
-    min-height: 100vh;
-    min-height: -webkit-fill-available;
-  }
 }
 
 body {
   color: hsl(var(--foreground));
   background: #000000;
-  min-height: 100vh;
-  /* Extend background behind safe areas on iPhone */
-  min-height: calc(100vh + env(safe-area-inset-top) + env(safe-area-inset-bottom));
-  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto,
-    'Helvetica Neue', Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font-feature-settings: 'cv11', 'ss01';
-  font-variant-numeric: tabular-nums;
-
-  /* Fix mobile Chrome display issues */
-  -webkit-overflow-scrolling: touch;
-  -webkit-transform: translate3d(0, 0, 0);
-  transform: translate3d(0, 0, 0);
-
-  /* Create a pseudo-element to extend background behind status bar */
-  position: relative;
-  margin: 0;
-  padding: 0;
 }
 
-body::before {
-  content: '';
-  position: fixed;
-  top: calc(-1 * env(safe-area-inset-top));
-  left: calc(-1 * env(safe-area-inset-left));
-  right: calc(-1 * env(safe-area-inset-right));
-  height: calc(100vh + env(safe-area-inset-top) + env(safe-area-inset-bottom) + 500px);
-  background: #000000;
-  z-index: -1;
-  pointer-events: none;
-}
-
-/* Force background coverage beyond keyboard area */
-body::after {
-  content: '';
-  position: fixed;
-  bottom: -500px;
-  /* Extend 500px below viewport */
-  left: 0;
-  right: 0;
-  height: 500px;
-  background: #000000;
-  z-index: -2;
-  pointer-events: none;
-}
-
-/* Minimize iOS keyboard accessory bar */
-textarea,
-input[type="text"] {
-  -webkit-appearance: none;
-  appearance: none;
-}
-
-/* CRITICAL iOS Keyboard Accessory Bar Minimization */
-@supports (-webkit-touch-callout: none) {
-
-  /* Target iOS Safari specifically */
-  input[type="text"],
-  textarea {
-    /* Remove all iOS input assistance */
-    -webkit-appearance: none !important;
-    appearance: none !important;
-
-    /* Force minimal keyboard UI */
-    -webkit-user-select: text;
-    user-select: text;
-
-    /* Remove any formatting assistance that triggers accessory bar */
-    -webkit-rtl-ordering: logical;
-    -webkit-writing-mode: horizontal-tb;
-    writing-mode: horizontal-tb;
-
-    /* Disable features that create tall accessory bars */
-    -webkit-text-size-adjust: 100%;
-    text-size-adjust: 100%;
-
-    /* Remove input assistance completely */
-    -webkit-touch-callout: none;
-    -webkit-tap-highlight-color: transparent;
-
-    /* Critical: Signal to iOS this is basic text input */
-    font-feature-settings: normal;
-    font-kerning: auto;
-    text-rendering: optimizeLegibility;
-  }
-
-  /* Target the specific input in focus */
-  input[type="text"]:focus,
-  textarea:focus {
-    /* Force GPU compositing to bypass iOS rendering */
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
-    will-change: contents;
-
-    /* Remove any styling that might trigger accessory features */
-    outline: none;
-    border-radius: inherit;
-
-    /* Critical: Ensure iOS treats this as simple text */
-    -webkit-user-modify: read-write;
-  }
-
-  /* Hide any iOS-generated accessory elements */
-  input[type="text"]+*,
-  textarea+* {
-    display: none !important;
-  }
-}
-
-/* Prevent zoom on mobile devices */
-input[type="text"],
-input[type="email"],
-input[type="number"],
-input[type="password"],
-input[type="tel"],
-input[type="url"],
-input[type="search"],
-textarea,
-select {
+/* Prevent zoom on mobile inputs */
+input, textarea, select {
   font-size: 16px !important;
-}
-
-/* Chess board mobile optimizations */
-.chess-board-container {
-  touch-action: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
-/* White chess pieces color matching - target SVG fills */
-.chess-board-container svg path[fill="#ffffff"],
-.chess-board-container svg path[fill="white"],
-.chess-board-container svg path[fill="#fff"] {
-  fill: hsl(45, 15%, 75%) !important;
-}
-
-/* Alternative: Filter approach for white piece images/SVGs */
-.chess-board-container [data-piece*="w"],
-.chess-board-container div[style*="wP"],
-.chess-board-container div[style*="wR"],
-.chess-board-container div[style*="wN"],
-.chess-board-container div[style*="wB"],
-.chess-board-container div[style*="wQ"],
-.chess-board-container div[style*="wK"] {
-  filter: sepia(0.25) brightness(0.85) saturate(0.9);
-}
-
-/* Piece lift and glow animation */
-@keyframes piece-selected {
-  0% {
-    transform: translateY(0) scale(1) rotate(0deg);
-    filter: brightness(1) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
-  }
-
-  50% {
-    transform: translateY(-8px) scale(1.1) rotate(-2deg);
-    filter: brightness(1.3) drop-shadow(0 12px 24px rgba(142, 255, 142, 0.8)) drop-shadow(0 0 20px rgba(142, 255, 142, 1));
-  }
-
-  100% {
-    transform: translateY(-6px) scale(1.08) rotate(0deg);
-    filter: brightness(1.2) drop-shadow(0 10px 20px rgba(142, 255, 142, 0.6)) drop-shadow(0 0 15px rgba(142, 255, 142, 0.8));
-  }
-}
-
-/* Target piece divs (with background-image) within selected squares */
-.chess-board-container [style*="hsla(142, 76%, 55%"] [style*="background-image"],
-.chess-board-container [style*="hsla(142, 76%, 55%"] div[style*="cursor"] {
-  animation: piece-selected 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards,
-    piece-pulse 2s ease-in-out 0.4s infinite !important;
-  transform-origin: center bottom !important;
-}
-
-/* Continuous subtle pulse after selection */
-@keyframes piece-pulse {
-
-  0%,
-  100% {
-    filter: brightness(1.1) drop-shadow(0 8px 16px rgba(142, 255, 142, 0.5));
-  }
-
-  50% {
-    filter: brightness(1.25) drop-shadow(0 10px 20px rgba(142, 255, 142, 0.8));
-  }
-}
-
-/* Move trail animations - source square (yellow) */
-@keyframes trail-from {
-  0% {
-    box-shadow: 0 0 15px rgba(255, 215, 0, 0.4),
-      0 0 30px rgba(255, 215, 0, 0.2),
-      inset 0 0 10px rgba(255, 215, 0, 0.3);
-  }
-
-  50% {
-    box-shadow: 0 0 25px rgba(255, 215, 0, 0.6),
-      0 0 45px rgba(255, 215, 0, 0.3),
-      inset 0 0 15px rgba(255, 215, 0, 0.4);
-  }
-
-  100% {
-    box-shadow: 0 0 15px rgba(255, 215, 0, 0.4),
-      0 0 30px rgba(255, 215, 0, 0.2),
-      inset 0 0 10px rgba(255, 215, 0, 0.3);
-  }
-}
-
-/* Move trail animations - destination square (green) */
-@keyframes trail-to {
-  0% {
-    box-shadow: 0 0 15px rgba(0, 255, 0, 0.4),
-      0 0 30px rgba(0, 255, 0, 0.2),
-      inset 0 0 10px rgba(0, 255, 0, 0.3);
-  }
-
-  50% {
-    box-shadow: 0 0 25px rgba(0, 255, 0, 0.6),
-      0 0 45px rgba(0, 255, 0, 0.3),
-      inset 0 0 15px rgba(0, 255, 0, 0.4);
-  }
-
-  100% {
-    box-shadow: 0 0 15px rgba(0, 255, 0, 0.4),
-      0 0 30px rgba(0, 255, 0, 0.2),
-      inset 0 0 10px rgba(0, 255, 0, 0.3);
-  }
-}
-
-/* Enhanced board notation styling */
-.chess-board-container .notation {
-  font-weight: 800 !important;
-  font-size: 14px !important;
-  color: #000000 !important;
-  text-shadow: none !important;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
-  letter-spacing: 0.5px !important;
-  background: rgba(255, 255, 255, 0.9) !important;
-  border-radius: 6px !important;
-  padding: 3px 6px !important;
-  border: 1.5px solid rgba(255, 255, 255, 1) !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
-}
-
-/* Target specific notation classes if available */
-.chess-board-container [class*="notation"],
-.chess-board-container [class*="coordinate"],
-.chess-board-container [class*="label"],
-.chess-board-container [class*="alpha"],
-.chess-board-container [class*="numeric"] {
-  font-weight: 900 !important;
-  font-size: 15px !important;
-  color: #000000 !important;
-  text-shadow: none !important;
-  background: rgba(255, 255, 255, 0.9) !important;
-  border-radius: 6px !important;
-  padding: 3px 6px !important;
-  backdrop-filter: blur(4px) !important;
-  border: 1.5px solid rgba(255, 255, 255, 1) !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
-}
-
-/* Additional targeting for react-chessboard specific elements */
-.chess-board-container div[style*="position: absolute"] {
-  font-weight: 900 !important;
-  font-size: 16px !important;
-  color: #000000 !important;
-  text-shadow: none !important;
-  background: rgba(255, 255, 255, 0.9) !important;
-  border-radius: 6px !important;
-  padding: 3px 6px !important;
-  border: 1.5px solid rgba(255, 255, 255, 1) !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
-}
-
-/* Smooth scrolling for chat */
-.chat-messages {
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 5rem;
-  /* Space for sticky input */
-  margin-bottom: 0;
-  /* No margin needed with sticky */
-}
-
-/* Safari viewport fix - use dynamic viewport height */
-.h-screen {
-  height: 100vh;
-  height: 100dvh;
-  /* Dynamic viewport height for Safari */
-}
-
-/* Safe area support for modern mobile devices */
-@supports (padding: max(0px)) {
-  .mobile-safe-area-bottom {
-    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
-  }
-
-  .mobile-safe-area-top {
-    padding-top: max(0.5rem, env(safe-area-inset-top));
-  }
-}
-
-/* Ensure proper flexbox behavior on mobile */
-.layout-container {
-  height: 100%;
-  height: 100dvh;
-  overflow: hidden;
-}
-
-/* Removed mobile chat input container positioning to prevent conflicts */
-
-/* Hide scrollbars */
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  /* Internet Explorer 10+ */
-  scrollbar-width: none;
-  /* Firefox */
-}
-
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-  /* Safari and Chrome */
-}
-
-/* High-performance animations with GPU acceleration */
-@keyframes message-appear {
-  0% {
-    opacity: 0;
-    transform: translate3d(0, 40px, 0) scale3d(0.9, 0.9, 1);
-    filter: blur(8px);
-  }
-
-  15% {
-    opacity: 0.1;
-    transform: translate3d(0, 30px, 0) scale3d(0.93, 0.93, 1);
-    filter: blur(6px);
-  }
-
-  40% {
-    opacity: 0.4;
-    transform: translate3d(0, 15px, 0) scale3d(0.96, 0.96, 1);
-    filter: blur(3px);
-  }
-
-  70% {
-    opacity: 0.7;
-    transform: translate3d(0, 5px, 0) scale3d(0.985, 0.985, 1);
-    filter: blur(1px);
-  }
-
-  85% {
-    opacity: 0.9;
-    transform: translate3d(0, 1px, 0) scale3d(0.995, 0.995, 1);
-    filter: blur(0.5px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
-    filter: blur(0);
-  }
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes glow-pulse {
-
-  0%,
-  100% {
-    box-shadow: 0 0 20px hsla(var(--primary), 0.1);
-  }
-
-  50% {
-    box-shadow: 0 0 30px hsla(var(--primary), 0.2);
-  }
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-
-  100% {
-    background-position: 200% 0;
-  }
-}
-
-.message-animate {
-  animation: message-appear 1.2s cubic-bezier(0.05, 0.7, 0.1, 1) !important;
-  animation-fill-mode: both !important;
-}
-
-.animate-fade-in {
-  opacity: 0;
-  animation: fade-in 1s ease-in-out forwards;
-}
-
-.glow-effect {
-  animation: glow-pulse 2s ease-in-out infinite;
-}
-
-.shimmer-bg {
-  background: linear-gradient(90deg,
-      transparent 0%,
-      hsla(var(--primary), 0.1) 50%,
-      transparent 100%);
-  background-size: 200% 100%;
-  animation: shimmer 2s infinite;
-}
-
-/* Markdown styling */
-.markdown-content h1,
-.markdown-content h2,
-.markdown-content h3,
-.markdown-content h4,
-.markdown-content h5,
-.markdown-content h6 {
-  margin-top: 1.5em;
-  margin-bottom: 0.5em;
-  font-weight: 600;
-}
-
-.markdown-content p {
-  margin-bottom: 0 !important;
-}
-
-@media screen and (max-width: 1024px) {
-  .markdown-content p {
-    margin-bottom: 0 !important;
-    margin-top: 0 !important;
-  }
-}
-
-.markdown-content pre {
-  background-color: rgb(var(--muted));
-  border-radius: 0.375rem;
-  padding: 1rem;
-  overflow-x: auto;
-  margin: 1em 0;
-}
-
-.markdown-content code {
-  background-color: rgb(var(--muted));
-  padding: 0.125rem 0.25rem;
-  border-radius: 0.25rem;
-  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-  font-size: 0.875em;
-}
-
-.markdown-content pre code {
-  background-color: transparent;
-  padding: 0;
-  border-radius: 0;
-}
-
-.markdown-content ul,
-.markdown-content ol {
-  margin-left: 1.5em;
-  margin-bottom: 1em;
-}
-
-.markdown-content li {
-  margin-bottom: 0.25em;
-}
-
-.markdown-content blockquote {
-  border-left: 4px solid rgb(var(--border));
-  padding-left: 1em;
-  margin: 1em 0;
-  color: rgb(var(--muted-foreground));
-}
-
-/* Loading dots animation */
-@keyframes loading-dots {
-
-  0%,
-  60%,
-  100% {
-    opacity: 0;
-  }
-
-  30% {
-    opacity: 1;
-  }
-}
-
-.loading-dot {
-  animation: loading-dots 1.4s infinite;
-}
-
-.loading-dot:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.loading-dot:nth-child(3) {
-  animation-delay: 0.4s;
-}
-
-/* Chrome Mobile and iOS specific fixes */
-@supports (-webkit-touch-callout: none) {
-
-  /* iOS Safari and Chrome mobile */
-  html {
-    height: -webkit-fill-available;
-    /* Extend behind safe areas */
-    margin-top: calc(-1 * env(safe-area-inset-top));
-    padding-top: calc(env(safe-area-inset-top) + env(safe-area-inset-top));
-  }
-
-  body {
-    height: 100vh;
-    height: -webkit-fill-available;
-    /* Ensure background covers behind status bar */
-    min-height: calc(100vh + env(safe-area-inset-top));
-  }
-
-  /* Fix viewport issues */
-  * {
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  /* Ensure proper rendering */
-  .chess-board-container,
-  .chat-messages {
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    -webkit-perspective: 1000;
-    perspective: 1000;
-  }
-}
-
-/* Performance optimization classes */
-.gpu-accelerated {
-  transform: translate3d(0, 0, 0);
-  -webkit-transform: translate3d(0, 0, 0);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  perspective: 1000px;
-  -webkit-perspective: 1000px;
-  will-change: transform;
-}
-
-.smooth-transitions {
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    scale 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: transform, opacity, scale;
-}
-
-.momentum-scroll {
-  -webkit-overflow-scrolling: touch;
-  scroll-behavior: smooth;
-  overscroll-behavior: contain;
-}
-
-/* Touch optimization */
-.touch-optimized {
-  -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  user-select: none;
-  touch-action: manipulation;
-}
-
-/* High refresh rate animations */
-@media (prefers-reduced-motion: no-preference) {
-  .high-fps {
-    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  /* 120fps support for capable devices */
-  @supports (animation-timeline: auto) {
-    .high-fps {
-      animation-fill-mode: both;
-      animation-duration: 0.25s;
-    }
-  }
-}
-
-/* Reduced motion support */
-@media (prefers-reduced-motion: reduce) {
-
-  .message-animate,
-  .animate-fade-in,
-  .glow-effect,
-  .shimmer-bg,
-  .thinking-dot,
-  .loading-dot {
-    animation: none !important;
-    transition: none !important;
-  }
-
-  .smooth-transitions {
-    transition: none !important;
-  }
-}
-
-/* Allow proper mobile scrolling while preventing bounce */
-@media screen and (max-width: 1024px) {
-  body {
-    position: relative;
-    width: 100%;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-}
-
-/* Visual indicator for possible moves */
-.possible-move-indicator {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: radial-gradient(circle, hsla(142, 76%, 55%, 0.8), hsla(142, 76%, 55%, 0.4));
-  box-shadow: 0 0 10px hsla(142, 76%, 55%, 0.6);
-  pointer-events: none;
-  animation: pulse-glow 2s infinite;
-}
-
-@keyframes pulse-glow {
-
-  0%,
-  100% {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 0.8;
-  }
-
-  50% {
-    transform: translate(-50%, -50%) scale(1.1);
-    opacity: 1;
-  }
-}
-
-/* Clean mobile styling - removed old conflicting rules */
-@media screen and (max-width: 1023px) {
-
-  /* Remove margins from all chat components in mobile */
-  .chat-message,
-  .loading-indicator {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-  }
-}
-
-/* Mobile landscape orientation optimizations */
-@media screen and (max-width: 1023px) and (orientation: landscape) {
-
-  /* Ensure full viewport usage in landscape */
-  .chess-board-container {
-    height: 100vh !important;
-    max-height: 100vh !important;
-    padding-top: 0.5rem !important;
-  }
-
-  /* Optimize chat for landscape - full height and proper overflow */
-  .mobile-chat-container {
-    height: 100vh !important;
-    max-height: 100vh !important;
-  }
-
-  /* Ensure chat interface uses full height in landscape */
-  .chat-interface-landscape {
-    height: 100vh !important;
-    max-height: 100vh !important;
-    border-top-left-radius: 0 !important;
-    border-top-right-radius: 0 !important;
-  }
-
-  /* Prevent overflow and ensure proper scrolling */
-  .layout-container {
-    overflow: hidden !important;
-    width: 100vw !important;
-    max-width: none !important;
-  }
-
-  /* Make sure the chat messages container fills available space smoothly */
-  .chat-messages {
-    flex: 1 !important;
-    min-height: 0 !important;
-    height: auto !important;
-    max-height: none !important;
-    overflow-y: auto !important;
-    /* Remove any hard stops */
-    margin-top: 0 !important;
-    padding-bottom: 0 !important;
-  }
-
-  /* Ensure smooth flow from messages to input */
-  .chat-interface-landscape .chat-messages {
-    padding-bottom: 0.5rem !important;
-  }
-}
-
-/* Enhanced orientation transition animations */
-@media screen and (max-width: 1023px) {
-  .orientation-transition {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    will-change: width, height, transform;
-  }
-
-  /* Smooth layout transitions on orientation change */
-  .layout-container {
-    transition: flex-direction 0.3s ease-out;
-  }
 }
 
 /* ========================================
-   CHATGPT-STYLE FIXED VIEWPORT CSS LAYOUT
+   ANIMATIONS
    ======================================== */
 
-/* Game Layout - Main Container */
-.game-layout {
-  width: 100vw;
-  height: 100dvh;
-  /* Dynamic viewport height with fallback */
-  height: 100vh;
-  /* Fallback for older browsers */
-  overflow: hidden;
-  position: relative;
-  margin: 0;
-  padding: 0;
-
-  /* Default to flex for all layouts - consistent model */
-  display: flex;
-
-  /* Smooth transitions for responsive behavior */
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-
-  /* GPU acceleration for smooth performance */
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
+@keyframes thinking-bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-8px); opacity: 1; }
 }
 
-/* Desktop Layout */
+.thinking-dot {
+  animation: thinking-bounce 1.4s infinite ease-in-out;
+}
+.thinking-dot:nth-child(1) { animation-delay: 0s; }
+.thinking-dot:nth-child(2) { animation-delay: 0.2s; }
+.thinking-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes message-appear {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.message-animate {
+  animation: message-appear 0.4s ease-out;
+}
+
+@keyframes pawn-pulse {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.25) drop-shadow(0 0 5px rgba(255, 255, 255, 0.4)); }
+}
+
+.pawn-pulse {
+  animation: pawn-pulse 4s ease-in-out infinite;
+}
+
+/* ========================================
+   CHESS BOARD STYLES
+   ======================================== */
+
+.chess-board-container {
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* White pieces color adjustment */
+.chess-board-container [data-piece*="w"] {
+  filter: sepia(0.25) brightness(0.85) saturate(0.9);
+}
+
+/* ========================================
+   GAME LAYOUT - DESKTOP
+   ======================================== */
+
+.game-layout {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  background: #000000;
+}
+
 .layout-desktop {
   display: flex;
   height: 100%;
@@ -922,7 +157,6 @@ select {
   flex-shrink: 0;
   width: 55%;
   border-right: 2px solid rgba(147, 51, 234, 0.3);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
 .board-desktop {
@@ -942,11 +176,12 @@ select {
 .chat-desktop {
   flex: 1;
   min-width: 0;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
 }
 
-/* Mobile Landscape Layout */
+/* ========================================
+   GAME LAYOUT - MOBILE LANDSCAPE
+   ======================================== */
+
 .layout-landscape {
   display: flex;
   height: 100%;
@@ -955,13 +190,9 @@ select {
 
 .board-landscape-wrapper {
   display: flex;
-  flex-direction: row;
-  /* Side-by-side Layout */
   flex-shrink: 0;
   width: 55%;
   border-right: 2px solid rgba(147, 51, 234, 0.3);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .board-landscape {
@@ -972,601 +203,192 @@ select {
   justify-content: center;
 }
 
-.controls-landscape {
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  /* Stack controls vertically on the side */
-  justify-content: center;
-  /* Center them vertically */
-  align-items: center;
-  padding: 0.5rem;
-  background: rgba(0, 0, 0, 0.3);
-  border-left: 1px solid rgba(147, 51, 234, 0.2);
-  /* Separate from board */
-  border-top: none;
-}
-
 .chat-landscape {
   flex: 1;
   min-width: 0;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Transition Zone - Ensure smooth layout transitions */
-@media screen and (min-width: 1023px) and (max-width: 1025px) {
-  .game-layout {
-    /* Force consistent behavior during transition */
-    min-height: 100vh;
-    max-height: 100vh;
-  }
+/* ========================================
+   CHAT INTERFACE - BASE
+   ======================================== */
 
-  .board-desktop-wrapper,
-  .board-landscape-wrapper {
-    min-width: 50%;
-    max-width: 60%;
-  }
-
-  .chat-desktop,
-  .chat-landscape {
-    min-width: 40%;
-    flex: 1;
-  }
-}
-
-/* Mobile Portrait Layout - Consistent Flexbox Approach */
-@media screen and (max-width: 1023px) and (orientation: portrait) {
-
-  /* Use Flexbox for consistent layout model across all breakpoints */
-  .game-layout {
-    display: flex;
-    flex-direction: column;
-    width: 100vw;
-    height: 100dvh;
-    /* Dynamic viewport height with fallback */
-    height: 100vh;
-    /* Fallback for older browsers */
-    overflow: hidden;
-
-    /* Smooth transitions during resize */
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  /* Chess Board Section - Flexbox item with fixed proportion */
-  .chess-board-section {
-    position: relative;
-    width: 100%;
-    height: 52.5%;
-    /* Increased from 45% for better chess board visibility */
-    flex-shrink: 0;
-    /* Prevent shrinking */
-    z-index: 20;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding: max(1rem, env(safe-area-inset-top)) 0.5rem 0.5rem;
-    background: transparent;
-    overflow: hidden;
-    /* Prevent board from overlapping chat section */
-
-    /* Smooth transitions when keyboard appears */
-    transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-      transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  /* Board container - responsive sizing with consistent units */
-  .chess-board-container {
-    width: 100%;
-    max-width: min(90vw, 55vh);
-    /* Testing larger size to maximize space utilization */
-    aspect-ratio: 1;
-    transform: scale(1);
-    transform-origin: center top;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    will-change: transform;
-
-    /* Enhanced mobile styling */
-    touch-action: none;
-    -webkit-user-select: none;
-    user-select: none;
-  }
-
-  /* Controls Section - Between board and chat */
-  .controls-section {
-    flex-shrink: 0;
-    display: flex;
-    justify-content: flex-end;
-    padding: 0.5rem 0.75rem;
-    background: rgba(0, 0, 0, 0.4);
-    border-top: 1px solid rgba(147, 51, 234, 0.2);
-    border-bottom: 1px solid rgba(147, 51, 234, 0.2);
-    z-index: 25;
-    position: relative;
-  }
-
-  /* Chat Section - Flexible item taking remaining space */
-  .chat-section {
-    position: relative;
-    width: 100%;
-    flex: 1;
-    /* Take remaining space */
-    min-height: 0;
-    /* Allow shrinking */
-    z-index: 10;
-    background: #000000;
-
-    /* Smooth transitions */
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    margin: 0;
-    padding: 0;
-
-    /* Ensure no overlap with visual separator */
-    border-top: 1px solid rgba(147, 51, 234, 0.3);
-
-    /* Remove bottom padding - sticky input handles this */
-    padding-bottom: 0;
-  }
-
-  /* Keyboard handling - optimize space usage */
-  .game-layout:focus-within .chess-board-section {
-    height: 50%;
-    /* Keep board visible when typing (was 30%) */
-  }
-
-  /* Removed scale transform - keep board at full size when typing */
-
-  /* Limit chat messages height when keyboard is active */
-  .game-layout:focus-within .chat-messages-container {
-    max-height: 8rem;
-    /* Show only recent messages */
-    overflow-y: auto;
-  }
-
-  .game-layout:focus-within .chat-section {
-    padding-top: 0.25rem;
-    /* Reduce padding to minimize empty space */
-  }
-
-  /* Keyboard Dismiss Overlay - Simplified */
-  .keyboard-dismiss-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 5rem;
-    /* Don't cover input area */
-    z-index: 15;
-    background: transparent;
-    pointer-events: none;
-    /* Only active when input is focused */
-
-    transition: pointer-events 0.1s ease;
-  }
-
-  /* Make overlay active when any input in game layout is focused */
-  .game-layout:focus-within .keyboard-dismiss-overlay {
-    pointer-events: auto;
-  }
-}
-
-/* Chat Interface Styling */
 .chat-interface {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  flex: 1 1 0%;
+  min-height: 0;
   background: #000000;
-  backdrop-filter: blur(12px);
   overflow: hidden;
-  position: relative;
-  border-radius: 0;
-  margin: 0;
-  padding: 0;
-  min-height: 100%;
 }
 
-/* Desktop and landscape chat interface */
-.chat-interface.landscape {
-  border-radius: 1rem;
-}
-
-@media screen and (min-width: 1024px) {
-  .chat-interface {
-    border-radius: 1rem;
-  }
-}
-
-/* Chat Messages Container */
 .chat-messages-container {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
-
-  /* Smooth scrolling */
   -webkit-overflow-scrolling: touch;
-  scroll-behavior: smooth;
   overscroll-behavior: contain;
-
-  /* Performance optimizations */
-  transform: translate3d(0, 0, 0);
-  -webkit-transform: translate3d(0, 0, 0);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
 }
 
-/* Chat Input Container - Fixed positioning */
-.chat-input-container {
-  /* Desktop and landscape - normal flow */
-  position: relative;
-  z-index: 30;
-  background: #000000;
-  margin: 0;
-  padding: 0;
-  border: none;
-}
-
-/* Mobile portrait - sticky at bottom above keyboard */
-@media screen and (max-width: 1023px) and (orientation: portrait) {
-  .chat-input-container {
-    position: sticky !important;
-    left: 0 !important;
-    right: 0 !important;
-    z-index: 999 !important;
-    display: block !important;
-    /* Force display */
-    visibility: visible !important;
-    /* Force visibility */
-    opacity: 1 !important;
-    /* Force opacity */
-
-    /* Use safe-area-inset-bottom for device-specific spacing (iPhone home bar, etc) */
-    /* Plus 16px padding for visual comfort */
-    bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
-
-    /* Reset any transforms */
-    transform: translateY(0) !important;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-
-    background: #000000;
-    padding: 0.25rem;
-    min-height: 4rem;
-    /* Define consistent height */
-  }
-
-  /* Alternative approach using :focus-within for broader support */
-  .chat-section:focus-within .chat-input-container {
-    transform: translateY(calc(-1 * var(--keyboard-height, 0px)));
-  }
-
-  /* Fix chat messages visibility behind sticky input */
-  .chat-messages-container {
-    padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
-    box-sizing: border-box;
-  }
-
-  .chat-messages {
-    padding-bottom: 6rem;
-    /* Increased from 5rem */
-    margin-bottom: 0;
-  }
-}
-
-/* iOS Safari support with proper spacing */
-@supports (-webkit-touch-callout: none) {
-  @media screen and (max-width: 1023px) and (orientation: portrait) {
-    .chat-messages-container {
-      padding-bottom: calc(4rem + env(safe-area-inset-bottom, 1rem));
-    }
-
-    .chat-messages {
-      padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
-    }
-  }
-}
-
-/* Chat Input Styling */
-.chat-input {
-  background: #000000;
-  backdrop-filter: blur(4px);
-  transition: all 0.3s ease-out;
-}
-
-.chat-input.landscape {
+.chat-messages {
   padding: 0.5rem;
 }
 
-.chat-input.portrait {
-  padding: 0.375rem 0.5rem;
+.chat-input-container {
+  flex-shrink: 0;
+  background: #000000;
+  padding: 0.5rem;
+  border-top: 1px solid rgba(147, 51, 234, 0.2);
 }
 
-@media screen and (min-width: 1024px) {
-  .chat-input.portrait {
-    padding: 1.5rem;
-  }
-}
-
-/* Input Wrapper */
+/* Input wrapper */
 .input-wrapper {
   position: relative;
-  max-width: 48rem;
-  margin: 0 auto;
-  padding: 0 0.5rem;
   display: flex;
   align-items: center;
 }
 
-.chat-input.landscape .input-wrapper {
-  width: 100%;
-  max-width: none;
-  padding: 0 0.5rem;
-}
-
-/* Text Input Styling */
 .chat-text-input {
   width: 100%;
   border-radius: 0.75rem;
   border: 2px solid rgba(147, 51, 234, 0.3);
   background: rgba(15, 23, 42, 0.8);
-  backdrop-filter: blur(4px);
-  padding: 0.375rem 0.875rem;
-  padding-right: 3rem;
+  padding: 0.5rem 3rem 0.5rem 0.75rem;
   color: rgb(241 245 249);
-  font-size: 0.8125rem;
-  /* Slightly smaller for mobile */
-  font-weight: 500;
-
-  /* iOS optimizations */
-  -webkit-appearance: none;
-  appearance: none;
-  -webkit-user-select: text;
-  user-select: text;
-
-  /* Smooth transitions */
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-
-  /* Touch optimizations */
-  touch-action: manipulation;
+  font-size: 16px;
   min-height: 44px;
+  -webkit-appearance: none;
 }
 
 .chat-text-input:focus {
   outline: none;
   border-color: rgb(147 51 234);
-  box-shadow: 0 0 0 2px rgba(147, 51, 234, 0.5),
-    0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
-.chat-text-input::placeholder {
-  color: rgb(148 163 184);
-}
-
-.chat-text-input:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* Desktop styling */
-@media screen and (min-width: 1024px) {
-  .chat-text-input {
-    border-radius: 1rem;
-    padding: 1.5rem 1.5rem;
-    padding-right: 4.5rem;
-    font-size: 1.125rem;
-  }
-}
-
-/* Send Button Styling */
 .chat-send-button {
   position: absolute;
-  right: 0.5rem;
-  bottom: 0.5rem;
+  right: 0.25rem;
   padding: 0.5rem;
   border-radius: 0.5rem;
   background: linear-gradient(to right, rgb(37 99 235), rgb(147 51 234));
   color: white;
   border: none;
   cursor: pointer;
-
-  /* Smooth interactions */
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-
-  /* Performance optimizations */
-  transform: translate3d(0, 0, 0);
-  will-change: transform, box-shadow;
-
-  /* Touch optimization */
   min-width: 44px;
   min-height: 44px;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.chat-send-button:hover:not(:disabled) {
-  background: linear-gradient(to right, rgb(29 78 216), rgb(126 34 206));
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  transform: scale(1.05);
-}
-
-.chat-send-button:active {
-  transform: scale(0.95);
 }
 
 .chat-send-button:disabled {
   opacity: 0.3;
   cursor: not-allowed;
-  transform: none !important;
 }
 
-/* Desktop send button - positioned inside input */
-@media screen and (min-width: 1024px) {
-  .chat-send-button {
-    position: absolute;
-    right: 1.5rem;
-    top: 50%;
-    bottom: auto;
-    transform: translateY(-50%);
-    padding: 0.75rem;
-    border-radius: 0.75rem;
-  }
+/* ========================================
+   MOBILE PORTRAIT - SINGLE PAGE APP LAYOUT
+   This is the ONE source of truth for mobile portrait.
+   No other rules should affect this layout.
+   ======================================== */
 
-  .chat-send-button:hover:not(:disabled) {
-    transform: translateY(-50%) scale(1.05);
-  }
-
-  .chat-send-button:active {
-    transform: translateY(-50%) scale(0.95);
-  }
-}
-
-/* Scroll Button Enhancement */
-.chat-interface .scroll-button {
-  position: absolute;
-  bottom: 5rem;
-  right: 1rem;
-  z-index: 10;
-  padding: 0.75rem;
-  background: linear-gradient(to right, rgb(37 99 235), rgb(147 51 234));
-  color: white;
-  border-radius: 50%;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  min-width: 48px;
-  min-height: 48px;
-
-  transform: translate3d(0, 0, 0);
-  will-change: transform;
-}
-
-.chat-interface .scroll-button:hover {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  transform: scale(1.05);
-}
-
-.chat-interface .scroll-button:active {
-  transform: scale(0.95);
-}
-
-/* Dynamic Keyboard Height Support */
-@supports (height: 100dvh) {
-
-  /* Modern browsers with dynamic viewport support */
+@media screen and (max-width: 1023px) and (orientation: portrait) {
   .game-layout {
-    height: 100dvh;
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
   }
 
-  @media screen and (max-width: 1023px) and (orientation: portrait) {
-    .chat-section {
-      /* Chat section adjusts automatically with dvh */
-      bottom: 0;
-    }
-  }
-}
-
-/* Fallback for older browsers */
-@supports not (height: 100dvh) {
-  @media screen and (max-width: 1023px) and (orientation: portrait) {
-
-    /* Use JavaScript-provided viewport height */
-    .game-layout {
-      height: calc(var(--vh, 1vh) * 100);
-    }
-  }
-}
-
-/* Enhanced iOS Safari Support */
-@supports (-webkit-touch-callout: none) {
-  /* iOS Safari specific optimizations */
-  @media screen and (max-width: 1023px) and (orientation: portrait) {
-
-    /* Consistent viewport approach for iOS */
-    .game-layout {
-      height: 100dvh;
-      /* Use dynamic viewport height */
-      height: 100vh;
-      /* Fallback */
-      min-height: 100vh;
-      /* Ensure minimum height */
-    }
-
-    /* Prevent iOS Safari layout shifts */
-    .chat-input-container {
-      position: fixed;
-      bottom: env(safe-area-inset-bottom);
-
-      /* Use visual viewport when available */
-      bottom: calc(env(safe-area-inset-bottom) + env(keyboard-height, 0px));
-    }
-
-    /* Ensure proper safe area handling */
-    .chess-board-section {
-      padding-top: max(1rem, env(safe-area-inset-top));
-    }
-  }
-}
-
-/* High refresh rate optimization */
-@media (prefers-reduced-motion: no-preference) {
-
-  .chat-text-input,
-  .chat-send-button,
-  .chess-board-container,
-  .chat-section,
   .chess-board-section {
-    will-change: transform, opacity;
+    flex: 0 0 auto;
+    padding-top: env(safe-area-inset-top, 0px);
   }
-}
 
-/* Reduced motion accessibility */
-@media (prefers-reduced-motion: reduce) {
+  .chess-board-container {
+    width: 90vw;
+    height: 90vw;
+    margin: 0 auto;
+  }
 
-  .chat-text-input,
-  .chat-send-button,
-  .chess-board-container,
-  .chat-section,
-  .chess-board-section,
+  .controls-section {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: flex-end;
+    padding: 0.25rem 0.5rem;
+    background: rgba(0, 0, 0, 0.6);
+  }
+
+  .chat-section {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
   .keyboard-dismiss-overlay {
-    transition: none !important;
+    display: none;
   }
 }
 
 /* ========================================
-   CHARACTER ANIMATIONS (PHASE 4 - ZERO RISK)
+   MOBILE LANDSCAPE
    ======================================== */
 
-@keyframes piece-pulse {
-
-  0%,
-  100% {
-    /* Baseline */
-    filter: brightness(1.0) drop-shadow(0 0 5px rgba(255, 255, 255, 0.4));
-  }
-
-  50% {
-    /* Peak - Stronger pulse for visibility */
-    filter: brightness(1.4) drop-shadow(0 0 5px rgba(255, 255, 255, 0.4));
+@media screen and (max-width: 1023px) and (orientation: landscape) {
+  .chess-board-container {
+    height: 90vh;
+    width: 90vh;
   }
 }
 
-.piece-pulse {
-  /* Removed GPU hints to prevent potential filter stacking context issues */
-  animation: piece-pulse 3s ease-in-out infinite;
-  will-change: filter;
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 
-/* Stagger animations for organic feel */
-.piece-pulse:nth-child(odd) {
-  animation-delay: 0.5s;
+.gpu-accelerated {
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
 }
 
-.piece-pulse:nth-child(3n) {
-  animation-delay: 1.2s;
+/* ========================================
+   MARKDOWN CONTENT
+   ======================================== */
+
+.markdown-content p {
+  margin-bottom: 0;
 }
 
-.piece-pulse:nth-child(7n) {
-  animation-delay: 2.1s;
+.markdown-content pre {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 0.375rem;
+  padding: 1rem;
+  overflow-x: auto;
+  margin: 0.5em 0;
+}
+
+.markdown-content code {
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-family: monospace;
+  font-size: 0.875em;
+}
+
+/* ========================================
+   REDUCED MOTION
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .message-animate,
+  .thinking-dot,
+  .pawn-pulse {
+    animation: none;
+  }
 }
