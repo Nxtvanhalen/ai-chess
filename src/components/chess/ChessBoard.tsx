@@ -56,15 +56,18 @@ export default function ChessBoard({
       setIsMobile(mobile);
       setIsLandscape(landscape);
 
+      // On mobile portrait, we let CSS (flex + aspect-ratio) handle the sizing
+      // so we don't need to calculate a specific pixel width here.
+      if (mobile && !landscape) {
+        setBoardWidth(0); // value 0 acts as a flag to disable inline styles
+        return;
+      }
+
       let maxSize;
 
       if (mobile && landscape) {
         // Mobile landscape: use available height minus some padding
         maxSize = Math.min(viewportHeight - 40, viewportWidth * 0.55 - 40);
-      } else if (mobile && !landscape) {
-        // Mobile portrait: use ONLY viewport width (90vw) - never use height
-        // This prevents resize when iOS address bar hides/shows
-        maxSize = viewportWidth * 0.9;
       } else {
         // Desktop: responsive to container width
         maxSize = Math.min(viewportWidth * 0.55 - 48, viewportHeight - 120);
@@ -427,11 +430,11 @@ export default function ChessBoard({
         ? 'p-2 h-full'
         : 'p-1 lg:p-6 pt-2 lg:pt-6'
         }`}
-      style={{
+      style={boardWidth > 0 ? {
         height: isMobile && isLandscape ? '100vh' : `${boardWidth + 8}px`,
         minHeight: isMobile && isLandscape ? '100vh' : 'auto'
-      }}>
-      <div ref={boardContainerRef} style={{ width: boardWidth, height: boardWidth }} className="relative">
+      } : undefined}>
+      <div ref={boardContainerRef} style={boardWidth > 0 ? { width: boardWidth, height: boardWidth } : { width: '100%', height: '100%' }} className="relative">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-2xl pointer-events-none" />
         <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl opacity-10 blur-sm pointer-events-none" />
         <Chessboard

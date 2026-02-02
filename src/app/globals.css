@@ -293,18 +293,31 @@ input, textarea, select {
   .game-layout {
     position: fixed;
     inset: 0;
+    height: 100vh; /* Fallback */
+    height: 100dvh;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
   }
 
   .chess-board-section {
     flex: 0 0 auto;
+    width: 100%;
+    /* Max height constraint to ensure chat space (approx 55% of screen max) */
+    max-height: 55vh; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding-top: env(safe-area-inset-top, 0px);
+    background: #000;
   }
 
+  /* Board container matches the section's constraints */
   .chess-board-container {
-    width: 90vw;
-    height: 90vw;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    max-height: 100%; /* Ensure it doesn't overflow the section */
     margin: 0 auto;
   }
 
@@ -318,10 +331,15 @@ input, textarea, select {
 
   .chat-section {
     flex: 1;
-    min-height: 0;
+    min-height: 0; /* Critical for flex scrolling */
     display: flex;
     flex-direction: column;
     padding-bottom: env(safe-area-inset-bottom, 0px);
+    overflow: hidden;
+  }
+
+  .chat-interface {
+    height: 100%;
   }
 
   .keyboard-dismiss-overlay {
