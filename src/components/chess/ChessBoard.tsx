@@ -67,7 +67,8 @@ export default function ChessBoard({
 
       if (mobile && landscape) {
         // Mobile landscape: use available height minus some padding
-        maxSize = Math.min(viewportHeight - 40, viewportWidth * 0.55 - 40);
+        // Wrapper is 50%, so we must ensure board is smaller (0.48) to fit
+        maxSize = Math.min(viewportHeight - 20, viewportWidth * 0.48 - 20);
       } else {
         // Desktop: responsive to container width
         maxSize = Math.min(viewportWidth * 0.55 - 48, viewportHeight - 120);
@@ -76,9 +77,24 @@ export default function ChessBoard({
       setBoardWidth(Math.floor(Math.max(maxSize, 300))); // Minimum size of 300px
     };
 
-    updateBoardSize();
-    window.addEventListener('resize', updateBoardSize);
-    return () => window.removeEventListener('resize', updateBoardSize);
+    updateBoardSize(); // Initial call
+
+    // Enhanced resize handler with debounce and orientation support
+    let resizeTimer: NodeJS.Timeout;
+    const handleResize = () => {
+      clearTimeout(resizeTimer);
+      // Small debounce to wait for orientation transition
+      resizeTimer = setTimeout(updateBoardSize, 100);
+    };
+
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
+      clearTimeout(resizeTimer);
+    };
   }, []);
 
   // Handle orientation changes - wait for CSS transitions to complete
@@ -431,8 +447,9 @@ export default function ChessBoard({
         : 'p-1 lg:p-6 pt-2 lg:pt-6'
         }`}
       style={boardWidth > 0 ? {
-        height: isMobile && isLandscape ? '100vh' : `${boardWidth + 8}px`,
-        minHeight: isMobile && isLandscape ? '100vh' : 'auto'
+        width: `${boardWidth}px`,
+        height: `${boardWidth + 8}px`,
+        minHeight: 'auto'
       } : undefined}>
       <div ref={boardContainerRef} style={boardWidth > 0 ? { width: boardWidth, height: boardWidth } : { width: '100%', height: '100%' }} className="relative">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-2xl pointer-events-none" />
