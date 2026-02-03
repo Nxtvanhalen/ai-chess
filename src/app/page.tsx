@@ -649,17 +649,21 @@ export default function Home() {
   );
 
   const handleRestart = useCallback(async () => {
-    // Reset game state
-    checkmateHandledRef.current = false;
+    // Reset game state - set position FIRST to prevent ChessBoard from re-detecting checkmate
+    const startingFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+    setCurrentPosition(startingFen);
     setGameOver({ checkmate: false });
     setMoveCount(0);
     gameStartTimeRef.current = Date.now();
+
+    // Only reset the ref AFTER position is updated to starting position
+    checkmateHandledRef.current = false;
 
     try {
       // Create new game
       const newGame = await createGame('white');
       setCurrentGameId(newGame.id);
-      setCurrentPosition(newGame.fen);
+      // Position already set to starting FEN above
 
       // Initialize game memory
       try {
