@@ -54,11 +54,11 @@ const securityHeaders = [
     key: 'Content-Security-Policy',
     value: [
       "default-src 'self';",
-      "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://va.vercel-scripts.com https://*.sentry.io;",
+      "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://va.vercel-scripts.com https://*.sentry.io https://www.googletagmanager.com;",
       "style-src 'self' 'unsafe-inline';",
-      "img-src 'self' blob: data: https://*.supabase.co;",
+      "img-src 'self' blob: data: https://*.supabase.co https://www.googletagmanager.com;",
       "font-src 'self';",
-      "connect-src 'self' https://*.supabase.co https://api.openai.com https://*.sentry.io https://*.ingest.sentry.io;",
+      "connect-src 'self' https://*.supabase.co https://api.openai.com https://*.sentry.io https://*.ingest.sentry.io https://www.google-analytics.com https://www.googletagmanager.com;",
       "frame-ancestors 'none';",
       "worker-src 'self' blob:;",
       // Only upgrade requests in production
