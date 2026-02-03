@@ -2,6 +2,26 @@ import OpenAI from 'openai';
 import { withOpenAIRetry } from '@/lib/utils/retry';
 
 let openaiClient: OpenAI | null = null;
+let deepseekClient: OpenAI | null = null;
+
+export function getDeepSeekClient() {
+  if (!deepseekClient) {
+    const apiKey = process.env.DEEPSEEK_API_KEY;
+
+    if (!apiKey) {
+      throw new Error('DEEPSEEK_API_KEY environment variable is not set');
+    }
+
+    deepseekClient = new OpenAI({
+      apiKey: apiKey,
+      baseURL: 'https://api.deepseek.com',
+      timeout: 30000,
+      maxRetries: 0,
+    });
+  }
+
+  return deepseekClient;
+}
 
 export function getOpenAIClient() {
   if (!openaiClient) {

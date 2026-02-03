@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { PositionAnalyzer } from '@/lib/chess/positionAnalyzer';
 import { formatMoveContext } from '@/lib/openai/chess-butler-prompt';
-import { getOpenAIClient } from '@/lib/openai/client';
+import { getDeepSeekClient } from '@/lib/openai/client';
 import { checkRateLimitRedis, getClientIPFromRequest, getRateLimitHeadersRedis } from '@/lib/redis';
 import { engineMoveAnalysisSchema, validateRequest } from '@/lib/validation/schemas';
 
@@ -105,9 +105,10 @@ export async function POST(request: NextRequest) {
         ? '\n\nTACTICAL OPPORTUNITY: Look for active play and threats'
         : '\n\nSTRATEGIC POSITION: Focus on piece activity, king safety, or pawn structure';
 
-    const openai = getOpenAIClient();
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-5.2-2025-12-11',
+    const deepseek = getDeepSeekClient();
+    console.log('[Engine Move Analysis] Using DeepSeek v3 model');
+    const completion = await deepseek.chat.completions.create({
+      model: 'deepseek-chat',
       messages: [
         { role: 'system', content: systemPrompt },
         {
