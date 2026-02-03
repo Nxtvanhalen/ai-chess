@@ -53,7 +53,7 @@ export default function SignupPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0d0d1a] via-[#1a1a2e] to-[#16162a] px-4">
+      <div className="min-h-dvh h-dvh flex items-center justify-center bg-gradient-to-br from-[#0d0d1a] via-[#1a1a2e] to-[#16162a] px-4 py-8 overflow-y-auto">
         <div className="w-full max-w-md">
           <div className="bg-[#1e1e3f]/80 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-purple-500/20 text-center">
             <div className="text-5xl mb-4">✉️</div>
@@ -76,7 +76,7 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0d0d1a] via-[#1a1a2e] to-[#16162a] px-4">
+    <div className="min-h-dvh h-dvh flex items-center justify-center bg-gradient-to-br from-[#0d0d1a] via-[#1a1a2e] to-[#16162a] px-4 py-8 overflow-y-auto">
       <div className="w-full max-w-md">
         {/* Logo/Title */}
         <div className="text-center mb-8">

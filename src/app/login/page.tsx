@@ -40,8 +40,8 @@ function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0d0d1a] via-[#1a1a2e] to-[#16162a] px-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-dvh h-dvh flex items-center justify-center bg-gradient-to-br from-[#0d0d1a] via-[#1a1a2e] to-[#16162a] px-4 py-8 overflow-y-auto">
+      <div className="w-full max-w-md my-auto">
         {/* Logo/Title */}
         <div className="text-center mb-8">
           <div className="text-4xl mb-2">♟️</div>
