@@ -6,7 +6,7 @@ export enum HapticPattern {
   Success = 'success',
   Warning = 'warning',
   Error = 'error',
-  Selection = 'selection'
+  Selection = 'selection',
 }
 
 class HapticManager {
@@ -72,25 +72,25 @@ class HapticManager {
     switch (pattern) {
       case HapticPattern.Light:
         return this.isIOS ? 50 : [50];
-      
+
       case HapticPattern.Medium:
         return this.isIOS ? 100 : [100];
-      
+
       case HapticPattern.Heavy:
         return this.isIOS ? 200 : [200];
-      
+
       case HapticPattern.Success:
         return this.isIOS ? [50, 50, 100] : [70, 50, 70, 50, 120];
-      
+
       case HapticPattern.Warning:
         return this.isIOS ? [100, 100] : [150, 100, 150];
-      
+
       case HapticPattern.Error:
         return this.isIOS ? [200, 100, 200] : [250, 100, 250, 100, 250];
-      
+
       case HapticPattern.Selection:
         return this.isIOS ? 30 : [30];
-      
+
       default:
         return 50;
     }
@@ -123,16 +123,22 @@ class HapticManager {
     }
   }
 
-  private async triggerIOSHaptic(pattern: HapticPattern, vibrationPattern: number | number[]): Promise<boolean> {
+  private async triggerIOSHaptic(
+    _pattern: HapticPattern,
+    vibrationPattern: number | number[],
+  ): Promise<boolean> {
     // Try iOS Haptic Feedback API first (iOS 10+)
-    if ((window as any).DeviceMotionEvent && typeof (window as any).DeviceMotionEvent.requestPermission === 'function') {
+    if (
+      (window as any).DeviceMotionEvent &&
+      typeof (window as any).DeviceMotionEvent.requestPermission === 'function'
+    ) {
       try {
         // For iOS 13+ with permission model
         const permission = await (window as any).DeviceMotionEvent.requestPermission();
         if (permission !== 'granted') {
           return this.fallbackToVibration(vibrationPattern);
         }
-      } catch (error) {
+      } catch (_error) {
         // Fallback to vibration
         return this.fallbackToVibration(vibrationPattern);
       }
@@ -146,7 +152,7 @@ class HapticManager {
         const result = navigator.vibrate(vibrationPattern);
         return result !== false;
       }
-    } catch (error) {
+    } catch (_error) {
       // Fallback to basic vibration
       return this.fallbackToVibration(vibrationPattern);
     }
@@ -159,7 +165,7 @@ class HapticManager {
       try {
         const result = navigator.vibrate(pattern);
         return result !== false;
-      } catch (error) {
+      } catch (_error) {
         return false;
       }
     }
@@ -226,7 +232,7 @@ class HapticManager {
     return {
       isIOS: this.isIOS,
       isAndroid: this.isAndroid,
-      isSupported: this.isSupported
+      isSupported: this.isSupported,
     };
   }
 }

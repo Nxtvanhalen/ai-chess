@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import LoginGate from '@/components/auth/LoginGate';
 
@@ -30,7 +29,7 @@ describe('LoginGate', () => {
     render(
       <LoginGate>
         <div>Game Content</div>
-      </LoginGate>
+      </LoginGate>,
     );
 
     expect(screen.getByText('Loading Chester AI Chess...')).toBeInTheDocument();
@@ -46,7 +45,7 @@ describe('LoginGate', () => {
     render(
       <LoginGate>
         <div>Game Content</div>
-      </LoginGate>
+      </LoginGate>,
     );
 
     expect(mockPush).toHaveBeenCalledWith('/login');
@@ -62,7 +61,7 @@ describe('LoginGate', () => {
     render(
       <LoginGate>
         <div>Game Content</div>
-      </LoginGate>
+      </LoginGate>,
     );
 
     expect(screen.getByText('Game Content')).toBeInTheDocument();
@@ -78,7 +77,7 @@ describe('LoginGate', () => {
     render(
       <LoginGate>
         <div>Game Content</div>
-      </LoginGate>
+      </LoginGate>,
     );
 
     expect(mockPush).not.toHaveBeenCalled();

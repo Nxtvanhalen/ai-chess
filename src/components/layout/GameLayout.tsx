@@ -1,8 +1,8 @@
 'use client';
 
-import { ReactNode } from 'react';
-import { useDeviceDetection } from '@/hooks/useKeyboardManager';
+import type { ReactNode } from 'react';
 import { PWAManager } from '@/components/pwa';
+import { useDeviceDetection } from '@/hooks/useKeyboardManager';
 
 interface GameLayoutProps {
   chessBoard: ReactNode;
@@ -38,22 +38,14 @@ export default function GameLayout({ chessBoard, chat, controls }: GameLayoutPro
         <>
           {/* Chess Board Section - Pure CSS positioning */}
           <div className="chess-board-section">
-            <div className="chess-board-container">
-              {chessBoard}
-            </div>
+            <div className="chess-board-container">{chessBoard}</div>
           </div>
 
           {/* Controls Section - Between board and chat */}
-          {controls && (
-            <div className="controls-section">
-              {controls}
-            </div>
-          )}
+          {controls && <div className="controls-section">{controls}</div>}
 
           {/* Chat Section */}
-          <div className="chat-section">
-            {chat}
-          </div>
+          <div className="chat-section">{chat}</div>
 
           {/* Keyboard dismiss overlay - only visible when input is focused */}
           <div
@@ -68,14 +60,10 @@ export default function GameLayout({ chessBoard, chat, controls }: GameLayoutPro
       {isMobile && isLandscape && (
         <div className="layout-landscape">
           <div className="board-landscape-wrapper">
-            <div className="board-landscape">
-              {chessBoard}
-            </div>
+            <div className="board-landscape">{chessBoard}</div>
             {/* Controls intentionally HIDDEN to maximize space and prevent overlap */}
           </div>
-          <div className="chat-landscape">
-            {chat}
-          </div>
+          <div className="chat-landscape">{chat}</div>
         </div>
       )}
 
@@ -83,19 +71,17 @@ export default function GameLayout({ chessBoard, chat, controls }: GameLayoutPro
       {!isMobile && (
         <div className="layout-desktop">
           <div className="board-desktop-wrapper">
-            <div className="board-desktop">
-              {chessBoard}
-            </div>
+            <div className="board-desktop">{chessBoard}</div>
             {controls && (
               <div className="controls-desktop">
                 {controls}
-                <div className="text-xs text-slate-500 mt-4 text-center font-mono select-none opacity-50">System v2.19 (Polished Avatar)</div>
+                <div className="text-xs text-slate-500 mt-4 text-center font-mono select-none opacity-50">
+                  System v2.19 (Polished Avatar)
+                </div>
               </div>
             )}
           </div>
-          <div className="chat-desktop">
-            {chat}
-          </div>
+          <div className="chat-desktop">{chat}</div>
         </div>
       )}
     </div>

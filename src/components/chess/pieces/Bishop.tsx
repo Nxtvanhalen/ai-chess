@@ -1,19 +1,17 @@
-import React from 'react';
-import { PieceProps } from './types';
+import type React from 'react';
+import type { PieceProps } from './types';
 
 export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   return (
-    <svg 
-      viewBox="0.00 0.00 677.00 369.00" 
-      style={style} 
+    <svg
+      viewBox="0.00 0.00 677.00 369.00"
+      style={style}
       className={className}
       xmlns="http://www.w3.org/2000/svg"
     >
-      
-
-
-<g fill="#13273f">
-<path d="
+      <g fill="#13273f">
+        <path
+          d="
   M 355.44 105.23
   Q 354.16 105.90 353.88 107.12
   A 0.65 0.64 -72.9 0 0 354.27 107.87
@@ -1199,8 +1197,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   L 298.54 299.19
   Q 297.70 298.81 296.54 299.07
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 347.09 101.00
   C 347.02 99.13 346.74 97.13 348.71 96.52
   A 0.48 0.48 0.0 0 1 349.32 97.07
@@ -1209,9 +1208,17 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.48 0.48 0.0 0 1 346.99 105.06
   Q 347.20 103.92 347.09 101.00
   Z"
-/>
-<rect x="-0.88" y="-4.31" transform="translate(329.11,101.44) rotate(-2.0)" width="1.76" height="8.62" rx="0.80"/>
-<path d="
+        />
+        <rect
+          x="-0.88"
+          y="-4.31"
+          transform="translate(329.11,101.44) rotate(-2.0)"
+          width="1.76"
+          height="8.62"
+          rx="0.80"
+        />
+        <path
+          d="
   M 344.76 99.08
   A 0.29 0.29 0.0 0 1 345.03 99.38
   L 344.72 107.19
@@ -1222,10 +1229,11 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.29 0.29 0.0 0 1 343.48 99.03
   L 344.76 99.08
   Z"
-/>
-</g>
-<g fill="#eed699">
-<path d="
+        />
+      </g>
+      <g fill="#eed699">
+        <path
+          d="
   M 339.25 39.16
   Q 337.92 45.48 338.44 52.80
   Q 336.44 52.44 335.15 52.93
@@ -1238,8 +1246,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 1.57 1.55 62.5 0 1 334.39 42.32
   Q 336.76 38.90 339.25 39.16
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 338.28 54.55
   L 338.19 70.75
   Q 337.62 70.96 337.08 70.92
@@ -1256,8 +1265,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.63 0.63 0.0 0 1 336.97 54.49
   L 338.28 54.55
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 338.49 72.70
   L 338.54 79.55
   L 334.62 79.64
@@ -1270,8 +1280,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.47 0.47 0.0 0 0 335.22 72.50
   L 338.49 72.70
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 265.18 79.06
   Q 266.95 85.37 269.58 92.32
   Q 270.10 93.69 268.28 94.73
@@ -1280,8 +1291,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   Q 265.54 85.33 262.99 81.65
   Q 264.74 82.06 265.18 79.06
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 281.45 105.98
   Q 280.51 106.63 279.89 106.31
   A 0.43 0.42 -80.7 0 1 279.67 105.99
@@ -1293,8 +1305,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   Q 283.60 96.52 282.46 98.72
   Q 281.32 100.91 281.45 105.98
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 338.73 81.73
   Q 339.60 83.11 338.25 84.15
   Q 337.87 84.44 336.22 84.57
@@ -1304,8 +1317,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.81 0.79 86.8 0 1 324.34 83.45
   L 338.73 81.73
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 281.75 113.60
   L 282.43 117.01
   Q 281.79 117.36 281.25 117.28
@@ -1314,16 +1328,18 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.58 0.58 0.0 0 1 279.85 113.62
   Q 280.64 113.35 281.75 113.60
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 313.10 113.37
   L 309.60 121.99
   A 0.73 0.72 26.0 0 1 308.57 122.34
   L 302.83 119.09
   Q 308.32 114.38 313.10 113.37
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 284.06 119.51
   L 286.95 150.45
   Q 286.12 150.89 285.54 150.78
@@ -1331,8 +1347,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   Q 283.44 135.21 281.62 120.46
   Q 281.55 119.90 284.06 119.51
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 338.69 129.93
   Q 338.99 132.26 338.66 135.00
   Q 338.47 136.60 339.68 137.64
@@ -1346,24 +1363,27 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   Q 332.66 131.73 330.73 125.90
   L 338.69 129.93
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 304.38 151.45
   Q 304.01 152.58 301.63 152.60
   L 295.86 149.28
   A 0.35 0.35 0.0 0 1 296.01 148.63
   Q 300.49 148.38 304.38 151.45
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 386.06 155.09
   L 374.21 154.76
   L 382.10 148.88
   A 0.54 0.53 -37.8 0 1 382.83 148.97
   Q 384.98 151.57 386.06 155.09
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 325.75 169.49
   L 326.63 167.42
   A 0.47 0.46 20.4 0 0 326.34 166.80
@@ -1376,8 +1396,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.37 0.37 0.0 0 1 330.78 171.20
   L 325.75 169.49
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 336.66 174.14
   A 4.84 4.69 87.5 0 1 333.79 170.13
   Q 337.06 168.53 338.65 165.27
@@ -1385,8 +1406,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 2.42 2.41 -37.5 0 1 340.01 171.12
   L 336.66 174.14
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 302.55 276.82
   Q 302.10 278.42 300.59 277.66
   A 0.46 0.45 -80.1 0 1 300.35 277.31
@@ -1400,8 +1422,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   Q 300.68 265.66 301.21 270.50
   Q 301.62 274.19 302.55 276.82
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 302.80 183.25
   L 302.78 214.91
   Q 301.16 218.08 299.33 219.30
@@ -1409,8 +1432,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   Q 298.07 196.57 298.51 180.05
   L 302.80 183.25
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 338.39 205.09
   L 338.93 209.24
   L 328.16 200.78
@@ -1420,8 +1444,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.98 0.98 0.0 0 0 331.55 199.81
   L 338.39 205.09
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 357.33 220.43
   Q 357.36 220.99 356.96 221.30
   Q 356.34 221.78 356.28 221.96
@@ -1434,8 +1459,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   Q 352.35 223.89 355.67 220.16
   Q 356.21 219.56 357.33 220.43
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 312.22 282.01
   L 309.54 287.91
   L 304.82 287.68
@@ -1444,10 +1470,11 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 1.25 1.23 16.7 0 1 307.47 282.86
   L 312.22 282.01
   Z"
-/>
-</g>
-<g fill="#8b734f">
-<path d="
+        />
+      </g>
+      <g fill="#8b734f">
+        <path
+          d="
   M 353.34 57.67
   L 344.74 46.31
   Q 344.54 45.10 344.66 44.58
@@ -1463,8 +1490,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 1.98 1.97 46.6 0 0 357.13 65.78
   Q 356.00 61.68 353.34 57.67
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 293.77 67.61
   L 298.07 78.01
   A 1.94 1.88 -50.3 0 1 298.16 79.17
@@ -1496,8 +1524,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.27 0.27 0.0 0 0 293.67 68.39
   L 293.77 67.61
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 342.11 68.53
   Q 341.98 69.15 342.09 69.52
   A 0.32 0.32 0.0 0 0 342.70 69.54
@@ -1510,8 +1539,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.70 0.70 0.0 0 0 342.38 72.11
   Q 341.94 70.57 342.11 68.53
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 363.03 109.46
   Q 359.53 114.76 357.41 120.70
   Q 356.51 120.25 355.16 120.17
@@ -1519,8 +1549,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.95 0.94 15.9 0 1 360.67 107.58
   Q 362.34 107.94 363.03 109.46
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 282.43 117.01
   L 281.75 113.60
   L 284.64 113.34
@@ -1529,8 +1560,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.99 0.95 -15.4 0 1 284.90 116.50
   Q 284.02 117.28 282.43 117.01
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 307.32 136.64
   Q 307.25 134.71 306.44 133.48
   Q 306.61 133.31 306.63 132.98
@@ -1545,8 +1577,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 2.51 2.51 0.0 0 1 318.62 130.37
   L 307.32 136.64
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 286.95 150.45
   L 284.06 119.51
   Q 286.12 124.25 286.02 129.91
@@ -1558,8 +1591,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   Q 288.31 147.12 288.46 149.50
   Q 288.54 150.74 286.95 150.45
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 301.63 152.60
   Q 304.01 152.58 304.38 151.45
   Q 306.89 154.02 308.51 157.46
@@ -1568,8 +1602,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.48 0.48 0.0 0 1 303.95 164.42
   Q 307.35 157.70 301.63 152.60
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 325.75 169.49
   L 319.09 167.84
   A 0.87 0.87 0.0 0 1 318.46 167.24
@@ -1578,8 +1613,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.47 0.46 20.4 0 1 326.63 167.42
   L 325.75 169.49
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 336.66 174.14
   L 340.01 171.12
   A 2.42 2.41 -37.5 0 0 340.42 168.02
@@ -1588,8 +1624,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 4.81 4.67 88.2 0 1 342.78 167.91
   A 4.82 4.67 88.1 0 1 336.66 174.14
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 302.80 183.25
   L 298.51 180.05
   L 298.67 169.82
@@ -1598,8 +1635,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.29 0.29 0.0 0 1 302.88 168.47
   L 302.80 183.25
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 302.55 276.82
   Q 301.62 274.19 301.21 270.50
   Q 300.68 265.66 299.28 256.19
@@ -1625,8 +1663,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.84 0.82 -26.5 0 1 303.09 276.26
   L 302.55 276.82
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 356.24 198.21
   L 362.78 201.86
   A 3.38 2.67 13.3 0 1 363.16 202.12
@@ -1641,8 +1680,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 1.28 1.27 -86.4 0 1 350.09 181.73
   L 356.24 198.21
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 346.60 187.66
   L 349.67 199.96
   A 0.88 0.87 63.7 0 1 349.37 200.86
@@ -1654,8 +1694,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   L 346.39 195.40
   L 346.60 187.66
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 302.78 214.91
   Q 302.84 224.87 302.87 234.50
   Q 302.88 236.85 304.23 237.74
@@ -1668,18 +1709,20 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   L 299.33 219.30
   Q 301.16 218.08 302.78 214.91
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 363.33 279.46
   Q 361.70 277.16 361.28 274.26
   Q 364.74 275.71 366.36 279.03
   A 0.28 0.28 0.0 0 1 366.04 279.43
   Q 364.55 279.05 363.33 279.46
   Z"
-/>
-</g>
-<g fill="#315468">
-<path d="
+        />
+      </g>
+      <g fill="#315468">
+        <path
+          d="
   M 353.34 57.67
   Q 350.67 65.45 348.42 72.84
   Q 347.46 76.01 345.51 77.94
@@ -1695,8 +1738,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   L 344.74 46.31
   L 353.34 57.67
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 332.51 77.52
   Q 332.80 78.51 332.53 79.28
   A 0.88 0.88 0.0 0 1 331.85 79.86
@@ -1707,8 +1751,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   Q 327.40 71.85 329.25 75.46
   Q 330.23 77.36 332.51 77.52
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 284.71 73.34
   Q 285.09 70.03 281.93 69.61
   A 0.36 0.35 2.9 0 1 281.62 69.27
@@ -1718,8 +1763,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   L 285.41 74.14
   A 0.71 0.71 0.0 0 1 284.71 73.34
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 339.12 93.02
   L 338.90 87.22
   Q 344.03 87.74 349.13 87.83
@@ -1755,8 +1801,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   L 345.03 99.38
   A 0.29 0.29 0.0 0 0 344.76 99.08
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 321.01 102.78
   Q 321.15 102.80 321.26 102.82
   A 0.45 0.44 -1.9 0 1 321.62 103.15
@@ -1767,8 +1814,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   Q 320.08 106.20 320.37 103.51
   Q 320.42 103.09 321.01 102.78
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 355.44 105.23
   Q 355.95 105.28 356.18 105.58
   Q 357.38 106.79 357.01 108.19
@@ -1777,8 +1825,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.65 0.64 -72.9 0 1 353.88 107.12
   Q 354.16 105.90 355.44 105.23
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 364.62 110.42
   L 363.84 110.72
   A 0.51 0.51 0.0 0 0 363.82 111.66
@@ -1804,8 +1853,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   Q 359.53 114.76 363.03 109.46
   L 364.62 110.42
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 352.05 145.58
   L 353.98 131.55
   A 0.48 0.47 -15.7 0 0 353.21 131.12
@@ -1822,8 +1872,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 1.38 1.37 59.7 0 1 358.24 141.13
   Q 355.53 143.88 352.05 145.58
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 324.38 145.67
   Q 324.91 145.92 325.15 146.71
   L 325.49 147.54
@@ -1835,8 +1886,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   L 318.18 139.74
   L 324.38 145.67
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 361.41 145.55
   A 0.35 0.34 -73.5 0 1 361.83 145.32
   L 362.05 145.60
@@ -1849,8 +1901,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 3.82 3.47 72.5 0 1 357.39 154.39
   Q 359.90 150.37 361.41 145.55
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 352.09 146.37
   L 348.58 162.70
   A 0.83 0.83 0.0 0 1 348.00 163.33
@@ -1859,8 +1912,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   Q 347.34 153.84 349.89 145.58
   Q 351.04 146.36 352.09 146.37
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 379.77 162.08
   A 0.03 0.03 0.0 0 1 379.76 162.13
   L 371.03 165.28
@@ -1871,8 +1925,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.46 0.45 -37.5 0 1 375.70 159.30
   L 379.77 162.08
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 285.60 164.20
   Q 287.53 165.37 290.41 164.62
   A 1.13 1.12 78.2 0 1 291.81 165.54
@@ -1883,8 +1938,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   Q 283.11 164.97 282.50 164.06
   Q 284.64 163.59 285.60 164.20
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 382.92 166.96
   Q 382.48 175.56 380.40 183.94
   Q 379.21 184.09 377.71 183.43
@@ -1894,8 +1950,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 2.42 2.26 -34.3 0 1 378.13 178.41
   L 382.92 166.96
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 325.39 172.64
   L 321.21 179.20
   A 0.98 0.98 0.0 0 1 320.45 179.64
@@ -1905,8 +1962,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.50 0.50 0.0 0 1 318.00 169.93
   L 325.39 172.64
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 362.87 178.29
   L 362.86 178.30
   A 0.35 0.35 0.0 0 1 362.44 178.16
@@ -1916,8 +1974,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   Q 361.41 174.66 363.06 177.67
   A 0.46 0.45 -28.5 0 1 362.87 178.29
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 356.24 198.21
   L 350.09 181.73
   A 1.28 1.27 -86.4 0 0 349.47 181.02
@@ -1942,8 +2001,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.47 0.44 54.7 0 0 356.17 197.48
   L 356.24 198.21
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 341.19 179.30
   Q 342.07 185.29 343.48 191.24
   Q 344.29 194.63 346.39 195.40
@@ -1954,8 +2014,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   Q 338.52 192.75 339.00 177.81
   Q 340.13 177.58 341.19 179.30
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 327.29 181.33
   L 321.87 197.17
   A 3.04 3.03 -5.0 0 1 320.44 198.87
@@ -1965,8 +2026,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.67 0.65 7.4 0 1 321.89 179.88
   Q 325.07 179.94 327.29 181.33
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 369.35 199.29
   L 372.18 196.02
   A 0.50 0.50 0.0 0 1 372.88 195.97
@@ -1975,9 +2037,16 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   L 369.71 200.18
   A 0.54 0.54 0.0 0 1 369.35 199.29
   Z"
-/>
-<ellipse cx="0.00" cy="0.00" transform="translate(363.14,217.20) rotate(-88.3)" rx="4.79" ry="1.11"/>
-<path d="
+        />
+        <ellipse
+          cx="0.00"
+          cy="0.00"
+          transform="translate(363.14,217.20) rotate(-88.3)"
+          rx="4.79"
+          ry="1.11"
+        />
+        <path
+          d="
   M 364.08 271.65
   A 0.57 0.57 0.0 0 1 363.15 272.19
   L 362.35 271.49
@@ -1991,8 +2060,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 1.32 1.16 47.6 0 0 363.10 266.56
   L 364.08 271.65
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 318.02 260.62
   L 319.08 250.17
   Q 320.44 247.97 320.47 245.77
@@ -2014,16 +2084,18 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.82 0.81 21.5 0 1 319.29 261.27
   Q 318.73 261.15 318.02 260.62
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 320.84 277.58
   Q 320.18 280.28 317.85 281.65
   L 313.41 279.50
   L 316.87 274.10
   Q 319.14 274.93 320.84 277.58
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 355.85 277.84
   L 359.37 281.90
   L 356.76 285.54
@@ -2031,8 +2103,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   C 353.34 285.82 353.82 284.49 353.97 282.77
   Q 354.23 279.86 355.85 277.84
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 339.20 292.39
   L 362.50 292.44
   L 362.32 296.82
@@ -2040,8 +2113,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   L 314.96 292.59
   L 339.20 292.39
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 298.54 299.19
   Q 297.78 299.40 298.14 299.94
   Q 302.66 306.70 308.77 316.75
@@ -2055,8 +2129,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   Q 297.37 299.14 296.54 299.07
   Q 297.70 298.81 298.54 299.19
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 356.56 302.33
   L 340.80 305.52
   A 0.84 0.84 0.0 0 0 340.63 307.12
@@ -2079,24 +2154,27 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 13.11 12.45 49.0 0 0 315.44 302.15
   L 356.56 302.33
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 391.11 316.37
   Q 393.85 316.43 393.82 315.30
   L 393.48 325.07
   A 0.77 0.77 0.0 0 1 391.94 325.11
   L 391.11 316.37
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 308.53 321.08
   Q 310.22 326.03 309.51 331.29
   L 285.80 326.08
   L 287.16 316.24
   L 308.53 321.08
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 367.71 321.10
   Q 367.89 321.05 368.07 321.01
   L 368.25 329.95
@@ -2105,10 +2183,11 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   Q 338.61 325.99 339.97 321.08
   L 367.71 321.10
   Z"
-/>
-</g>
-<g fill="#55747c">
-<path d="
+        />
+      </g>
+      <g fill="#55747c">
+        <path
+          d="
   M 329.46 65.18
   Q 329.40 65.94 331.62 66.07
   A 0.83 0.83 0.0 0 1 332.41 66.90
@@ -2124,8 +2203,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.58 0.58 0.0 0 0 325.85 68.13
   L 329.46 65.18
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 275.45 74.54
   A 0.11 0.11 0.0 0 1 275.34 74.63
   L 272.36 74.63
@@ -2134,8 +2214,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.39 0.39 0.0 0 1 276.38 70.63
   L 275.45 74.54
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 286.20 86.17
   Q 286.30 85.25 286.42 85.68
   Q 287.80 83.65 289.75 83.13
@@ -2144,8 +2225,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.40 0.40 0.0 0 1 285.95 87.96
   Q 285.91 87.00 286.20 86.17
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 275.75 89.55
   Q 273.88 88.02 272.99 85.69
   A 0.72 0.71 65.1 0 1 273.31 84.81
@@ -2153,8 +2235,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.89 0.89 0.0 0 1 276.34 85.19
   Q 276.81 87.68 275.75 89.55
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 320.08 119.59
   L 317.34 127.99
   L 309.57 123.33
@@ -2172,8 +2255,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   Q 314.70 110.01 314.93 110.41
   Q 317.51 114.81 320.08 119.59
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 352.05 145.58
   L 352.09 146.37
   Q 351.04 146.36 349.89 145.58
@@ -2183,16 +2267,18 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.48 0.47 -15.7 0 1 353.98 131.55
   L 352.05 145.58
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 307.38 143.13
   Q 305.81 147.16 303.71 148.26
   L 298.68 146.06
   L 300.90 140.16
   Q 305.02 141.16 307.38 143.13
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 368.34 142.43
   A 0.51 0.51 0.0 0 1 368.90 141.65
   L 378.99 144.65
@@ -2201,8 +2287,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 1.83 1.82 -71.8 0 1 377.65 147.93
   Q 371.05 146.28 368.34 142.43
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 338.67 143.54
   L 338.69 158.09
   L 338.50 162.14
@@ -2216,8 +2303,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   Q 338.48 157.28 338.49 156.75
   Q 338.54 150.14 338.67 143.54
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 301.69 158.90
   L 296.01 160.23
   L 297.17 155.75
@@ -2226,8 +2314,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.37 0.36 60.4 0 1 302.35 158.90
   Q 302.04 159.30 301.69 158.90
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 285.60 164.20
   Q 284.64 163.59 282.50 164.06
   Q 282.01 163.39 281.91 162.83
@@ -2238,8 +2327,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 1.10 1.10 0.0 0 1 290.76 163.73
   L 285.60 164.20
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 382.92 166.96
   L 378.13 178.41
   A 2.42 2.26 -34.3 0 0 377.96 179.17
@@ -2254,8 +2344,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.54 0.54 0.0 0 1 383.10 165.79
   Q 383.18 166.51 382.92 166.96
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 295.88 181.65
   A 0.07 0.07 0.0 0 1 295.81 181.72
   L 295.79 181.72
@@ -2266,8 +2357,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.07 0.07 0.0 0 1 295.44 169.64
   L 295.88 181.65
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 339.00 177.81
   Q 338.52 192.75 339.13 204.00
   Q 339.17 204.69 339.95 204.53
@@ -2279,24 +2371,27 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 1.34 1.16 13.7 0 0 335.39 180.76
   L 339.00 177.81
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 316.33 198.10
   Q 315.77 200.10 315.89 201.39
   Q 309.42 205.94 310.43 201.69
   L 314.31 182.55
   L 316.33 198.10
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 373.00 187.25
   Q 372.64 193.38 368.13 196.54
   A 0.46 0.46 0.0 0 1 367.41 196.24
   Q 366.94 193.57 367.28 191.79
   Q 370.46 191.17 373.00 187.25
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 322.68 206.10
   L 321.21 216.76
   L 315.77 220.22
@@ -2305,8 +2400,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   Q 313.25 211.09 314.41 210.38
   Q 318.50 207.91 322.68 206.10
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 347.79 224.61
   A 0.59 0.58 -29.5 0 1 346.81 224.34
   L 344.90 216.84
@@ -2317,8 +2413,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 2.39 2.38 65.4 0 1 354.66 217.73
   L 347.79 224.61
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 359.09 263.22
   L 359.97 271.02
   A 0.80 0.79 74.4 0 1 359.51 271.84
@@ -2329,8 +2426,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   Q 350.86 257.04 348.18 247.37
   Q 354.16 254.35 359.09 263.22
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 304.63 252.83
   L 304.12 254.00
   Q 302.66 251.88 303.13 248.60
@@ -2339,8 +2437,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 1.19 1.17 -63.9 0 1 305.13 250.46
   L 304.63 252.83
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 306.54 291.18
   L 314.96 292.59
   L 314.74 297.18
@@ -2349,8 +2448,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.68 0.67 -89.0 0 1 296.83 289.80
   L 306.54 291.18
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 311.17 316.99
   Q 310.91 316.43 311.19 315.69
   Q 313.36 310.06 315.02 304.33
@@ -2360,8 +2460,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 1.62 1.57 39.0 0 1 312.95 316.79
   Q 311.45 316.44 311.17 316.99
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 287.16 316.24
   L 285.80 326.08
   L 283.98 325.86
@@ -2369,10 +2470,11 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   L 283.16 315.96
   L 287.16 316.24
   Z"
-/>
-</g>
-<g fill="#c0b087">
-<path d="
+        />
+      </g>
+      <g fill="#c0b087">
+        <path
+          d="
   M 332.44 46.97
   L 332.34 57.70
   A 0.44 0.44 0.0 0 1 331.69 58.08
@@ -2386,8 +2488,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   L 321.84 61.68
   Q 326.13 53.71 332.44 46.97
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 321.21 118.72
   Q 321.16 119.08 320.98 119.31
   Q 320.86 119.47 320.56 119.50
@@ -2400,16 +2503,18 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.64 0.64 0.0 0 1 317.63 108.29
   L 321.21 118.72
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 327.44 113.20
   L 324.44 118.67
   Q 322.15 114.93 322.05 112.39
   A 2.10 2.10 0.0 0 1 325.83 111.04
   L 327.44 113.20
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 338.57 119.24
   L 338.73 126.96
   L 332.51 123.49
@@ -2417,8 +2522,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   Q 329.38 117.25 329.48 114.80
   L 338.57 119.24
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 357.41 120.70
   L 359.43 126.27
   Q 360.35 127.54 359.87 128.18
@@ -2428,8 +2534,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   Q 354.91 121.82 355.16 120.17
   Q 356.51 120.25 357.41 120.70
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 326.19 123.11
   Q 325.45 127.27 323.28 131.04
   Q 324.04 137.64 324.91 143.76
@@ -2442,16 +2549,18 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.49 0.48 -82.4 0 1 324.89 122.34
   Q 325.59 122.49 326.19 123.11
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 347.37 125.55
   L 339.68 137.64
   Q 338.47 136.60 338.66 135.00
   Q 338.99 132.26 338.69 129.93
   L 347.37 125.55
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 338.82 139.06
   L 338.74 140.54
   L 338.67 143.54
@@ -2463,9 +2572,17 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   L 325.15 146.71
   L 338.82 139.06
   Z"
-/>
-<rect x="-3.79" y="-1.07" transform="translate(285.23,154.24) rotate(-6.8)" width="7.58" height="2.14" rx="1.03"/>
-<path d="
+        />
+        <rect
+          x="-3.79"
+          y="-1.07"
+          transform="translate(285.23,154.24) rotate(-6.8)"
+          width="7.58"
+          height="2.14"
+          rx="1.03"
+        />
+        <path
+          d="
   M 281.22 159.89
   A 0.16 0.16 0.0 0 1 281.05 159.74
   L 281.04 159.66
@@ -2476,8 +2593,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.16 0.16 0.0 0 1 290.62 159.35
   L 281.22 159.89
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 380.40 183.94
   Q 382.48 175.56 382.92 166.96
   Q 383.18 166.51 383.10 165.79
@@ -2496,16 +2614,18 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   Q 383.02 176.66 381.78 183.84
   Q 381.69 184.39 380.40 183.94
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 355.28 164.12
   Q 355.80 163.86 355.94 164.20
   Q 356.18 164.76 355.61 164.98
   Q 350.77 166.78 345.07 167.29
   Q 349.56 164.74 355.28 164.12
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 330.02 180.84
   L 324.60 198.58
   A 2.00 1.99 82.7 0 1 323.76 199.67
@@ -2517,8 +2637,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   L 327.29 181.33
   L 330.02 180.84
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 378.96 213.54
   Q 379.16 226.81 378.95 239.75
   Q 378.93 240.72 378.35 240.93
@@ -2526,8 +2647,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   L 374.47 219.16
   Q 375.81 216.28 378.96 213.54
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 364.35 227.49
   Q 363.88 228.71 363.37 228.15
   Q 360.58 225.07 357.45 222.00
@@ -2539,8 +2661,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   Q 360.00 222.48 362.64 224.61
   Q 364.42 226.06 364.35 227.49
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 359.09 263.22
   Q 354.16 254.35 348.18 247.37
   L 348.46 239.02
@@ -2549,8 +2672,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 1.59 1.58 13.7 0 1 358.04 245.18
   L 359.09 263.22
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 319.08 250.17
   L 318.02 260.62
   L 317.39 267.96
@@ -2562,16 +2686,18 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 1.44 1.44 0.0 0 1 319.03 245.49
   L 319.08 250.17
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 361.28 274.26
   Q 361.70 277.16 363.33 279.46
   L 359.37 281.90
   L 355.85 277.84
   Q 358.54 274.76 361.28 274.26
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 302.44 285.22
   A 0.52 0.52 0.0 0 1 301.72 285.38
   L 301.58 285.29
@@ -2582,16 +2708,18 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.52 0.52 0.0 0 1 304.82 281.50
   L 302.44 285.22
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 365.88 282.13
   L 368.31 288.35
   L 359.12 287.22
   A 0.42 0.41 18.1 0 1 358.81 286.61
   Q 361.28 282.13 365.88 282.13
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 307.30 290.72
   Q 306.68 290.60 306.54 291.18
   L 296.83 289.80
@@ -2601,8 +2729,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 1.12 1.12 0.0 0 1 294.68 288.37
   L 307.30 290.72
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 311.04 318.39
   L 311.71 318.52
   Q 316.82 318.95 321.91 318.84
@@ -2615,10 +2744,11 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   L 309.59 318.22
   L 311.04 318.39
   Z"
-/>
-</g>
-<g fill="#7c928b">
-<path d="
+        />
+      </g>
+      <g fill="#7c928b">
+        <path
+          d="
   M 342.76 68.53
   Q 342.82 69.19 342.70 69.54
   A 0.32 0.32 0.0 0 1 342.09 69.52
@@ -2627,8 +2757,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.27 0.27 0.0 0 1 342.78 65.55
   L 342.76 68.53
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 334.58 99.77
   Q 334.28 98.74 333.15 99.05
   A 0.69 0.69 0.0 0 0 332.65 99.74
@@ -2654,8 +2785,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.80 0.80 0.0 0 0 330.1120 104.9172
   L 329.8670 97.9014
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 364.62 110.42
   L 376.22 117.46
   Q 375.20 118.67 373.99 117.98
@@ -2665,8 +2797,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.51 0.51 0.0 0 1 363.84 110.72
   L 364.62 110.42
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 360.83 128.51
   L 359.43 126.27
   L 357.41 120.70
@@ -2674,8 +2807,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.77 0.77 0.0 0 1 367.51 123.89
   L 360.83 128.51
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 293.99 156.87
   A 1.07 1.07 0.0 0 1 291.98 157.06
   Q 290.80 154.44 291.94 151.19
@@ -2684,8 +2818,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 1.17 1.16 -59.8 0 1 294.91 153.03
   L 293.99 156.87
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 330.02 180.84
   L 327.29 181.33
   Q 325.07 179.94 321.89 179.88
@@ -2700,16 +2835,18 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.73 0.72 34.7 0 1 333.33 176.33
   L 330.02 180.84
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 373.00 187.25
   Q 370.46 191.17 367.28 191.79
   Q 368.94 187.73 372.41 185.80
   Q 372.79 185.59 373.10 185.88
   Q 373.67 186.42 373.00 187.25
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 380.92 196.86
   A 0.66 0.66 0.0 0 1 379.93 197.43
   L 375.20 194.69
@@ -2720,8 +2857,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 1.12 1.11 9.0 0 1 380.92 187.95
   L 380.92 196.86
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 308.39 275.87
   A 0.27 0.27 0.0 0 1 308.67 276.13
   L 308.67 276.29
@@ -2732,8 +2870,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.27 0.27 0.0 0 1 306.39 275.91
   L 308.39 275.87
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 362.85 291.30
   L 362.50 292.44
   L 339.20 292.39
@@ -2742,8 +2881,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   Q 338.88 291.39 338.44 291.00
   L 362.85 291.30
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 296.54 299.07
   Q 297.37 299.14 297.36 299.45
   Q 297.36 300.24 296.94 300.90
@@ -2751,8 +2891,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   Q 287.17 314.09 284.92 313.18
   L 296.54 299.07
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 298.54 299.19
   L 298.91 299.27
   Q 300.17 300.83 303.00 301.13
@@ -2769,10 +2910,11 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   Q 302.66 306.70 298.14 299.94
   Q 297.78 299.40 298.54 299.19
   Z"
-/>
-</g>
-<g fill="#213b55">
-<path d="
+        />
+      </g>
+      <g fill="#213b55">
+        <path
+          d="
   M 334.58 99.77
   L 334.38 108.50
   Q 333.96 109.39 333.19 107.79
@@ -2781,16 +2923,18 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.69 0.69 0.0 0 1 333.15 99.05
   Q 334.28 98.74 334.58 99.77
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 352.82 118.79
   L 349.53 114.04
   L 353.13 110.84
   A 1.16 1.16 0.0 0 1 355.06 111.75
   Q 354.92 115.53 352.82 118.79
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 379.05 127.52
   L 380.97 134.40
   L 377.78 133.78
@@ -2804,8 +2948,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.18 0.18 0.0 0 0 380.09 132.44
   L 379.05 127.52
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 317.34 127.99
   Q 313.34 130.90 308.13 132.83
   Q 307.31 133.13 306.63 132.98
@@ -2813,8 +2958,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.62 0.62 0.0 0 1 309.57 123.33
   L 317.34 127.99
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 340.16 139.69
   L 349.89 145.58
   Q 347.34 153.84 338.69 158.09
@@ -2822,8 +2968,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   L 338.74 140.54
   L 340.16 139.69
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 303.71 148.26
   Q 305.81 147.16 307.38 143.13
   L 310.94 144.95
@@ -2832,8 +2979,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.75 0.75 0.0 0 1 308.85 152.03
   L 303.71 148.26
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 301.69 158.90
   L 302.24 159.72
   A 1.19 1.18 -53.1 0 1 302.38 160.73
@@ -2844,16 +2992,18 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   L 296.01 160.23
   L 301.69 158.90
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 346.60 187.66
   L 346.39 195.40
   Q 344.29 194.63 343.48 191.24
   Q 342.07 185.29 341.19 179.30
   Q 345.54 182.82 346.60 187.66
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 321.21 216.76
   L 322.68 206.10
   L 331.87 214.42
@@ -2862,16 +3012,18 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 1.12 1.12 0.0 0 1 328.65 224.32
   Q 325.87 219.05 321.21 216.76
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 317.85 281.65
   Q 320.18 280.28 320.84 277.58
   Q 322.97 281.01 322.97 284.80
   A 0.89 0.89 0.0 0 1 321.43 285.41
   L 317.85 281.65
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 362.32 296.82
   L 362.50 292.44
   L 362.85 291.30
@@ -2881,16 +3033,18 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 1.43 1.43 0.0 0 1 382.74 293.10
   L 362.32 296.82
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 380.09 299.50
   L 385.94 309.80
   L 375.49 305.91
   A 1.06 1.06 0.0 0 1 375.14 304.14
   L 380.09 299.50
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 366.08 317.68
   L 364.90 317.63
   L 340.63 307.12
@@ -2900,8 +3054,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 1.37 1.37 0.0 0 1 361.43 303.23
   Q 364.73 310.72 366.08 317.68
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 310.55 321.01
   L 339.97 321.08
   Q 338.61 325.99 339.57 330.92
@@ -2909,10 +3064,11 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   Q 310.22 326.03 308.53 321.08
   L 310.55 321.01
   Z"
-/>
-</g>
-<g fill="#f0e7bf">
-<path d="
+        />
+      </g>
+      <g fill="#f0e7bf">
+        <path
+          d="
   M 332.44 46.97
   Q 326.13 53.71 321.84 61.68
   L 319.56 66.29
@@ -2923,8 +3079,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.38 0.38 0.0 0 1 332.52 44.54
   Q 332.86 45.56 332.44 46.97
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 293.77 67.61
   L 293.67 68.39
   A 0.27 0.27 0.0 0 1 293.18 68.51
@@ -2942,8 +3099,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   Q 284.01 62.29 290.61 65.15
   Q 292.93 66.15 293.77 67.61
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 278.45 78.06
   Q 278.59 78.20 278.62 78.36
   A 0.28 0.28 0.0 0 1 278.44 78.69
@@ -2953,8 +3111,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.68 0.68 0.0 0 1 274.62 77.44
   L 278.45 78.06
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 338.90 87.22
   L 339.12 93.02
   L 328.61 90.18
@@ -2980,8 +3139,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.46 0.45 -6.4 0 1 325.22 88.42
   Q 332.09 86.85 338.90 87.22
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 285.99 110.70
   L 284.08 110.40
   A 0.70 0.68 -46.1 0 0 283.82 110.41
@@ -2994,8 +3154,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   L 286.42 109.85
   A 0.50 0.50 0.0 0 1 285.99 110.70
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 313.93 109.76
   Q 314.10 110.16 314.11 110.54
   Q 313.86 112.66 313.10 113.37
@@ -3005,8 +3166,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 2.60 2.56 81.9 0 1 301.77 116.90
   L 313.93 109.76
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 327.44 113.20
   L 329.48 114.80
   Q 329.38 117.25 330.24 118.52
@@ -3014,8 +3176,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   L 324.44 118.67
   L 327.44 113.20
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 330.73 125.90
   Q 332.66 131.73 336.42 136.56
   A 0.69 0.69 0.0 0 1 335.47 137.54
@@ -3023,8 +3186,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   Q 325.45 127.27 326.19 123.11
   Q 329.33 124.44 330.73 125.90
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 306.44 133.48
   Q 307.25 134.71 307.32 136.64
   L 296.63 137.11
@@ -3032,32 +3196,36 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   Q 295.51 135.09 296.69 134.12
   L 306.44 133.48
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 300.90 140.16
   L 298.68 146.06
   Q 298.21 146.20 297.60 146.03
   A 0.55 0.55 0.0 0 1 297.21 145.38
   Q 298.39 139.95 300.90 140.16
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 300.13 154.78
   L 297.17 155.75
   L 297.12 153.14
   A 0.37 0.37 0.0 0 1 297.63 152.79
   Q 299.04 153.40 300.13 154.78
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 338.45 164.87
   Q 338.52 165.13 338.65 165.27
   Q 337.06 168.53 333.79 170.13
   A 4.82 4.66 86.5 0 1 336.03 165.56
   A 4.89 4.72 -86.0 0 1 338.45 164.87
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 314.54 178.88
   Q 314.04 181.45 314.31 182.55
   L 310.43 201.69
@@ -3067,8 +3235,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   L 313.59 178.99
   Q 314.55 179.06 314.54 178.88
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 315.77 220.22
   Q 315.18 221.47 314.14 221.77
   A 0.44 0.43 81.9 0 1 313.59 221.35
@@ -3076,8 +3245,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   Q 314.86 211.60 315.03 213.27
   Q 315.39 216.86 315.77 220.22
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 321.81 220.44
   L 321.10 221.47
   A 1.15 1.10 66.8 0 0 320.90 222.01
@@ -3089,8 +3259,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   Q 317.22 222.91 320.58 220.36
   Q 321.59 219.60 321.81 220.44
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 314.08 239.28
   Q 313.28 243.47 313.41 244.70
   Q 314.33 253.21 315.21 261.76
@@ -3107,16 +3278,18 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.43 0.42 -64.4 0 1 313.12 238.09
   Q 313.70 238.47 314.08 239.28
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 316.87 274.10
   L 313.41 279.50
   L 310.66 279.64
   A 0.30 0.30 0.0 0 1 310.38 279.19
   Q 312.40 275.65 316.87 274.10
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 307.30 290.72
   L 338.44 291.00
   Q 338.88 291.39 339.43 291.54
@@ -3126,8 +3299,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   L 306.54 291.18
   Q 306.68 290.60 307.30 290.72
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 284.92 313.18
   Q 287.17 314.09 288.80 314.00
   L 308.95 318.12
@@ -3138,24 +3312,27 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   L 283.16 315.96
   L 284.92 313.18
   Z"
-/>
-</g>
-<g fill="#7c644b">
-<path d="
+        />
+      </g>
+      <g fill="#7c644b">
+        <path
+          d="
   M 281.04 83.50
   Q 280.69 83.75 280.36 83.72
   Q 280.62 83.42 281.04 83.50
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 352.82 118.79
   L 339.67 126.29
   Q 340.17 124.39 340.88 123.63
   Q 345.30 118.91 349.53 114.04
   L 352.82 118.79
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 291.52 147.91
   A 0.50 0.50 0.0 0 1 291.06 147.04
   Q 293.58 145.23 293.06 141.66
@@ -3164,8 +3341,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.66 0.65 17.2 0 1 295.90 141.31
   C 294.90 144.27 294.31 146.91 291.52 147.91
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 374.21 154.76
   L 386.06 155.09
   L 384.53 160.59
@@ -3177,8 +3355,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 1.18 1.18 0.0 0 1 369.15 155.21
   L 374.21 154.76
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 345.07 167.29
   Q 350.77 166.78 355.61 164.98
   Q 356.18 164.76 355.94 164.20
@@ -3191,8 +3370,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.63 0.63 0.0 0 1 345.79 170.73
   L 345.07 167.29
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 378.96 213.54
   Q 375.81 216.28 374.47 219.16
   L 374.48 204.92
@@ -3201,8 +3381,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.32 0.32 0.0 0 1 378.99 203.60
   L 378.96 213.54
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 356.25 240.54
   Q 356.82 240.77 357.13 240.21
   Q 357.38 239.78 357.28 239.19
@@ -3215,8 +3396,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.55 0.52 -66.4 0 1 357.66 241.37
   Q 356.86 241.33 356.25 240.54
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 329.40 231.03
   Q 329.51 233.06 328.68 235.00
   A 1.67 1.66 84.2 0 1 328.08 235.74
@@ -3226,8 +3408,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.67 0.67 0.0 0 1 320.74 232.11
   L 329.40 231.03
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 374.47 235.38
   L 378.35 240.93
   L 369.16 248.61
@@ -3236,8 +3419,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 3.05 3.03 80.0 0 1 370.33 239.90
   Q 373.56 238.71 374.47 235.38
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 338.59 256.31
   Q 338.63 256.31 338.66 256.31
   A 0.20 0.04 1.2 0 0 338.80 256.29
@@ -3258,8 +3442,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.20 0.04 -1.0 0 0 338.52 256.31
   Q 338.55 256.31 338.59 256.31
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 309.54 287.91
   L 312.22 282.01
   Q 314.15 281.91 315.96 283.54
@@ -3267,8 +3452,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.74 0.74 0.0 0 1 317.91 287.71
   L 309.54 287.91
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 368.31 288.35
   L 365.88 282.13
   L 369.31 282.54
@@ -3277,8 +3463,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.45 0.45 0.0 0 1 372.98 287.58
   L 368.31 288.35
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 393.82 315.30
   Q 393.85 316.43 391.11 316.37
   L 368.07 321.01
@@ -3303,10 +3490,11 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 1.53 0.74 39.8 0 0 386.02 305.95
   L 393.82 315.30
   Z"
-/>
-</g>
-<g fill="#ae8854">
-<path d="
+        />
+      </g>
+      <g fill="#ae8854">
+        <path
+          d="
   M 338.44 52.80
   Q 337.92 45.48 339.25 39.16
   Q 341.83 40.71 342.84 42.38
@@ -3321,8 +3509,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.70 0.69 -82.3 0 0 341.61 52.89
   Q 339.95 52.43 338.44 52.80
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 338.19 70.75
   L 338.28 54.55
   Q 341.70 53.32 340.08 59.66
@@ -3337,8 +3526,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.72 0.71 77.5 0 1 340.27 70.81
   Q 339.29 71.09 338.19 70.75
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 283.04 78.12
   L 282.61 80.67
   Q 282.24 82.34 281.04 83.50
@@ -3359,8 +3549,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   Q 282.45 73.81 282.42 76.74
   Q 282.41 77.75 283.04 78.12
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 336.22 84.57
   Q 337.87 84.44 338.25 84.15
   Q 339.60 83.11 338.73 81.73
@@ -3370,8 +3561,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 0.83 0.83 0.0 0 1 352.85 85.94
   Q 344.55 84.50 336.22 84.57
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 349.53 114.04
   Q 345.30 118.91 340.88 123.63
   Q 340.17 124.39 339.67 126.29
@@ -3379,8 +3571,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   L 338.57 119.24
   L 349.53 114.04
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 360.83 128.51
   Q 367.92 132.58 370.63 133.41
   Q 373.16 134.18 377.78 133.78
@@ -3397,8 +3590,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   Q 360.35 127.54 359.43 126.27
   L 360.83 128.51
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 329.40 231.03
   L 320.74 232.11
   A 0.67 0.67 0.0 0 0 320.17 232.63
@@ -3414,8 +3608,9 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   A 1.44 1.40 -74.6 0 1 329.53 228.46
   Q 329.80 229.63 329.40 231.03
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 364.35 227.49
   L 364.63 229.11
   L 358.35 231.63
@@ -3434,10 +3629,8 @@ export const Bishop: React.FC<PieceProps> = ({ style, className }) => {
   Q 360.58 225.07 363.37 228.15
   Q 363.88 228.71 364.35 227.49
   Z"
-/>
-</g>
-
-
+        />
+      </g>
     </svg>
   );
 };

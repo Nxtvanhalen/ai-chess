@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { usePWAInstall } from '@/hooks/usePWAInstall';
-import PWAInstallButton from './PWAInstallButton';
 import PWAInstallBanner from './PWAInstallBanner';
+import PWAInstallButton from './PWAInstallButton';
 import PWAWelcome from './PWAWelcome';
 
 interface PWAManagerProps {
@@ -35,13 +35,7 @@ export default function PWAManager({
 }: PWAManagerProps) {
   const [mounted, setMounted] = useState(false);
 
-  const {
-    isInstallable,
-    isInstalled,
-    isStandalone,
-    canShowBanner,
-    platform,
-  } = usePWAInstall();
+  const { isInstallable, isInstalled, isStandalone, canShowBanner, platform } = usePWAInstall();
 
   // Only render after client-side hydration to prevent mismatch
   useEffect(() => {
@@ -98,13 +92,8 @@ export default function PWAManager({
 
       {/* Welcome Message - Celebrates successful installation */}
       {showWelcomeMessage && isStandalone && (
-        <PWAWelcome
-          showOnFirstInstall={true}
-          autoHideAfter={10000}
-        />
+        <PWAWelcome showOnFirstInstall={true} autoHideAfter={10000} />
       )}
-
     </div>
   );
 }
-

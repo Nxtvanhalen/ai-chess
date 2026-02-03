@@ -1,6 +1,11 @@
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
-import { Subscription, SubscriptionUsage, SubscriptionTier, PLAN_LIMITS } from './types';
+import {
+  PLAN_LIMITS,
+  type Subscription,
+  type SubscriptionTier,
+  type SubscriptionUsage,
+} from './types';
 
 // =============================================================================
 // SUBSCRIPTION SERVICE - Chester AI Chess
@@ -32,7 +37,7 @@ async function getServerClient() {
           }
         },
       },
-    }
+    },
   );
 }
 
@@ -97,7 +102,10 @@ export async function getUserUsage(userId: string): Promise<SubscriptionUsage | 
       limit: subscription.daily_chat_messages_limit,
       remaining: chatUnlimited
         ? Infinity
-        : Math.max(0, subscription.daily_chat_messages_limit - subscription.daily_chat_messages_used),
+        : Math.max(
+            0,
+            subscription.daily_chat_messages_limit - subscription.daily_chat_messages_used,
+          ),
       unlimited: chatUnlimited,
     },
   };
@@ -224,10 +232,13 @@ export async function getUserFeatures(userId: string): Promise<string[]> {
 /**
  * Create error response for usage limit exceeded
  */
-export function createUsageLimitError(type: 'ai_move' | 'chat', usage: {
-  remaining: number;
-  limit: number;
-}): {
+export function createUsageLimitError(
+  type: 'ai_move' | 'chat',
+  usage: {
+    remaining: number;
+    limit: number;
+  },
+): {
   error: string;
   code: string;
   details: {
@@ -241,9 +252,10 @@ export function createUsageLimitError(type: 'ai_move' | 'chat', usage: {
   resetAt.setUTCHours(24, 0, 0, 0); // Midnight UTC
 
   return {
-    error: type === 'ai_move'
-      ? 'Daily AI move limit reached. Upgrade your plan for more moves.'
-      : 'Daily chat message limit reached. Upgrade your plan for more messages.',
+    error:
+      type === 'ai_move'
+        ? 'Daily AI move limit reached. Upgrade your plan for more moves.'
+        : 'Daily chat message limit reached. Upgrade your plan for more messages.',
     code: 'USAGE_LIMIT_EXCEEDED',
     details: {
       type,
@@ -257,11 +269,14 @@ export function createUsageLimitError(type: 'ai_move' | 'chat', usage: {
 /**
  * Add usage headers to response
  */
-export function getUsageHeaders(type: 'ai_move' | 'chat', usage: {
-  remaining: number;
-  limit: number;
-  unlimited: boolean;
-}): Record<string, string> {
+export function getUsageHeaders(
+  type: 'ai_move' | 'chat',
+  usage: {
+    remaining: number;
+    limit: number;
+    unlimited: boolean;
+  },
+): Record<string, string> {
   const prefix = type === 'ai_move' ? 'X-AI-Moves' : 'X-Chat-Messages';
 
   return {

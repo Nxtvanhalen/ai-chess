@@ -20,7 +20,7 @@ export function getRedisClient(): Redis {
     if (!url || !token) {
       throw new Error(
         'Missing Redis environment variables. ' +
-        'Please set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in your .env.local file.'
+          'Please set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in your .env.local file.',
       );
     }
 

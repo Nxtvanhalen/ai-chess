@@ -1,4 +1,4 @@
-import { loadStripe, Stripe } from '@stripe/stripe-js';
+import { loadStripe, type Stripe } from '@stripe/stripe-js';
 
 // =============================================================================
 // STRIPE CLIENT-SIDE - Chester AI Chess
@@ -45,7 +45,7 @@ export async function redirectToCheckout(checkoutUrl: string): Promise<void> {
 export async function createCheckoutSession(
   priceId: string,
   successUrl?: string,
-  cancelUrl?: string
+  cancelUrl?: string,
 ): Promise<{ sessionId: string; url: string }> {
   const response = await fetch('/api/stripe/checkout', {
     method: 'POST',
@@ -74,7 +74,7 @@ export async function createCheckoutSession(
 export async function startCheckout(
   priceId: string,
   successUrl?: string,
-  cancelUrl?: string
+  cancelUrl?: string,
 ): Promise<void> {
   const { url } = await createCheckoutSession(priceId, successUrl, cancelUrl);
   if (url) {

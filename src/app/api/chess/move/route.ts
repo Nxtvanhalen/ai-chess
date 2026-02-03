@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createResponsesCompletion } from '@/lib/openai/client';
-import { CHESS_BUTLER_SYSTEM_PROMPT } from '@/lib/openai/chess-butler-prompt';
-import { checkRateLimitRedis, getRateLimitHeadersRedis, getClientIPFromRequest } from '@/lib/redis';
-import { GameMemoryService } from '@/lib/services/GameMemoryService';
-import { ChesterMemoryService } from '@/lib/services/ChesterMemoryService';
-import { chessMoveSchema, validateRequest } from '@/lib/validation/schemas';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getAuthenticatedUser } from '@/lib/auth/getUser';
+import { CHESS_BUTLER_SYSTEM_PROMPT } from '@/lib/openai/chess-butler-prompt';
+import { createResponsesCompletion } from '@/lib/openai/client';
+import { checkRateLimitRedis, getClientIPFromRequest, getRateLimitHeadersRedis } from '@/lib/redis';
+import { ChesterMemoryService } from '@/lib/services/ChesterMemoryService';
+import { GameMemoryService } from '@/lib/services/GameMemoryService';
+import { chessMoveSchema, validateRequest } from '@/lib/validation/schemas';
 
 const MOVE_ANALYSIS_PROMPT = `
 You are Chester analyzing a move. Provide brief but insightful commentary on:
@@ -32,12 +32,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: 'Rate limit exceeded. Please wait before requesting move analysis.',
-          retryAfter: Math.ceil((rateLimitResult.reset - Date.now()) / 1000)
+          retryAfter: Math.ceil((rateLimitResult.reset - Date.now()) / 1000),
         },
         {
           status: 429,
-          headers: getRateLimitHeadersRedis(rateLimitResult)
-        }
+          headers: getRateLimitHeadersRedis(rateLimitResult),
+        },
       );
     }
 
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
       hasMoveDetails: !!moveDetails,
       totalMoves: gameContext?.totalMoves,
       moveHistoryLength: moveHistory?.length || 0,
-      fullMoveHistoryLength: gameContext?.fullMoveHistory?.length || 0
+      fullMoveHistoryLength: gameContext?.fullMoveHistory?.length || 0,
     });
 
     // Fetch comprehensive game memory context with timeout
@@ -73,19 +73,19 @@ export async function POST(request: NextRequest) {
       try {
         // Add timeout to database calls (5 seconds)
         const dbTimeout = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Database timeout after 5s')), 5000)
+          setTimeout(() => reject(new Error('Database timeout after 5s')), 5000),
         );
 
         const contextPromise = GameMemoryService.getGameContext(gameId);
         const personalityPromise = ChesterMemoryService.getPersonalityContext(userId);
 
-        fullGameContext = await Promise.race([contextPromise, dbTimeout]) as any;
-        chesterPersonality = await Promise.race([personalityPromise, dbTimeout]) as any;
+        fullGameContext = (await Promise.race([contextPromise, dbTimeout])) as any;
+        chesterPersonality = (await Promise.race([personalityPromise, dbTimeout])) as any;
 
         console.log('Move API - Memory context loaded:', {
           totalMovesInMemory: fullGameContext?.totalMoves || 0,
           tacticalThemes: fullGameContext?.tacticalThemes || [],
-          loadTime: Date.now() - startTime
+          loadTime: Date.now() - startTime,
         });
       } catch (error) {
         console.error('Error fetching game memory (continuing with degraded context):', error);
@@ -94,34 +94,34 @@ export async function POST(request: NextRequest) {
         chesterPersonality = null;
       }
     }
-    
+
     // Build context
     const messages: any[] = [
       { role: 'system', content: CHESS_BUTLER_SYSTEM_PROMPT },
       { role: 'system', content: MOVE_ANALYSIS_PROMPT },
       { role: 'system', content: `Current position (FEN): ${fen}` },
-      { role: 'user', content: `I just played ${move}. What do you think of this move?` }
+      { role: 'user', content: `I just played ${move}. What do you think of this move?` },
     ];
-    
+
     // Add comprehensive game context
     if (gameContext?.fullMoveHistory && gameContext.fullMoveHistory.length > 0) {
       const moveSequence = gameContext.fullMoveHistory
         .map((m: any) => {
           // Ensure move is a string, not an object
-          const moveStr = typeof m.move === 'string' ? m.move : (m.move?.san || String(m.move));
+          const moveStr = typeof m.move === 'string' ? m.move : m.move?.san || String(m.move);
           return `${m.role === 'user' ? 'Chris' : 'AI'}: ${moveStr}`;
         })
         .join(', ');
-      
-      messages.splice(-1, 0, { 
-        role: 'system', 
+
+      messages.splice(-1, 0, {
+        role: 'system',
         content: `Complete game move history: ${moveSequence}
         
         Use this full context to provide accurate strategic analysis of Chris's move considering:
         - The opening progression and development patterns
         - Previous tactical sequences and their outcomes
         - The overall strategic direction of the game
-        - How this move fits into the broader game plan` 
+        - How this move fits into the broader game plan`,
       });
     } else if (moveHistory && moveHistory.length > 0) {
       // Fallback to limited context if full history not available
@@ -129,18 +129,18 @@ export async function POST(request: NextRequest) {
         .map((m: any) => {
           const moveCtx = m.metadata?.moveContext;
           // Ensure moveContext is a string
-          return typeof moveCtx === 'string' ? moveCtx : (moveCtx?.san || String(moveCtx));
+          return typeof moveCtx === 'string' ? moveCtx : moveCtx?.san || String(moveCtx);
         })
         .filter(Boolean)
         .join(', ');
       messages.splice(-1, 0, {
         role: 'system',
-        content: `Recent moves: ${recentMoves}`
+        content: `Recent moves: ${recentMoves}`,
       });
     }
-    
+
     // Build comprehensive instructions for Responses API
-    let instructions = CHESS_BUTLER_SYSTEM_PROMPT + '\n\n' + MOVE_ANALYSIS_PROMPT;
+    let instructions = `${CHESS_BUTLER_SYSTEM_PROMPT}\n\n${MOVE_ANALYSIS_PROMPT}`;
     instructions += `\nCurrent position (FEN): ${fen}`;
 
     // Add Chester's personality context
@@ -157,7 +157,10 @@ export async function POST(request: NextRequest) {
     if (fullGameContext && fullGameContext.fullMoveHistory.length > 0) {
       const recentMoves = fullGameContext.fullMoveHistory.slice(-MAX_MOVES_IN_CONTEXT);
       const moveSequence = recentMoves
-        .map((m: any) => `${m.move_number}. ${m.player_type === 'human' ? 'Chris' : 'AI'}: ${m.san}${m.captured ? ' (x' + m.captured + ')' : ''}`)
+        .map(
+          (m: any) =>
+            `${m.move_number}. ${m.player_type === 'human' ? 'Chris' : 'AI'}: ${m.san}${m.captured ? ` (x${m.captured})` : ''}`,
+        )
         .join(', ');
 
       const isFullHistory = fullGameContext.fullMoveHistory.length <= MAX_MOVES_IN_CONTEXT;
@@ -189,7 +192,7 @@ export async function POST(request: NextRequest) {
       const moveSequence = recentMoves
         .map((m: any) => {
           // Ensure move is a string, not an object
-          const moveStr = typeof m.move === 'string' ? m.move : (m.move?.san || String(m.move));
+          const moveStr = typeof m.move === 'string' ? m.move : m.move?.san || String(m.move);
           return `${m.role === 'user' ? 'Chris' : 'AI'}: ${moveStr}`;
         })
         .join(', ');
@@ -209,7 +212,7 @@ export async function POST(request: NextRequest) {
         .map((m: any) => {
           const moveCtx = m.metadata?.moveContext;
           // Ensure moveContext is a string
-          return typeof moveCtx === 'string' ? moveCtx : (moveCtx?.san || String(moveCtx));
+          return typeof moveCtx === 'string' ? moveCtx : moveCtx?.san || String(moveCtx);
         })
         .filter(Boolean) // Remove any undefined/null values
         .join(', ');
@@ -225,9 +228,11 @@ export async function POST(request: NextRequest) {
       const completion = await createResponsesCompletion({
         model: 'gpt-5.2-2025-12-11',
         input: `I just played ${move}. React briefly.`,
-        instructions: instructions + `\n\nREMEMBER: Keep your reaction to 1 sentence, maybe 2 if critical. Be witty, not eager. Examples: "Solid.", "That's brave.", "Engine won't like that.", "Interesting choice.", "Trading queens already?"`,
+        instructions:
+          instructions +
+          `\n\nREMEMBER: Keep your reaction to 1 sentence, maybe 2 if critical. Be witty, not eager. Examples: "Solid.", "That's brave.", "Engine won't like that.", "Interesting choice.", "Trading queens already?"`,
         reasoning: {
-          effort: 'low' // Fast move analysis
+          effort: 'low', // Fast move analysis
         },
         max_output_tokens: 100, // Reduced for brevity
       });
@@ -237,14 +242,16 @@ export async function POST(request: NextRequest) {
 
       // Parse Responses API format
       const messageOutput = completion.output.find((item: any) => item.type === 'message');
-      const textContent = messageOutput?.content.find((content: any) => content.type === 'output_text');
+      const textContent = messageOutput?.content.find(
+        (content: any) => content.type === 'output_text',
+      );
       content = textContent?.text || 'Interesting move.';
     } catch (aiError: any) {
       console.error('Move API - OpenAI API error:', {
         error: aiError.message,
         status: aiError.status,
         code: aiError.code,
-        duration: Date.now() - startTime
+        duration: Date.now() - startTime,
       });
 
       // Provide fallback commentary based on move type
@@ -269,7 +276,7 @@ export async function POST(request: NextRequest) {
             fen_after: fen,
             timestamp: new Date().toISOString(),
             player_type: moveDetails.player_type || 'human',
-            evaluation: moveDetails.evaluation
+            evaluation: moveDetails.evaluation,
           });
 
           // Save Chester's commentary
@@ -278,21 +285,21 @@ export async function POST(request: NextRequest) {
             type: 'post_move',
             content: content,
             timestamp: new Date().toISOString(),
-            metadata: {}
+            metadata: {},
           });
 
           // Detect and save tactical themes from commentary
           const tacticalKeywords = {
-            'fork': 'fork',
-            'pin': 'pin',
-            'skewer': 'skewer',
-            'discovery': 'discovered_attack',
-            'sacrifice': 'sacrifice',
+            fork: 'fork',
+            pin: 'pin',
+            skewer: 'skewer',
+            discovery: 'discovered_attack',
+            sacrifice: 'sacrifice',
             'mate threat': 'mate_threat',
-            'zugzwang': 'zugzwang',
-            'overload': 'overload',
-            'deflection': 'deflection',
-            'decoy': 'decoy'
+            zugzwang: 'zugzwang',
+            overload: 'overload',
+            deflection: 'deflection',
+            decoy: 'decoy',
           };
 
           const lowercaseContent = content.toLowerCase();
@@ -317,7 +324,7 @@ export async function POST(request: NextRequest) {
       headers: {
         'Content-Type': 'text/plain',
         'Cache-Control': 'no-cache',
-        'X-Response-Time': `${totalDuration}ms`
+        'X-Response-Time': `${totalDuration}ms`,
       },
     });
   } catch (error: any) {
@@ -326,7 +333,7 @@ export async function POST(request: NextRequest) {
       error: error.message,
       stack: error.stack,
       duration: totalDuration,
-      clientIP
+      clientIP,
     });
 
     // Return a friendly error message
@@ -334,9 +341,9 @@ export async function POST(request: NextRequest) {
       {
         error: 'Failed to analyze move',
         message: error.message || 'Unknown error',
-        retryable: true
+        retryable: true,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

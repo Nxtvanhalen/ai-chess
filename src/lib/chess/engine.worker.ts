@@ -67,59 +67,67 @@ class LRUTranspositionTable {
 
 // Piece-Square Tables
 const PAWN_TABLE = [
-  0,0,0,0,0,0,0,0,50,50,50,50,50,50,50,50,10,10,20,30,30,20,10,10,
-  5,5,10,25,25,10,5,5,0,0,0,20,20,0,0,0,5,-5,-10,0,0,-10,-5,5,
-  5,10,10,-20,-20,10,10,5,0,0,0,0,0,0,0,0
+  0, 0, 0, 0, 0, 0, 0, 0, 50, 50, 50, 50, 50, 50, 50, 50, 10, 10, 20, 30, 30, 20, 10, 10, 5, 5, 10,
+  25, 25, 10, 5, 5, 0, 0, 0, 20, 20, 0, 0, 0, 5, -5, -10, 0, 0, -10, -5, 5, 5, 10, 10, -20, -20, 10,
+  10, 5, 0, 0, 0, 0, 0, 0, 0, 0,
 ];
 const KNIGHT_TABLE = [
-  -50,-40,-30,-30,-30,-30,-40,-50,-40,-20,0,0,0,0,-20,-40,
-  -30,0,10,15,15,10,0,-30,-30,5,15,20,20,15,5,-30,
-  -30,0,15,20,20,15,0,-30,-30,5,10,15,15,10,5,-30,
-  -40,-20,0,5,5,0,-20,-40,-50,-40,-30,-30,-30,-30,-40,-50
+  -50, -40, -30, -30, -30, -30, -40, -50, -40, -20, 0, 0, 0, 0, -20, -40, -30, 0, 10, 15, 15, 10, 0,
+  -30, -30, 5, 15, 20, 20, 15, 5, -30, -30, 0, 15, 20, 20, 15, 0, -30, -30, 5, 10, 15, 15, 10, 5,
+  -30, -40, -20, 0, 5, 5, 0, -20, -40, -50, -40, -30, -30, -30, -30, -40, -50,
 ];
 const BISHOP_TABLE = [
-  -20,-10,-10,-10,-10,-10,-10,-20,-10,0,0,0,0,0,0,-10,
-  -10,0,5,10,10,5,0,-10,-10,5,5,10,10,5,5,-10,
-  -10,0,10,10,10,10,0,-10,-10,10,10,10,10,10,10,-10,
-  -10,5,0,0,0,0,5,-10,-20,-10,-10,-10,-10,-10,-10,-20
+  -20, -10, -10, -10, -10, -10, -10, -20, -10, 0, 0, 0, 0, 0, 0, -10, -10, 0, 5, 10, 10, 5, 0, -10,
+  -10, 5, 5, 10, 10, 5, 5, -10, -10, 0, 10, 10, 10, 10, 0, -10, -10, 10, 10, 10, 10, 10, 10, -10,
+  -10, 5, 0, 0, 0, 0, 5, -10, -20, -10, -10, -10, -10, -10, -10, -20,
 ];
 const ROOK_TABLE = [
-  0,0,0,0,0,0,0,0,5,10,10,10,10,10,10,5,-5,0,0,0,0,0,0,-5,
-  -5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,
-  -5,0,0,0,0,0,0,-5,0,0,0,5,5,0,0,0
+  0, 0, 0, 0, 0, 0, 0, 0, 5, 10, 10, 10, 10, 10, 10, 5, -5, 0, 0, 0, 0, 0, 0, -5, -5, 0, 0, 0, 0, 0,
+  0, -5, -5, 0, 0, 0, 0, 0, 0, -5, -5, 0, 0, 0, 0, 0, 0, -5, -5, 0, 0, 0, 0, 0, 0, -5, 0, 0, 0, 5,
+  5, 0, 0, 0,
 ];
 const QUEEN_TABLE = [
-  -20,-10,-10,-5,-5,-10,-10,-20,-10,0,0,0,0,0,0,-10,
-  -10,0,5,5,5,5,0,-10,-5,0,5,5,5,5,0,-5,
-  0,0,5,5,5,5,0,-5,-10,5,5,5,5,5,0,-10,
-  -10,0,5,0,0,0,0,-10,-20,-10,-10,-5,-5,-10,-10,-20
+  -20, -10, -10, -5, -5, -10, -10, -20, -10, 0, 0, 0, 0, 0, 0, -10, -10, 0, 5, 5, 5, 5, 0, -10, -5,
+  0, 5, 5, 5, 5, 0, -5, 0, 0, 5, 5, 5, 5, 0, -5, -10, 5, 5, 5, 5, 5, 0, -10, -10, 0, 5, 0, 0, 0, 0,
+  -10, -20, -10, -10, -5, -5, -10, -10, -20,
 ];
 const KING_MG_TABLE = [
-  -30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,
-  -30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,
-  -20,-30,-30,-40,-40,-30,-30,-20,-10,-20,-20,-20,-20,-20,-20,-10,
-  20,20,0,0,0,0,20,20,20,30,10,0,0,10,30,20
+  -30, -40, -40, -50, -50, -40, -40, -30, -30, -40, -40, -50, -50, -40, -40, -30, -30, -40, -40,
+  -50, -50, -40, -40, -30, -30, -40, -40, -50, -50, -40, -40, -30, -20, -30, -30, -40, -40, -30,
+  -30, -20, -10, -20, -20, -20, -20, -20, -20, -10, 20, 20, 0, 0, 0, 0, 20, 20, 20, 30, 10, 0, 0,
+  10, 30, 20,
 ];
 const KING_EG_TABLE = [
-  -50,-40,-30,-20,-20,-30,-40,-50,-30,-20,-10,0,0,-10,-20,-30,
-  -30,-10,20,30,30,20,-10,-30,-30,-10,30,40,40,30,-10,-30,
-  -30,-10,30,40,40,30,-10,-30,-30,-10,20,30,30,20,-10,-30,
-  -30,-30,0,0,0,0,-30,-30,-50,-30,-30,-30,-30,-30,-30,-50
+  -50, -40, -30, -20, -20, -30, -40, -50, -30, -20, -10, 0, 0, -10, -20, -30, -30, -10, 20, 30, 30,
+  20, -10, -30, -30, -10, 30, 40, 40, 30, -10, -30, -30, -10, 30, 40, 40, 30, -10, -30, -30, -10,
+  20, 30, 30, 20, -10, -30, -30, -30, 0, 0, 0, 0, -30, -30, -50, -30, -30, -30, -30, -30, -30, -50,
 ];
 
 function getPieceSquareValue(piece: string, square: number, isEndgame: boolean): number {
   const isBlack = piece === piece.toLowerCase();
-  const idx = isBlack ? (63 - square) : square;
+  const idx = isBlack ? 63 - square : square;
   const pieceType = piece.toLowerCase();
 
   let value = 0;
   switch (pieceType) {
-    case 'p': value = PAWN_TABLE[idx]; break;
-    case 'n': value = KNIGHT_TABLE[idx]; break;
-    case 'b': value = BISHOP_TABLE[idx]; break;
-    case 'r': value = ROOK_TABLE[idx]; break;
-    case 'q': value = QUEEN_TABLE[idx]; break;
-    case 'k': value = isEndgame ? KING_EG_TABLE[idx] : KING_MG_TABLE[idx]; break;
+    case 'p':
+      value = PAWN_TABLE[idx];
+      break;
+    case 'n':
+      value = KNIGHT_TABLE[idx];
+      break;
+    case 'b':
+      value = BISHOP_TABLE[idx];
+      break;
+    case 'r':
+      value = ROOK_TABLE[idx];
+      break;
+    case 'q':
+      value = QUEEN_TABLE[idx];
+      break;
+    case 'k':
+      value = isEndgame ? KING_EG_TABLE[idx] : KING_MG_TABLE[idx];
+      break;
   }
   return isBlack ? value : -value;
 }
@@ -151,7 +159,7 @@ function evaluatePosition(chess: Chess): number {
         const positionalValue = getPieceSquareValue(
           piece.color === 'w' ? piece.type.toUpperCase() : piece.type,
           squareIndex,
-          isEndgame
+          isEndgame,
         );
 
         if (piece.color === 'b') {
@@ -170,7 +178,7 @@ function evaluatePosition(chess: Chess): number {
   return evaluation / 100;
 }
 
-function orderMoves(chess: Chess, moves: string[], ttBestMove?: string): string[] {
+function orderMoves(_chess: Chess, moves: string[], ttBestMove?: string): string[] {
   const scored: { move: string; score: number }[] = [];
 
   for (const move of moves) {
@@ -194,7 +202,7 @@ function minimax(
   depth: number,
   isMaximizing: boolean,
   alpha: number = -Infinity,
-  beta: number = Infinity
+  beta: number = Infinity,
 ): number {
   nodesSearched++;
 
@@ -273,7 +281,7 @@ function selectMoveWithVariation(
   moveEvaluations: { move: string; eval: number }[],
   chess: Chess,
   unpredictability: number,
-  positionEval: number
+  positionEval: number,
 ): { move: string; eval: number } {
   const bestEval = moveEvaluations[0].eval;
   let tolerance = 0.15;
@@ -293,7 +301,7 @@ function selectMoveWithVariation(
   const finalCandidates =
     forcingMoves.length > 0 && Math.abs(positionEval) > 2.0 ? forcingMoves : candidates;
 
-  const weights = finalCandidates.map((_, i) => Math.pow(2, finalCandidates.length - i - 1));
+  const weights = finalCandidates.map((_, i) => 2 ** (finalCandidates.length - i - 1));
   const totalWeight = weights.reduce((sum, w) => sum + w, 0);
   let random = Math.random() * totalWeight;
 
@@ -309,9 +317,9 @@ function calculateThinkingTime(
   pieceCount: number,
   depth: number,
   evalMagnitude: number,
-  unpredictability: number
+  unpredictability: number,
 ): number {
-  let baseTime = 1200;
+  const baseTime = 1200;
   const complexityFactor = (32 - pieceCount) * 25;
   const depthFactor = depth * 150;
   const criticalFactor = evalMagnitude > 3 ? 400 : 0;
@@ -320,7 +328,12 @@ function calculateThinkingTime(
   return Math.max(600, Math.min(3500, Math.floor(totalTime)));
 }
 
-function generateAnalysis(pieceCount: number, evaluation: number, depth: number, move: string): string {
+function generateAnalysis(
+  pieceCount: number,
+  evaluation: number,
+  depth: number,
+  move: string,
+): string {
   const isEndgame = pieceCount <= 12;
   const isTactical = Math.abs(evaluation) > 2;
   const isCheck = move.includes('+');
@@ -337,7 +350,7 @@ function generateAnalysis(pieceCount: number, evaluation: number, depth: number,
 }
 
 // Main worker message handler
-self.onmessage = function (e: MessageEvent) {
+self.onmessage = (e: MessageEvent) => {
   const { type, fen, difficulty = 'medium', playerMoveHistory = [] } = e.data;
 
   if (type === 'getBestMove') {
@@ -401,7 +414,10 @@ self.onmessage = function (e: MessageEvent) {
 
     // Calculate depth
     let depth = { easy: 2, medium: 3, hard: 4 }[difficulty as 'easy' | 'medium' | 'hard'];
-    const pieceCount = chess.board().flat().filter((p) => p !== null).length;
+    const pieceCount = chess
+      .board()
+      .flat()
+      .filter((p) => p !== null).length;
     const evaluation = evaluatePosition(chess);
 
     if (pieceCount <= 8) depth = Math.min(depth + 2, 6);
@@ -420,8 +436,18 @@ self.onmessage = function (e: MessageEvent) {
     }
 
     moveEvaluations.sort((a, b) => b.eval - a.eval);
-    const selectedMove = selectMoveWithVariation(moveEvaluations, chess, playerUnpredictability, evaluation);
-    const thinkingTime = calculateThinkingTime(pieceCount, depth, Math.abs(selectedMove.eval), playerUnpredictability);
+    const selectedMove = selectMoveWithVariation(
+      moveEvaluations,
+      chess,
+      playerUnpredictability,
+      evaluation,
+    );
+    const thinkingTime = calculateThinkingTime(
+      pieceCount,
+      depth,
+      Math.abs(selectedMove.eval),
+      playerUnpredictability,
+    );
     const ttStats = transpositionTable.getStats();
 
     self.postMessage({

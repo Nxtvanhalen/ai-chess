@@ -20,7 +20,7 @@ interface GameContext {
 }
 
 // Helper to add delay
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const _sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export function useChesterStream() {
   const [isStreaming, setIsStreaming] = useState(false);
@@ -35,7 +35,7 @@ export function useChesterStream() {
       message: string,
       gameContext?: GameContext,
       gameId?: string | null,
-      options?: StreamOptions
+      options?: StreamOptions,
     ): Promise<string> => {
       // Abort any existing stream
       if (abortControllerRef.current) {
@@ -60,11 +60,11 @@ export function useChesterStream() {
           // Add next character(s) - 1 char at a time for smoother, slower feel
           const charsToAdd = Math.min(
             1, // Characters per tick
-            textBufferRef.current.length - displayedTextRef.current.length
+            textBufferRef.current.length - displayedTextRef.current.length,
           );
           const nextChars = textBufferRef.current.slice(
             displayedTextRef.current.length,
-            displayedTextRef.current.length + charsToAdd
+            displayedTextRef.current.length + charsToAdd,
           );
           displayedTextRef.current += nextChars;
           setStreamedText(displayedTextRef.current);
@@ -158,7 +158,7 @@ export function useChesterStream() {
         abortControllerRef.current = null;
       }
     },
-    []
+    [],
   );
 
   const cancelStream = useCallback(() => {

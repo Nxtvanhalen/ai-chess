@@ -1,13 +1,14 @@
 import { z } from 'zod';
 
 // FEN validation regex - validates basic FEN structure
-const fenRegex = /^([rnbqkpRNBQKP1-8]+\/){7}[rnbqkpRNBQKP1-8]+ [wb] (-|K?Q?k?q?) (-|[a-h][36]) \d+ \d+$/;
+const _fenRegex =
+  /^([rnbqkpRNBQKP1-8]+\/){7}[rnbqkpRNBQKP1-8]+ [wb] (-|K?Q?k?q?) (-|[a-h][36]) \d+ \d+$/;
 
 // Chess square validation
 const squareRegex = /^[a-h][1-8]$/;
 
 // SAN move validation (loose - allows most algebraic notation)
-const sanRegex = /^[KQRBN]?[a-h]?[1-8]?x?[a-h][1-8](=[QRBN])?[+#]?$|^O-O(-O)?[+#]?$/;
+const _sanRegex = /^[KQRBN]?[a-h]?[1-8]?x?[a-h][1-8](=[QRBN])?[+#]?$|^O-O(-O)?[+#]?$/;
 
 // Difficulty levels
 const difficultySchema = z.enum(['easy', 'medium', 'hard']).default('medium');
@@ -19,7 +20,8 @@ const pieceSchema = z.enum(['p', 'n', 'b', 'r', 'q', 'k', 'P', 'N', 'B', 'R', 'Q
 const playerTypeSchema = z.enum(['human', 'ai']).default('human');
 
 // FEN string schema with validation
-export const fenSchema = z.string()
+export const fenSchema = z
+  .string()
   .min(10, 'FEN string too short')
   .max(100, 'FEN string too long')
   .refine((fen) => {
@@ -38,15 +40,17 @@ export const fenSchema = z.string()
   }, 'Invalid FEN format');
 
 // Move details schema
-export const moveDetailsSchema = z.object({
-  san: z.string().max(10).optional(),
-  from: z.string().regex(squareRegex, 'Invalid source square').optional(),
-  to: z.string().regex(squareRegex, 'Invalid target square').optional(),
-  piece: pieceSchema,
-  captured: pieceSchema,
-  player_type: playerTypeSchema,
-  evaluation: z.number().optional(),
-}).optional();
+export const moveDetailsSchema = z
+  .object({
+    san: z.string().max(10).optional(),
+    from: z.string().regex(squareRegex, 'Invalid source square').optional(),
+    to: z.string().regex(squareRegex, 'Invalid target square').optional(),
+    piece: pieceSchema,
+    captured: pieceSchema,
+    player_type: playerTypeSchema,
+    evaluation: z.number().optional(),
+  })
+  .optional();
 
 // AI Move endpoint schema
 export const aiMoveSchema = z.object({
@@ -57,12 +61,14 @@ export const aiMoveSchema = z.object({
 });
 
 // Game context schema for move/chat endpoints
-export const gameContextSchema = z.object({
-  fen: z.string().optional(),
-  lastMove: z.string().max(10).optional(),
-  totalMoves: z.number().int().min(0).max(1000).optional(),
-  fullMoveHistory: z.array(z.any()).max(500).optional(),
-}).optional();
+export const gameContextSchema = z
+  .object({
+    fen: z.string().optional(),
+    lastMove: z.string().max(10).optional(),
+    totalMoves: z.number().int().min(0).max(1000).optional(),
+    fullMoveHistory: z.array(z.any()).max(500).optional(),
+  })
+  .optional();
 
 // Move history item for chat context
 const chatMoveHistoryItemSchema = z.object({
@@ -78,19 +84,30 @@ export const chessMoveSchema = z.object({
   moveHistory: z.array(chatMoveHistoryItemSchema).max(500).optional(),
   gameContext: gameContextSchema,
   gameId: z.string().uuid().optional(),
-  userId: z.string().min(1).max(100).optional().transform(v => v ?? 'anonymous'),
+  userId: z
+    .string()
+    .min(1)
+    .max(100)
+    .optional()
+    .transform((v) => v ?? 'anonymous'),
   moveDetails: moveDetailsSchema,
 });
 
 // Chat endpoint schema
 export const chatSchema = z.object({
-  message: z.string()
+  message: z
+    .string()
     .min(1, 'Message cannot be empty')
     .max(2000, 'Message too long (max 2000 characters)'),
   gameContext: gameContextSchema,
   moveHistory: z.array(chatMoveHistoryItemSchema).max(500).optional(),
   gameId: z.string().uuid().optional(),
-  userId: z.string().min(1).max(100).optional().transform(v => v ?? 'anonymous'),
+  userId: z
+    .string()
+    .min(1)
+    .max(100)
+    .optional()
+    .transform((v) => v ?? 'anonymous'),
 });
 
 // Pre-move analysis endpoint schema
@@ -100,7 +117,12 @@ export const preMoveAnalysisSchema = z.object({
   gamePhase: z.enum(['opening', 'middlegame', 'endgame']).optional(),
   gameContext: gameContextSchema,
   gameId: z.string().uuid().optional(),
-  userId: z.string().min(1).max(100).optional().transform(v => v ?? 'anonymous'),
+  userId: z
+    .string()
+    .min(1)
+    .max(100)
+    .optional()
+    .transform((v) => v ?? 'anonymous'),
 });
 
 // Engine move analysis schema (for AI opponent move commentary)
@@ -111,7 +133,7 @@ export const engineMoveAnalysisSchema = z.object({
       san: z.string().max(10).optional(),
       from: z.string().optional(),
       to: z.string().optional(),
-    })
+    }),
   ]),
   fen: fenSchema,
   engineEvaluation: z.number().optional(),
@@ -128,14 +150,12 @@ export type EngineMoveAnalysisInput = z.infer<typeof engineMoveAnalysisSchema>;
 // Validation helper that returns formatted error response
 export function validateRequest<T>(
   schema: z.ZodSchema<T>,
-  data: unknown
+  data: unknown,
 ): { success: true; data: T } | { success: false; error: string } {
   const result = schema.safeParse(data);
 
   if (!result.success) {
-    const errors = result.error.errors
-      .map(e => `${e.path.join('.')}: ${e.message}`)
-      .join(', ');
+    const errors = result.error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');
     return { success: false, error: `Validation failed: ${errors}` };
   }
 

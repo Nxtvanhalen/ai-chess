@@ -3,13 +3,11 @@
 // =============================================================================
 
 // Client instances
-export { supabase, createAdminClient } from './client';
+export { createAdminClient, supabase } from './client';
 
 // Database operations
 export * from './database';
-
-// Types
-export * from './types';
-
 // Subscription management
 export * from './subscription';
+// Types
+export * from './types';

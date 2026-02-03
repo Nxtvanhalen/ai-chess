@@ -51,11 +51,7 @@ export async function getCached<T>(key: string): Promise<T | null> {
 /**
  * Set a cached value with optional TTL
  */
-export async function setCached<T>(
-  key: string,
-  value: T,
-  ttlSeconds?: number
-): Promise<boolean> {
+export async function setCached<T>(key: string, value: T, ttlSeconds?: number): Promise<boolean> {
   const redis = getRedisClientSafe();
   if (!redis) return false;
 
@@ -94,7 +90,7 @@ export async function deleteCached(key: string): Promise<boolean> {
 export async function getOrSet<T>(
   key: string,
   computeFn: () => Promise<T>,
-  ttlSeconds?: number
+  ttlSeconds?: number,
 ): Promise<T> {
   const cached = await getCached<T>(key);
   if (cached !== null) {
@@ -170,7 +166,10 @@ export async function getCachedGameContext(gameId: string): Promise<CachedGameCo
   return getCached<CachedGameContext>(`${CACHE_KEYS.gameContext}${gameId}`);
 }
 
-export async function setCachedGameContext(gameId: string, context: CachedGameContext): Promise<boolean> {
+export async function setCachedGameContext(
+  gameId: string,
+  context: CachedGameContext,
+): Promise<boolean> {
   return setCached(`${CACHE_KEYS.gameContext}${gameId}`, context, DEFAULT_TTLS.gameContext);
 }
 
@@ -191,7 +190,10 @@ export async function getCachedUserProfile(userId: string): Promise<CachedUserPr
   return getCached<CachedUserProfile>(`${CACHE_KEYS.userProfile}${userId}`);
 }
 
-export async function setCachedUserProfile(userId: string, profile: CachedUserProfile): Promise<boolean> {
+export async function setCachedUserProfile(
+  userId: string,
+  profile: CachedUserProfile,
+): Promise<boolean> {
   return setCached(`${CACHE_KEYS.userProfile}${userId}`, profile, DEFAULT_TTLS.userProfile);
 }
 
@@ -213,12 +215,21 @@ export interface CachedChesterPersonality {
   cachedAt: number;
 }
 
-export async function getCachedChesterPersonality(userId: string): Promise<CachedChesterPersonality | null> {
+export async function getCachedChesterPersonality(
+  userId: string,
+): Promise<CachedChesterPersonality | null> {
   return getCached<CachedChesterPersonality>(`${CACHE_KEYS.chesterPersonality}${userId}`);
 }
 
-export async function setCachedChesterPersonality(userId: string, personality: CachedChesterPersonality): Promise<boolean> {
-  return setCached(`${CACHE_KEYS.chesterPersonality}${userId}`, personality, DEFAULT_TTLS.chesterPersonality);
+export async function setCachedChesterPersonality(
+  userId: string,
+  personality: CachedChesterPersonality,
+): Promise<boolean> {
+  return setCached(
+    `${CACHE_KEYS.chesterPersonality}${userId}`,
+    personality,
+    DEFAULT_TTLS.chesterPersonality,
+  );
 }
 
 // -----------------------------------------------------------------------------

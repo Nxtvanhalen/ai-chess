@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
-import { AnimatePresence, useMotionValue, animate } from 'framer-motion';
-import ChatMessage from './ChatMessage';
+import { AnimatePresence, animate } from 'framer-motion';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { ChatMessage as ChatMessageType } from '@/types';
 import ChatInput from './ChatInput';
-import LoadingIndicator from './LoadingIndicator';
-import { ChatMessage as ChatMessageType } from '@/types';
+import ChatMessage from './ChatMessage';
 
 interface ChatInterfaceProps {
   messages: ChatMessageType[];
@@ -16,14 +15,14 @@ interface ChatInterfaceProps {
 export default function ChatInterface({
   messages,
   onSendMessage,
-  isLoading = false
+  isLoading = false,
 }: ChatInterfaceProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const messagesContentRef = useRef<HTMLDivElement>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [isLandscape, setIsLandscape] = useState(false);
-  const lastScrollHeightRef = useRef(0);
+  const _lastScrollHeightRef = useRef(0);
   const userScrolledUpRef = useRef(false);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const scrollAnimationRef = useRef<{ stop: () => void } | null>(null);
@@ -75,7 +74,7 @@ export default function ChatInterface({
       onComplete: () => {
         scrollAnimationRef.current = null;
         isAnimatingRef.current = false;
-      }
+      },
     });
   }, []);
 
@@ -127,9 +126,9 @@ export default function ChatInterface({
     });
 
     observer.observe(messagesContent, {
-      childList: true,      // Watch for new messages
-      subtree: true,        // Watch nested elements
-      characterData: true,  // Watch text content changes (typing)
+      childList: true, // Watch for new messages
+      subtree: true, // Watch nested elements
+      characterData: true, // Watch text content changes (typing)
     });
 
     return () => {
@@ -146,7 +145,7 @@ export default function ChatInterface({
       // Small delay to let new message render
       setTimeout(() => scrollToBottom(true), 50);
     }
-  }, [messages.length, scrollToBottom]);
+  }, [scrollToBottom]);
 
   const handleScrollToBottomClick = useCallback(() => {
     userScrolledUpRef.current = false;
@@ -175,46 +174,49 @@ export default function ChatInterface({
   const visibleMessages = useMemo(() => messages, [messages]);
 
   return (
-    <div className={`chat-interface ${isLandscape ? 'landscape' : 'portrait'}`}>
+    <section
+      className={`chat-interface ${isLandscape ? 'landscape' : 'portrait'}`}
+      aria-label="Chat with Chester, your chess coach"
+    >
       <div
         ref={scrollContainerRef}
         className="chat-messages-container"
         onScroll={handleScroll}
       >
-
         {/* Message container with ref for MutationObserver */}
-        <div ref={messagesContentRef} className="space-y-1">
+        <div
+          ref={messagesContentRef}
+          className="space-y-1"
+          role="log"
+          aria-live="polite"
+          aria-relevant="additions"
+        >
           <AnimatePresence mode="popLayout">
             {visibleMessages.map((message) => (
               <ChatMessage key={message.id} message={message} />
             ))}
           </AnimatePresence>
         </div>
-        
-        <div 
-          ref={messagesEndRef} 
-          style={{ 
+
+        <div
+          ref={messagesEndRef}
+          style={{
             height: '1px',
-            width: '100%'
-          }} 
+            width: '100%',
+          }}
         />
       </div>
-      
+
       {/* Scroll to bottom button */}
       {showScrollButton && (
         <button
+          type="button"
           onClick={handleScrollToBottomClick}
           className="absolute bottom-20 right-4 z-10 p-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 smooth-transitions gpu-accelerated touch-optimized"
           style={{ minWidth: '48px', minHeight: '48px' }}
           aria-label="Scroll to bottom"
         >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            className="text-current"
-          >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-current">
             <path
               d="M7 13L12 18L17 13M12 6V17"
               stroke="currentColor"
@@ -230,6 +232,6 @@ export default function ChatInterface({
       <div className="chat-input-container">
         <ChatInput onSendMessage={onSendMessage} disabled={isLoading} />
       </div>
-    </div>
+    </section>
   );
 }

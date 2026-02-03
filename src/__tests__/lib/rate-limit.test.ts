@@ -1,4 +1,4 @@
-import { checkRateLimit, getRateLimitHeaders, getClientIP } from '@/lib/middleware/rate-limit';
+import { checkRateLimit, getClientIP, getRateLimitHeaders } from '@/lib/middleware/rate-limit';
 
 describe('Rate Limiting', () => {
   // Use unique IPs for each test to avoid state pollution
@@ -94,11 +94,12 @@ describe('Rate Limiting', () => {
 
   describe('getClientIP', () => {
     // Create a mock request object since Request is not available in Jest
-    const createMockRequest = (headers: Record<string, string>) => ({
-      headers: {
-        get: (key: string) => headers[key.toLowerCase()] || null,
-      },
-    } as unknown as Request);
+    const createMockRequest = (headers: Record<string, string>) =>
+      ({
+        headers: {
+          get: (key: string) => headers[key.toLowerCase()] || null,
+        },
+      }) as unknown as Request;
 
     it('should extract IP from x-forwarded-for header', () => {
       const request = createMockRequest({

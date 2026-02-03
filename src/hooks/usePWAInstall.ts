@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 /**
  * PWA Installation Detection and Management Hook
- * 
+ *
  * Provides comprehensive PWA installation capabilities including:
  * - BeforeInstallPrompt event detection
  * - Installation state management
@@ -27,15 +27,15 @@ interface PWAInstallState {
   isInstalled: boolean;
   isStandalone: boolean;
   hasInstallPromptDismissed: boolean;
-  
+
   // Platform detection
   platform: 'ios' | 'android' | 'desktop' | 'unknown';
   canShowBanner: boolean;
-  
+
   // User preferences
   showInstallBanner: boolean;
   permanentlyDismissed: boolean;
-  
+
   // Installation actions
   promptInstall: () => Promise<boolean>;
   dismissBanner: () => void;
@@ -52,23 +52,23 @@ const STORAGE_KEYS = {
 
 export function usePWAInstall(): PWAInstallState {
   const [isInstallable, setIsInstallable] = useState(false);
-  const [isInstalled, setIsInstalled] = useState(false);
+  const [_isInstalled, setIsInstalled] = useState(false);
   const [hasInstallPromptDismissed, setHasInstallPromptDismissed] = useState(false);
   const [showInstallBanner, setShowInstallBanner] = useState(false);
   const [permanentlyDismissed, setPermanentlyDismissed] = useState(false);
-  
+
   const deferredPromptRef = useRef<BeforeInstallPromptEvent | null>(null);
 
   // Platform detection with verbose logging
   const platform = useRef<'ios' | 'android' | 'desktop' | 'unknown'>('unknown');
   const isStandalone = useRef(false);
-  
+
   useEffect(() => {
     try {
       // Detect standalone mode
-      isStandalone.current = 
+      isStandalone.current =
         window.matchMedia('(display-mode: standalone)').matches ||
-        // @ts-ignore - iOS specific property
+        // @ts-expect-error - iOS specific property
         window.navigator.standalone === true ||
         document.referrer.includes('android-app://');
 
@@ -76,7 +76,7 @@ export function usePWAInstall(): PWAInstallState {
       const userAgent = navigator.userAgent.toLowerCase();
       const isIOS = /iphone|ipad|ipod/.test(userAgent);
       const isAndroid = /android/.test(userAgent);
-      
+
       if (isIOS) {
         platform.current = 'ios';
       } else if (isAndroid) {
@@ -91,7 +91,7 @@ export function usePWAInstall(): PWAInstallState {
         userAgent: navigator.userAgent,
         displayMode: window.matchMedia('(display-mode: standalone)').matches,
       });
-      
+
       setIsInstalled(isStandalone.current);
     } catch (error) {
       console.error('[PWA Install] Platform detection error:', error);
@@ -103,10 +103,10 @@ export function usePWAInstall(): PWAInstallState {
     try {
       const dismissed = localStorage.getItem(STORAGE_KEYS.PERMANENTLY_DISMISSED) === 'true';
       const bannerDismissed = localStorage.getItem(STORAGE_KEYS.BANNER_DISMISSED) === 'true';
-      
+
       setPermanentlyDismissed(dismissed);
       setHasInstallPromptDismissed(bannerDismissed);
-      
+
       console.log('[PWA Install] User preferences loaded:', {
         permanentlyDismissed: dismissed,
         bannerDismissed,
@@ -121,11 +121,11 @@ export function usePWAInstall(): PWAInstallState {
     const handleBeforeInstallPrompt = (e: Event) => {
       console.log('[PWA Install] beforeinstallprompt fired');
       e.preventDefault();
-      
+
       const beforeInstallPromptEvent = e as BeforeInstallPromptEvent;
       deferredPromptRef.current = beforeInstallPromptEvent;
       setIsInstallable(true);
-      
+
       // Show banner if not permanently dismissed and not installed
       if (!permanentlyDismissed && !isStandalone.current && !hasInstallPromptDismissed) {
         // Small delay to let the user see the app first
@@ -142,11 +142,11 @@ export function usePWAInstall(): PWAInstallState {
       setIsInstallable(false);
       setShowInstallBanner(false);
       deferredPromptRef.current = null;
-      
+
       // Track successful installation
       try {
         const interactions = JSON.parse(
-          localStorage.getItem(STORAGE_KEYS.INSTALL_INTERACTIONS) || '[]'
+          localStorage.getItem(STORAGE_KEYS.INSTALL_INTERACTIONS) || '[]',
         );
         interactions.push({
           type: 'installed',
@@ -178,16 +178,16 @@ export function usePWAInstall(): PWAInstallState {
     try {
       console.log('[PWA Install] Prompting user for installation');
       await deferredPromptRef.current.prompt();
-      
+
       const choiceResult = await deferredPromptRef.current.userChoice;
       console.log('[PWA Install] User choice:', choiceResult);
-      
+
       const installed = choiceResult.outcome === 'accepted';
-      
+
       // Track user interaction
       try {
         const interactions = JSON.parse(
-          localStorage.getItem(STORAGE_KEYS.INSTALL_INTERACTIONS) || '[]'
+          localStorage.getItem(STORAGE_KEYS.INSTALL_INTERACTIONS) || '[]',
         );
         interactions.push({
           type: installed ? 'accepted' : 'dismissed',
@@ -198,7 +198,7 @@ export function usePWAInstall(): PWAInstallState {
       } catch (error) {
         console.error('[PWA Install] Failed to track interaction:', error);
       }
-      
+
       if (installed) {
         setIsInstalled(true);
         setShowInstallBanner(false);
@@ -206,10 +206,10 @@ export function usePWAInstall(): PWAInstallState {
         setHasInstallPromptDismissed(true);
         localStorage.setItem(STORAGE_KEYS.INSTALL_DISMISSED, 'true');
       }
-      
+
       deferredPromptRef.current = null;
       setIsInstallable(false);
-      
+
       return installed;
     } catch (error) {
       console.error('[PWA Install] Installation prompt error:', error);
@@ -221,7 +221,7 @@ export function usePWAInstall(): PWAInstallState {
   const dismissBanner = useCallback(() => {
     console.log('[PWA Install] Banner dismissed temporarily');
     setShowInstallBanner(false);
-    
+
     try {
       localStorage.setItem(STORAGE_KEYS.BANNER_DISMISSED, 'true');
     } catch (error) {
@@ -234,13 +234,13 @@ export function usePWAInstall(): PWAInstallState {
     console.log('[PWA Install] Banner permanently dismissed');
     setShowInstallBanner(false);
     setPermanentlyDismissed(true);
-    
+
     try {
       localStorage.setItem(STORAGE_KEYS.PERMANENTLY_DISMISSED, 'true');
-      
+
       // Track permanent dismissal
       const interactions = JSON.parse(
-        localStorage.getItem(STORAGE_KEYS.INSTALL_INTERACTIONS) || '[]'
+        localStorage.getItem(STORAGE_KEYS.INSTALL_INTERACTIONS) || '[]',
       );
       interactions.push({
         type: 'permanently_dismissed',
@@ -256,12 +256,12 @@ export function usePWAInstall(): PWAInstallState {
   // Reset preferences (for testing/debugging)
   const resetPreferences = useCallback(() => {
     console.log('[PWA Install] Resetting all preferences');
-    
+
     try {
-      Object.values(STORAGE_KEYS).forEach(key => {
+      Object.values(STORAGE_KEYS).forEach((key) => {
         localStorage.removeItem(key);
       });
-      
+
       setHasInstallPromptDismissed(false);
       setPermanentlyDismissed(false);
       setShowInstallBanner(false);
@@ -271,9 +271,8 @@ export function usePWAInstall(): PWAInstallState {
   }, []);
 
   // Determine if banner can be shown
-  const canShowBanner = !isStandalone.current && 
-                       !permanentlyDismissed && 
-                       (isInstallable || platform.current === 'ios');
+  const canShowBanner =
+    !isStandalone.current && !permanentlyDismissed && (isInstallable || platform.current === 'ios');
 
   return {
     // Installation states
@@ -281,15 +280,15 @@ export function usePWAInstall(): PWAInstallState {
     isInstalled: isStandalone.current,
     isStandalone: isStandalone.current,
     hasInstallPromptDismissed,
-    
+
     // Platform info
     platform: platform.current,
     canShowBanner,
-    
+
     // User preferences
     showInstallBanner,
     permanentlyDismissed,
-    
+
     // Actions
     promptInstall,
     dismissBanner,

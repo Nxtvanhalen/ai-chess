@@ -7,13 +7,13 @@ import { createAdminClient } from '../supabase/client';
 
 // Use admin client for server-side operations (bypasses RLS)
 const getSupabase = () => createAdminClient();
-import {
+
+import type {
   ChesterLongTermMemory,
-  PlayStyleProfile,
-  RecentGameSummary,
+  GameMemory,
   MemorableMoment,
+  RecentGameSummary,
   RelationshipMetrics,
-  GameMemory
 } from '@/types';
 
 // UUID v4 regex pattern
@@ -52,7 +52,7 @@ export class ChesterMemoryService {
     if (error) {
       if (error.code === 'PGRST116') {
         // No memory found - create initial memory
-        return await this.createInitialMemory(userId);
+        return await ChesterMemoryService.createInitialMemory(userId);
       }
       console.error('Error fetching Chester memory:', error);
       return null; // Graceful degradation instead of throwing
@@ -87,7 +87,7 @@ export class ChesterMemoryService {
         rapport_level: 1,
         inside_jokes: [],
         chester_confidence_in_user: 5,
-        preferred_communication_style: 'casual' as const
+        preferred_communication_style: 'casual' as const,
       },
       win_rate_by_opening: {},
       win_rate_by_color: {},
@@ -97,7 +97,7 @@ export class ChesterMemoryService {
       total_positions_analyzed: 0,
       total_suggestions_given: 0,
       suggestions_followed_percentage: 0,
-      last_played_at: null
+      last_played_at: null,
     };
 
     const { data, error } = await supabase
@@ -120,16 +120,16 @@ export class ChesterMemoryService {
   static async updateGameStatistics(
     userId: string,
     result: 'win' | 'loss' | 'draw',
-    gameDuration?: number
+    gameDuration?: number,
   ): Promise<void> {
-    const memory = await this.getOrCreateMemory(userId);
+    const memory = await ChesterMemoryService.getOrCreateMemory(userId);
 
     // Skip if no memory (anonymous user)
     if (!memory) return;
 
     const updates: Partial<ChesterLongTermMemory> = {
       total_games: memory.total_games + 1,
-      last_played_at: new Date().toISOString()
+      last_played_at: new Date().toISOString(),
     };
 
     // Update win/loss/draw counts
@@ -138,7 +138,7 @@ export class ChesterMemoryService {
       updates.current_streak = memory.current_streak + 1;
       updates.longest_winning_streak = Math.max(
         memory.longest_winning_streak,
-        memory.current_streak + 1
+        memory.current_streak + 1,
       );
     } else if (result === 'loss') {
       updates.games_lost = memory.games_lost + 1;
@@ -172,7 +172,7 @@ export class ChesterMemoryService {
    * Learn from completed game and update play style profile
    */
   static async learnFromGame(userId: string, gameMemory: GameMemory): Promise<void> {
-    const memory = await this.getOrCreateMemory(userId);
+    const memory = await ChesterMemoryService.getOrCreateMemory(userId);
     if (!memory) return;
     const profile = memory.play_style_profile || {};
 
@@ -180,12 +180,11 @@ export class ChesterMemoryService {
     if (gameMemory.full_move_history.length > 0) {
       const firstMove = gameMemory.full_move_history[0].san;
       profile.opening_preferences = profile.opening_preferences || {};
-      profile.opening_preferences[firstMove] =
-        (profile.opening_preferences[firstMove] || 0) + 1;
+      profile.opening_preferences[firstMove] = (profile.opening_preferences[firstMove] || 0) + 1;
     }
 
     // Calculate aggressiveness (captures per game)
-    const captures = gameMemory.full_move_history.filter(m => m.captured).length;
+    const captures = gameMemory.full_move_history.filter((m) => m.captured).length;
     const aggressivenessScore = Math.min(captures / 10, 1); // Normalize to 0-1
     profile.aggressiveness = profile.aggressiveness
       ? (profile.aggressiveness + aggressivenessScore) / 2
@@ -193,14 +192,14 @@ export class ChesterMemoryService {
 
     // Update tactical patterns
     const patterns = memory.recurring_tactical_patterns || {};
-    gameMemory.tactical_themes.forEach(theme => {
+    gameMemory.tactical_themes.forEach((theme) => {
       patterns[theme] = (patterns[theme] || 0) + 1;
     });
 
     // Update common mistakes from bad suggestion outcomes
     const mistakes = profile.common_mistakes || [];
-    const badSuggestions = gameMemory.suggestions_given.filter(s => s.outcome === 'bad');
-    badSuggestions.forEach(s => {
+    const badSuggestions = gameMemory.suggestions_given.filter((s) => s.outcome === 'bad');
+    badSuggestions.forEach((s) => {
       if (s.outcome_reason && !mistakes.includes(s.outcome_reason)) {
         mistakes.push(s.outcome_reason);
       }
@@ -214,7 +213,7 @@ export class ChesterMemoryService {
       .from('chester_long_term_memory')
       .update({
         play_style_profile: profile,
-        recurring_tactical_patterns: patterns
+        recurring_tactical_patterns: patterns,
       })
       .eq('user_id', userId);
 
@@ -228,7 +227,7 @@ export class ChesterMemoryService {
    * Add recent game summary
    */
   static async addRecentGame(userId: string, gameSummary: RecentGameSummary): Promise<void> {
-    const memory = await this.getOrCreateMemory(userId);
+    const memory = await ChesterMemoryService.getOrCreateMemory(userId);
     if (!memory) return;
 
     // Keep only last 10 games
@@ -240,7 +239,7 @@ export class ChesterMemoryService {
     const { error } = await supabase
       .from('chester_long_term_memory')
       .update({
-        recent_games: recentGames
+        recent_games: recentGames,
       })
       .eq('user_id', userId);
 
@@ -254,7 +253,7 @@ export class ChesterMemoryService {
    * Add memorable moment
    */
   static async addMemorableMoment(userId: string, moment: MemorableMoment): Promise<void> {
-    const memory = await this.getOrCreateMemory(userId);
+    const memory = await ChesterMemoryService.getOrCreateMemory(userId);
     if (!memory) return;
 
     // Keep only last 20 memorable moments
@@ -266,7 +265,7 @@ export class ChesterMemoryService {
     const { error } = await supabase
       .from('chester_long_term_memory')
       .update({
-        memorable_moments: moments
+        memorable_moments: moments,
       })
       .eq('user_id', userId);
 
@@ -281,14 +280,14 @@ export class ChesterMemoryService {
    */
   static async updateRelationship(
     userId: string,
-    updates: Partial<RelationshipMetrics>
+    updates: Partial<RelationshipMetrics>,
   ): Promise<void> {
-    const memory = await this.getOrCreateMemory(userId);
+    const memory = await ChesterMemoryService.getOrCreateMemory(userId);
     if (!memory) return;
 
     const updatedMetrics = {
       ...memory.relationship_metrics,
-      ...updates
+      ...updates,
     };
 
     const supabase = getSupabase();
@@ -297,7 +296,7 @@ export class ChesterMemoryService {
     const { error } = await supabase
       .from('chester_long_term_memory')
       .update({
-        relationship_metrics: updatedMetrics
+        relationship_metrics: updatedMetrics,
       })
       .eq('user_id', userId);
 
@@ -311,7 +310,7 @@ export class ChesterMemoryService {
    * Increment relationship after game
    */
   static async incrementGamesPlayed(userId: string): Promise<void> {
-    const memory = await this.getOrCreateMemory(userId);
+    const memory = await ChesterMemoryService.getOrCreateMemory(userId);
     if (!memory) return;
 
     const metrics = memory.relationship_metrics;
@@ -322,7 +321,7 @@ export class ChesterMemoryService {
       metrics.rapport_level += 1;
     }
 
-    await this.updateRelationship(userId, metrics);
+    await ChesterMemoryService.updateRelationship(userId, metrics);
   }
 
   /**
@@ -331,15 +330,14 @@ export class ChesterMemoryService {
   static async updateSuggestionStats(
     userId: string,
     suggestionsGiven: number,
-    suggestionsFollowed: number
+    suggestionsFollowed: number,
   ): Promise<void> {
-    const memory = await this.getOrCreateMemory(userId);
+    const memory = await ChesterMemoryService.getOrCreateMemory(userId);
     if (!memory) return;
 
     const totalSuggestions = memory.total_suggestions_given + suggestionsGiven;
-    const followedPercentage = totalSuggestions > 0
-      ? (suggestionsFollowed / totalSuggestions) * 100
-      : 0;
+    const followedPercentage =
+      totalSuggestions > 0 ? (suggestionsFollowed / totalSuggestions) * 100 : 0;
 
     const supabase = getSupabase();
     if (!supabase) return;
@@ -348,7 +346,7 @@ export class ChesterMemoryService {
       .from('chester_long_term_memory')
       .update({
         total_suggestions_given: totalSuggestions,
-        suggestions_followed_percentage: followedPercentage
+        suggestions_followed_percentage: followedPercentage,
       })
       .eq('user_id', userId);
 
@@ -364,9 +362,9 @@ export class ChesterMemoryService {
   static async updateWinRateByColor(
     userId: string,
     color: 'white' | 'black',
-    won: boolean
+    won: boolean,
   ): Promise<void> {
-    const memory = await this.getOrCreateMemory(userId);
+    const memory = await ChesterMemoryService.getOrCreateMemory(userId);
     if (!memory) return;
 
     const rates = memory.win_rate_by_color || {};
@@ -374,9 +372,12 @@ export class ChesterMemoryService {
     const gamesPlayed = memory.total_games;
 
     // Exponential moving average
-    const newRate = gamesPlayed > 0
-      ? (currentRate * (gamesPlayed - 1) + (won ? 1 : 0)) / gamesPlayed
-      : (won ? 1 : 0);
+    const newRate =
+      gamesPlayed > 0
+        ? (currentRate * (gamesPlayed - 1) + (won ? 1 : 0)) / gamesPlayed
+        : won
+          ? 1
+          : 0;
 
     rates[color] = newRate;
 
@@ -386,7 +387,7 @@ export class ChesterMemoryService {
     const { error } = await supabase
       .from('chester_long_term_memory')
       .update({
-        win_rate_by_color: rates
+        win_rate_by_color: rates,
       })
       .eq('user_id', userId);
 
@@ -407,11 +408,11 @@ export class ChesterMemoryService {
     commonMistakes: string[];
     strongAreas: string[];
   } | null> {
-    const memory = await this.getOrCreateMemory(userId);
+    const memory = await ChesterMemoryService.getOrCreateMemory(userId);
     if (!memory) return null;
 
     const recentGames = memory.recent_games.slice(-5);
-    const recentWins = recentGames.filter(g => g.result === 'win').length;
+    const recentWins = recentGames.filter((g) => g.result === 'win').length;
 
     let recentPerformance = 'neutral';
     if (recentWins >= 4) recentPerformance = 'excellent';
@@ -424,7 +425,7 @@ export class ChesterMemoryService {
       currentStreak: memory.current_streak,
       recentPerformance,
       commonMistakes: memory.play_style_profile.common_mistakes || [],
-      strongAreas: memory.play_style_profile.strong_areas || []
+      strongAreas: memory.play_style_profile.strong_areas || [],
     };
   }
 
@@ -432,7 +433,7 @@ export class ChesterMemoryService {
    * Get full context for AI calls (for Chester's awareness)
    */
   static async getFullContext(userId?: string | null): Promise<ChesterLongTermMemory | null> {
-    return await this.getOrCreateMemory(userId);
+    return await ChesterMemoryService.getOrCreateMemory(userId);
   }
 
   /**
@@ -453,6 +454,6 @@ export class ChesterMemoryService {
     }
 
     // Recreate initial memory
-    await this.createInitialMemory(userId);
+    await ChesterMemoryService.createInitialMemory(userId);
   }
 }

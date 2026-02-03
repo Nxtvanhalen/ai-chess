@@ -50,9 +50,7 @@ export default function PricingPage() {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-white mb-4">
-            Choose Your Plan
-          </h1>
+          <h1 className="text-4xl font-bold text-white mb-4">Choose Your Plan</h1>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
             Unlock Chester's full potential with a Pro or Premium subscription
           </p>
@@ -89,12 +87,8 @@ export default function PricingPage() {
         <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           {/* Free Plan */}
           <div className="bg-gray-800/30 backdrop-blur-sm border border-gray-700 rounded-2xl p-8">
-            <h3 className="text-xl font-semibold text-white mb-2">
-              {PLAN_FEATURES.free.name}
-            </h3>
-            <p className="text-gray-400 text-sm mb-6">
-              {PLAN_FEATURES.free.description}
-            </p>
+            <h3 className="text-xl font-semibold text-white mb-2">{PLAN_FEATURES.free.name}</h3>
+            <p className="text-gray-400 text-sm mb-6">{PLAN_FEATURES.free.description}</p>
             <div className="mb-6">
               <span className="text-4xl font-bold text-white">$0</span>
               <span className="text-gray-500">/forever</span>
@@ -102,8 +96,18 @@ export default function PricingPage() {
             <ul className="space-y-3 mb-8">
               {PLAN_FEATURES.free.features.map((feature, i) => (
                 <li key={i} className="flex items-start gap-3 text-gray-300 text-sm">
-                  <svg className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  <svg
+                    className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
                   {feature}
                 </li>
@@ -124,12 +128,8 @@ export default function PricingPage() {
                 POPULAR
               </span>
             </div>
-            <h3 className="text-xl font-semibold text-white mb-2">
-              {PLAN_FEATURES.pro.name}
-            </h3>
-            <p className="text-gray-400 text-sm mb-6">
-              {PLAN_FEATURES.pro.description}
-            </p>
+            <h3 className="text-xl font-semibold text-white mb-2">{PLAN_FEATURES.pro.name}</h3>
+            <p className="text-gray-400 text-sm mb-6">{PLAN_FEATURES.pro.description}</p>
             <div className="mb-6">
               <span className="text-4xl font-bold text-white">
                 {formatPrice(PRICING.pro[interval])}
@@ -139,8 +139,18 @@ export default function PricingPage() {
             <ul className="space-y-3 mb-8">
               {PLAN_FEATURES.pro.features.map((feature, i) => (
                 <li key={i} className="flex items-start gap-3 text-gray-300 text-sm">
-                  <svg className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  <svg
+                    className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
                   {feature}
                 </li>
@@ -157,12 +167,8 @@ export default function PricingPage() {
 
           {/* Premium Plan */}
           <div className="bg-gradient-to-b from-amber-900/30 to-gray-800/50 backdrop-blur-sm border border-amber-500/30 rounded-2xl p-8">
-            <h3 className="text-xl font-semibold text-white mb-2">
-              {PLAN_FEATURES.premium.name}
-            </h3>
-            <p className="text-gray-400 text-sm mb-6">
-              {PLAN_FEATURES.premium.description}
-            </p>
+            <h3 className="text-xl font-semibold text-white mb-2">{PLAN_FEATURES.premium.name}</h3>
+            <p className="text-gray-400 text-sm mb-6">{PLAN_FEATURES.premium.description}</p>
             <div className="mb-6">
               <span className="text-4xl font-bold text-white">
                 {formatPrice(PRICING.premium[interval])}
@@ -172,8 +178,18 @@ export default function PricingPage() {
             <ul className="space-y-3 mb-8">
               {PLAN_FEATURES.premium.features.map((feature, i) => (
                 <li key={i} className="flex items-start gap-3 text-gray-300 text-sm">
-                  <svg className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  <svg
+                    className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
                   {feature}
                 </li>
@@ -191,10 +207,7 @@ export default function PricingPage() {
 
         {/* Back Link */}
         <div className="text-center mt-12">
-          <a
-            href="/"
-            className="text-gray-400 hover:text-white transition-colors"
-          >
+          <a href="/" className="text-gray-400 hover:text-white transition-colors">
             Back to Game
           </a>
         </div>

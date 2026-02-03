@@ -1,10 +1,10 @@
 'use client';
 
-import { ChatMessage as ChatMessageType } from '@/types';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import DynamicMarkdown from './DynamicMarkdown';
+import type { ChatMessage as ChatMessageType } from '@/types';
 import { King } from '../chess/pieces/King';
+import DynamicMarkdown from './DynamicMarkdown';
 
 interface ChatMessageProps {
   message: ChatMessageType;
@@ -15,32 +15,33 @@ const messageVariants = {
   hidden: {
     opacity: 0,
     y: 30,
-    scale: 0.94
+    scale: 0.94,
   },
   visible: {
     opacity: 1,
     y: 0,
     scale: 1,
     transition: {
-      type: "spring" as const,
+      type: 'spring' as const,
       stiffness: 120,
       damping: 14,
-      duration: 1
-    }
+      duration: 1,
+    },
   },
   exit: {
     opacity: 0,
     y: -10,
     scale: 0.96,
     transition: {
-      duration: 0.3
-    }
-  }
+      duration: 0.3,
+    },
+  },
 };
 
-const HighlightedText = ({ children }: { children: string }) => {
+const _HighlightedText = ({ children }: { children: string }) => {
   // Pattern to match chess moves like "Knight to E4", "Pawn to D5", "castles kingside", etc.
-  const movePattern = /((?:King|Queen|Rook|Bishop|Knight|Pawn)\s+to\s+[A-H][1-8]|castles\s+(?:kingside|queenside))/gi;
+  const movePattern =
+    /((?:King|Queen|Rook|Bishop|Knight|Pawn)\s+to\s+[A-H][1-8]|castles\s+(?:kingside|queenside))/gi;
 
   const parts = children.split(movePattern);
 
@@ -82,7 +83,7 @@ const TypingDots = () => (
             duration: 1.2,
             repeat: Infinity,
             delay: i * 0.2,
-            ease: "easeInOut",
+            ease: 'easeInOut',
           }}
         />
       ))}
@@ -90,14 +91,10 @@ const TypingDots = () => (
   </div>
 );
 
-const SuggestionContent = ({ suggestions, comment }: { suggestions: any[], comment?: string }) => (
+const SuggestionContent = ({ suggestions, comment }: { suggestions: any[]; comment?: string }) => (
   <div className="space-y-3">
     {/* Show Chester's typed comment first */}
-    {comment && (
-      <div className="text-slate-200">
-        {comment}
-      </div>
-    )}
+    {comment && <div className="text-slate-200">{comment}</div>}
     <div className="flex items-center gap-2">
       <span className="text-purple-300 text-sm italic">Here's what I'm thinking:</span>
     </div>
@@ -110,12 +107,8 @@ const SuggestionContent = ({ suggestions, comment }: { suggestions: any[], comme
           transition={{ delay: i * 0.1 }}
           className="bg-purple-500/10 border border-purple-400/20 rounded-lg p-3"
         >
-          <div className="font-medium text-purple-200 text-sm mb-1">
-            {suggestion.move}
-          </div>
-          <div className="text-xs text-purple-300/80">
-            {suggestion.reasoning}
-          </div>
+          <div className="font-medium text-purple-200 text-sm mb-1">{suggestion.move}</div>
+          <div className="text-xs text-purple-300/80">{suggestion.reasoning}</div>
         </motion.div>
       ))}
     </div>
@@ -138,14 +131,18 @@ export default function ChatMessage({ message }: ChatMessageProps) {
   };
 
   const getNameClass = () => {
-    if (isEngine) return 'bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent';
-    if (isAssistant) return 'bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent';
+    if (isEngine)
+      return 'bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent';
+    if (isAssistant)
+      return 'bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent';
     return 'text-slate-900 dark:text-slate-100';
   };
 
   const getBubbleClass = () => {
-    if (isEngine) return 'bg-red-900/15 px-1 py-0.5 lg:p-4 rounded-md lg:rounded-2xl border border-red-400/30 shadow-lg backdrop-blur-sm';
-    if (isAssistant) return 'bg-purple-900/15 px-1 py-0.5 lg:p-4 rounded-md lg:rounded-2xl border border-purple-400/30 shadow-lg backdrop-blur-sm';
+    if (isEngine)
+      return 'bg-red-900/15 px-1 py-0.5 lg:p-4 rounded-md lg:rounded-2xl border border-red-400/30 shadow-lg backdrop-blur-sm';
+    if (isAssistant)
+      return 'bg-purple-900/15 px-1 py-0.5 lg:p-4 rounded-md lg:rounded-2xl border border-purple-400/30 shadow-lg backdrop-blur-sm';
     return 'bg-slate-800/25 px-1 py-0.5 lg:p-4 rounded-md lg:rounded-2xl border border-slate-400/30 shadow-lg backdrop-blur-sm';
   };
 
@@ -179,7 +176,9 @@ export default function ChatMessage({ message }: ChatMessageProps) {
           </div>
           <div className="bg-red-900/15 px-1 py-0.5 lg:p-4 rounded-md lg:rounded-2xl border border-red-400/30 shadow-lg backdrop-blur-sm">
             <div className="flex items-center gap-2">
-              <span className="text-orange-300 text-sm italic">{message.metadata?.analysis || 'Thinking...'}</span>
+              <span className="text-orange-300 text-sm italic">
+                {message.metadata?.analysis || 'Thinking...'}
+              </span>
               <div className="flex gap-0.5 ml-2">
                 {[0, 1, 2].map((i) => (
                   <motion.div
@@ -193,7 +192,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
                       duration: 1.2,
                       repeat: Infinity,
                       delay: i * 0.2,
-                      ease: "easeInOut",
+                      ease: 'easeInOut',
                     }}
                   />
                 ))}
@@ -211,8 +210,9 @@ export default function ChatMessage({ message }: ChatMessageProps) {
       initial="hidden"
       animate="visible"
       exit="exit"
-      className={`flex gap-1 lg:gap-4 px-1 lg:px-6 py-1 lg:py-6 ${isUser ? 'hover:bg-purple-900/10 rounded-l-2xl' : ''
-        } mx-0 lg:mx-2`}
+      className={`flex gap-1 lg:gap-4 px-1 lg:px-6 py-1 lg:py-6 ${
+        isUser ? 'hover:bg-purple-900/10 rounded-l-2xl' : ''
+      } mx-0 lg:mx-2`}
     >
       <div className="flex-shrink-0">
         {isEngine ? (
@@ -236,7 +236,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
                 top: '50%',
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
-                filter: 'brightness(1.1) contrast(1.1) drop-shadow(0 2px 3px rgba(0,0,0,0.3))'
+                filter: 'brightness(1.1) contrast(1.1) drop-shadow(0 2px 3px rgba(0,0,0,0.3))',
               }}
             />
           </div>
@@ -248,7 +248,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
               className="absolute inset-0 w-full h-full"
               style={{
                 objectFit: 'contain',
-                objectPosition: 'center'
+                objectPosition: 'center',
               }}
             />
           </div>
@@ -257,26 +257,27 @@ export default function ChatMessage({ message }: ChatMessageProps) {
 
       <div className="flex-1 overflow-hidden">
         <div className="flex items-baseline gap-1 mb-1">
-          <span className={`font-bold text-xs lg:text-sm ${getNameClass()}`}>
-            {getName()}
-          </span>
+          <span className={`font-bold text-xs lg:text-sm ${getNameClass()}`}>{getName()}</span>
           <span className="text-xs lg:text-xs text-slate-500 dark:text-slate-400 font-medium hidden lg:inline">
             {new Date(message.timestamp).toLocaleTimeString([], {
               hour: '2-digit',
-              minute: '2-digit'
+              minute: '2-digit',
             })}
           </span>
         </div>
 
-        <div className={`markdown-content prose prose-sm max-w-none prose-invert prose-p:leading-tight prose-p:mb-0 prose-headings:font-bold prose-a:text-blue-400 text-slate-200 text-sm lg:text-base ${getBubbleClass()}`}>
+        <div
+          className={`markdown-content prose prose-sm max-w-none prose-invert prose-p:leading-tight prose-p:mb-0 prose-headings:font-bold prose-a:text-blue-400 text-slate-200 text-sm lg:text-base ${getBubbleClass()}`}
+        >
           {isThinking && isAssistant ? (
             <TypingDots />
           ) : message.type === 'suggestion' && message.metadata?.suggestions ? (
-            <SuggestionContent suggestions={message.metadata.suggestions} comment={message.content} />
+            <SuggestionContent
+              suggestions={message.metadata.suggestions}
+              comment={message.content}
+            />
           ) : (
-            <DynamicMarkdown>
-              {message.content}
-            </DynamicMarkdown>
+            <DynamicMarkdown>{message.content}</DynamicMarkdown>
           )}
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { Chess, Square } from 'chess.js';
+import { Chess, type Square } from 'chess.js';
 
 interface PieceValue {
   [key: string]: number;
@@ -38,12 +38,12 @@ interface PositionAnalysis {
 export class PositionAnalyzer {
   private chess: Chess;
   private pieceValues: PieceValue = {
-    'p': 1,   // Pawn
-    'n': 3,   // Knight  
-    'b': 3,   // Bishop
-    'r': 5,   // Rook
-    'q': 9,   // Queen
-    'k': 0    // King (invaluable)
+    p: 1, // Pawn
+    n: 3, // Knight
+    b: 3, // Bishop
+    r: 5, // Rook
+    q: 9, // Queen
+    k: 0, // King (invaluable)
   };
 
   constructor(fen: string) {
@@ -58,7 +58,12 @@ export class PositionAnalyzer {
     const criticalSquares = this.findCriticalSquares();
     const gamePhase = this.determineGamePhase(materialCount);
     const urgencyLevel = this.determineUrgency(threats, kingSafety, materialCount);
-    const recommendations = this.generateRecommendations(materialCount, threats, kingSafety, urgencyLevel);
+    const recommendations = this.generateRecommendations(
+      materialCount,
+      threats,
+      kingSafety,
+      urgencyLevel,
+    );
 
     return {
       materialCount,
@@ -68,7 +73,7 @@ export class PositionAnalyzer {
       criticalSquares,
       gamePhase,
       urgencyLevel,
-      recommendations
+      recommendations,
     };
   }
 
@@ -78,8 +83,8 @@ export class PositionAnalyzer {
     const black = { p: 0, n: 0, b: 0, r: 0, q: 0, k: 0 };
 
     // Count pieces
-    board.forEach(row => {
-      row.forEach(square => {
+    board.forEach((row) => {
+      row.forEach((square) => {
         if (square) {
           if (square.color === 'w') {
             white[square.type]++;
@@ -91,32 +96,36 @@ export class PositionAnalyzer {
     });
 
     // Calculate totals
-    const whiteTotal = Object.entries(white).reduce((sum, [piece, count]) => 
-      sum + (this.pieceValues[piece] * count), 0);
-    const blackTotal = Object.entries(black).reduce((sum, [piece, count]) => 
-      sum + (this.pieceValues[piece] * count), 0);
-    
+    const whiteTotal = Object.entries(white).reduce(
+      (sum, [piece, count]) => sum + this.pieceValues[piece] * count,
+      0,
+    );
+    const blackTotal = Object.entries(black).reduce(
+      (sum, [piece, count]) => sum + this.pieceValues[piece] * count,
+      0,
+    );
+
     const imbalance = whiteTotal - blackTotal;
 
     return {
       white,
-      black, 
+      black,
       whiteTotal,
       blackTotal,
-      imbalance: this.chess.turn() === 'w' ? imbalance : -imbalance // From current player's perspective
+      imbalance: this.chess.turn() === 'w' ? imbalance : -imbalance, // From current player's perspective
     };
   }
 
   private analyzeThreats(): ThreatInfo[] {
     const threats: ThreatInfo[] = [];
-    const board = this.chess.board();
-    
+    const _board = this.chess.board();
+
     // Check each square for pieces and their threat status
     for (let rank = 0; rank < 8; rank++) {
       for (let file = 0; file < 8; file++) {
         const square = this.indexToSquare(rank, file);
         const piece = this.chess.get(square);
-        
+
         if (piece) {
           const attackedBy = this.getAttackersOfSquare(square, piece.color === 'w' ? 'b' : 'w');
           const defendedBy = this.getAttackersOfSquare(square, piece.color);
@@ -130,7 +139,7 @@ export class PositionAnalyzer {
               attackedBy,
               defendedBy,
               isHanging,
-              value
+              value,
             });
           }
         }
@@ -148,7 +157,7 @@ export class PositionAnalyzer {
   private analyzeKingSafety(): PositionAnalysis['kingSafety'] {
     const whiteKing = this.findKing('w');
     const blackKing = this.findKing('b');
-    
+
     const whiteThreats = whiteKing ? this.getAttackersOfSquare(whiteKing, 'b') : [];
     const blackThreats = blackKing ? this.getAttackersOfSquare(blackKing, 'w') : [];
 
@@ -156,19 +165,19 @@ export class PositionAnalyzer {
       white: {
         safe: whiteThreats.length === 0 && !this.chess.inCheck(),
         threats: whiteThreats,
-        castlingAvailable: this.canCastle('w')
+        castlingAvailable: this.canCastle('w'),
       },
       black: {
         safe: blackThreats.length === 0 && !this.chess.inCheck(),
-        threats: blackThreats, 
-        castlingAvailable: this.canCastle('b')
-      }
+        threats: blackThreats,
+        castlingAvailable: this.canCastle('b'),
+      },
     };
   }
 
   private detectTacticalPatterns(): string[] {
     const patterns: string[] = [];
-    
+
     // Check for checks
     if (this.chess.inCheck()) {
       patterns.push('CHECK');
@@ -198,11 +207,11 @@ export class PositionAnalyzer {
 
   private findCriticalSquares(): Square[] {
     const critical: Square[] = [];
-    
+
     // Add squares around kings
     const whiteKing = this.findKing('w');
     const blackKing = this.findKing('b');
-    
+
     if (whiteKing) {
       critical.push(...this.getAdjacentSquares(whiteKing));
     }
@@ -215,16 +224,20 @@ export class PositionAnalyzer {
 
   private determineGamePhase(materialCount: MaterialCount): 'opening' | 'middlegame' | 'endgame' {
     const totalPieces = materialCount.whiteTotal + materialCount.blackTotal;
-    
+
     if (totalPieces < 15) return 'endgame';
     if (totalPieces < 25) return 'middlegame';
     return 'opening';
   }
 
-  private determineUrgency(threats: ThreatInfo[], kingSafetyParam: PositionAnalysis['kingSafety'], materialCount: MaterialCount): 'emergency' | 'tactical' | 'strategic' {
+  private determineUrgency(
+    threats: ThreatInfo[],
+    kingSafetyParam: PositionAnalysis['kingSafety'],
+    materialCount: MaterialCount,
+  ): 'emergency' | 'tactical' | 'strategic' {
     // Emergency: King in danger or major material loss imminent
     const currentColor = this.chess.turn();
-    const kingSafetyStatus = currentColor === 'w' ? kingSafetyParam.white : kingSafetyParam.black;
+    const _kingSafetyStatus = currentColor === 'w' ? kingSafetyParam.white : kingSafetyParam.black;
 
     // Check or immediate king danger = emergency
     if (this.chess.inCheck()) {
@@ -232,8 +245,8 @@ export class PositionAnalyzer {
     }
 
     // Hanging piece worth 3+ (Knight/Bishop or better) = emergency
-    const myThreats = threats.filter(t => t.piece.startsWith(currentColor));
-    if (myThreats.some(t => t.isHanging && t.value >= 3)) {
+    const myThreats = threats.filter((t) => t.piece.startsWith(currentColor));
+    if (myThreats.some((t) => t.isHanging && t.value >= 3)) {
       return 'emergency';
     }
 
@@ -244,9 +257,9 @@ export class PositionAnalyzer {
 
     // Tactical: Only if there's a SIGNIFICANT hanging piece (not just pawns)
     // or we can capture something valuable
-    const enemyThreats = threats.filter(t => !t.piece.startsWith(currentColor));
-    const canCaptureValuable = enemyThreats.some(t => t.isHanging && t.value >= 3);
-    const myHangingMinor = myThreats.some(t => t.isHanging && t.value >= 3);
+    const enemyThreats = threats.filter((t) => !t.piece.startsWith(currentColor));
+    const canCaptureValuable = enemyThreats.some((t) => t.isHanging && t.value >= 3);
+    const myHangingMinor = myThreats.some((t) => t.isHanging && t.value >= 3);
 
     if (canCaptureValuable || myHangingMinor || Math.abs(materialCount.imbalance) >= 3) {
       return 'tactical';
@@ -258,22 +271,24 @@ export class PositionAnalyzer {
   }
 
   private generateRecommendations(
-    materialCount: MaterialCount, 
-    threats: ThreatInfo[], 
+    materialCount: MaterialCount,
+    threats: ThreatInfo[],
     kingSafetyParam: PositionAnalysis['kingSafety'],
-    urgencyLevel: 'emergency' | 'tactical' | 'strategic'
+    _urgencyLevel: 'emergency' | 'tactical' | 'strategic',
   ): string[] {
     const recommendations: string[] = [];
     const currentColor = this.chess.turn();
-    
+
     // Material recommendations
     if (materialCount.imbalance < -3) {
-      recommendations.push(`You're down ${Math.abs(materialCount.imbalance)} points in material - look for tactics`);
+      recommendations.push(
+        `You're down ${Math.abs(materialCount.imbalance)} points in material - look for tactics`,
+      );
     } else if (materialCount.imbalance > 3) {
       recommendations.push(`You're up ${materialCount.imbalance} points - simplify to endgame`);
     }
 
-    // King safety recommendations  
+    // King safety recommendations
     const kingStatus = currentColor === 'w' ? kingSafetyParam.white : kingSafetyParam.black;
     if (!kingStatus.safe) {
       recommendations.push('Your king is under attack - prioritize king safety');
@@ -282,20 +297,24 @@ export class PositionAnalyzer {
     }
 
     // Threat-based recommendations
-    const myThreats = threats.filter(t => t.piece.startsWith(currentColor));
+    const myThreats = threats.filter((t) => t.piece.startsWith(currentColor));
     if (myThreats.length > 0) {
-      const hangingPieces = myThreats.filter(t => t.isHanging);
+      const hangingPieces = myThreats.filter((t) => t.isHanging);
       if (hangingPieces.length > 0) {
-        recommendations.push(`Save your hanging ${this.pieceTypeToName(hangingPieces[0].piece.slice(1))} on ${hangingPieces[0].square}`);
+        recommendations.push(
+          `Save your hanging ${this.pieceTypeToName(hangingPieces[0].piece.slice(1))} on ${hangingPieces[0].square}`,
+        );
       }
     }
 
     // Enemy threat opportunities
-    const enemyThreats = threats.filter(t => !t.piece.startsWith(currentColor));
+    const enemyThreats = threats.filter((t) => !t.piece.startsWith(currentColor));
     if (enemyThreats.length > 0) {
-      const enemyHanging = enemyThreats.filter(t => t.isHanging);
+      const enemyHanging = enemyThreats.filter((t) => t.isHanging);
       if (enemyHanging.length > 0) {
-        recommendations.push(`Capture the hanging ${this.pieceTypeToName(enemyHanging[0].piece.slice(1))} on ${enemyHanging[0].square}`);
+        recommendations.push(
+          `Capture the hanging ${this.pieceTypeToName(enemyHanging[0].piece.slice(1))} on ${enemyHanging[0].square}`,
+        );
       }
     }
 
@@ -346,7 +365,7 @@ export class PositionAnalyzer {
 
   private findKing(color: 'w' | 'b'): Square | null {
     const board = this.chess.board();
-    
+
     for (let rank = 0; rank < 8; rank++) {
       for (let file = 0; file < 8; file++) {
         const piece = board[rank][file];
@@ -355,44 +374,44 @@ export class PositionAnalyzer {
         }
       }
     }
-    
+
     return null;
   }
 
-  private canCastle(color: 'w' | 'b'): boolean {
+  private canCastle(_color: 'w' | 'b'): boolean {
     const moves = this.chess.moves({ verbose: true });
-    return moves.some(move => move.flags.includes('k') || move.flags.includes('q'));
+    return moves.some((move) => move.flags.includes('k') || move.flags.includes('q'));
   }
 
   private getAdjacentSquares(square: Square): Square[] {
     const file = square.charCodeAt(0) - 97; // a=0, b=1, etc.
-    const rank = parseInt(square[1]) - 1;   // 1=0, 2=1, etc.
+    const rank = parseInt(square[1], 10) - 1; // 1=0, 2=1, etc.
     const adjacent: Square[] = [];
-    
+
     for (let dRank = -1; dRank <= 1; dRank++) {
       for (let dFile = -1; dFile <= 1; dFile++) {
         if (dRank === 0 && dFile === 0) continue;
-        
+
         const newRank = rank + dRank;
         const newFile = file + dFile;
-        
+
         if (newRank >= 0 && newRank < 8 && newFile >= 0 && newFile < 8) {
           adjacent.push(`${String.fromCharCode(97 + newFile)}${newRank + 1}` as Square);
         }
       }
     }
-    
+
     return adjacent;
   }
 
   private pieceTypeToName(pieceType: string): string {
     const names: { [key: string]: string } = {
-      'p': 'Pawn',
-      'n': 'Knight', 
-      'b': 'Bishop',
-      'r': 'Rook',
-      'q': 'Queen',
-      'k': 'King'
+      p: 'Pawn',
+      n: 'Knight',
+      b: 'Bishop',
+      r: 'Rook',
+      q: 'Queen',
+      k: 'King',
     };
     return names[pieceType] || pieceType;
   }

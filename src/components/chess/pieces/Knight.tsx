@@ -1,19 +1,17 @@
-import React from 'react';
-import { PieceProps } from './types';
+import type React from 'react';
+import type { PieceProps } from './types';
 
 export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   return (
-    <svg 
-      viewBox="0.00 0.00 677.00 369.00" 
-      style={style} 
+    <svg
+      viewBox="0.00 0.00 677.00 369.00"
+      style={style}
       className={className}
       xmlns="http://www.w3.org/2000/svg"
     >
-      
-
-
-<g fill="#152943">
-<path d="
+      <g fill="#152943">
+        <path
+          d="
   M 304.39 92.34
   L 307.35 93.35
   A 0.90 0.90 0.0 0 0 308.49 92.82
@@ -1332,9 +1330,16 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.99 0.97 -64.8 0 0 292.22 306.12
   L 283.63 315.96
   Z"
-/>
-<ellipse cx="0.00" cy="0.00" transform="translate(324.98,89.62) rotate(-66.6)" rx="3.31" ry="0.92"/>
-<path d="
+        />
+        <ellipse
+          cx="0.00"
+          cy="0.00"
+          transform="translate(324.98,89.62) rotate(-66.6)"
+          rx="3.31"
+          ry="0.92"
+        />
+        <path
+          d="
   M 329.51 92.05
   L 328.73 93.67
   L 327.69 94.73
@@ -1345,8 +1350,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.57 0.56 29.4 0 1 330.47 88.76
   Q 329.66 90.28 329.51 92.05
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 414.67 119.67
   Q 415.40 120.11 415.68 120.48
   Q 414.84 122.50 414.90 125.10
@@ -1355,10 +1361,11 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 2.08 2.08 0.0 0 1 411.65 123.17
   Q 411.43 120.05 414.67 119.67
   Z"
-/>
-</g>
-<g fill="#f8edc8">
-<path d="
+        />
+      </g>
+      <g fill="#f8edc8">
+        <path
+          d="
   M 318.19 47.25
   Q 317.59 47.61 317.13 47.09
   Q 312.67 42.03 304.17 40.38
@@ -1368,8 +1375,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 1.15 1.12 -3.4 0 1 315.40 42.09
   L 318.19 47.25
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 322.70 55.62
   L 320.38 47.88
   Q 319.67 46.52 319.40 44.73
@@ -1377,17 +1385,25 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 321.13 45.39 321.90 46.86
   Q 324.35 51.50 322.70 55.62
   Z"
-/>
-<ellipse cx="0.00" cy="0.00" transform="translate(317.98,64.42) rotate(-7.1)" rx="2.19" ry="0.52"/>
-<path d="
+        />
+        <ellipse
+          cx="0.00"
+          cy="0.00"
+          transform="translate(317.98,64.42) rotate(-7.1)"
+          rx="2.19"
+          ry="0.52"
+        />
+        <path
+          d="
   M 391.11 71.22
   L 385.23 77.88
   Q 388.11 71.83 392.54 66.65
   A 0.32 0.31 -12.7 0 1 393.07 66.98
   L 391.11 71.22
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 326.45 70.75
   Q 316.97 64.51 311.07 73.37
   Q 309.50 78.25 310.64 82.22
@@ -1399,8 +1415,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 322.01 65.07 327.46 69.51
   Q 327.93 69.90 326.45 70.75
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 331.54 81.44
   Q 331.49 77.32 329.65 73.99
   A 0.96 0.95 -33.9 0 0 328.21 73.71
@@ -1411,8 +1428,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.37 0.36 -0.4 0 1 333.53 81.83
   L 331.54 81.44
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 385.48 72.18
   L 378.29 73.03
   L 376.48 71.25
@@ -1421,8 +1439,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.25 0.25 0.0 0 1 386.75 70.40
   L 385.48 72.18
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 402.32 82.42
   Q 403.65 79.33 401.52 76.98
   Q 399.22 74.43 396.79 72.20
@@ -1434,8 +1453,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.48 0.48 0.0 0 1 403.26 83.48
   Q 402.67 83.14 402.32 82.42
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 376.92 75.17
   L 378.07 76.53
   Q 377.57 76.92 377.11 77.06
@@ -1447,8 +1467,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.88 0.87 -37.7 0 1 374.66 73.43
   L 376.92 75.17
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 379.92 86.58
   L 365.26 103.45
   L 362.78 97.96
@@ -1466,8 +1487,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.40 0.40 0.0 0 1 378.66 79.89
   L 379.92 86.58
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 408.81 109.25
   L 406.28 105.28
   L 401.71 94.53
@@ -1487,8 +1509,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.51 0.51 0.0 0 1 413.21 107.94
   L 408.81 109.25
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 304.39 92.34
   Q 305.41 91.58 305.57 90.82
   L 308.31 91.05
@@ -1497,8 +1520,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.90 0.90 0.0 0 1 307.35 93.35
   L 304.39 92.34
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 326.78 110.32
   Q 328.72 119.31 327.55 128.42
   Q 326.59 128.67 326.61 127.42
@@ -1511,8 +1535,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.29 0.29 0.0 0 1 315.33 105.57
   L 326.78 110.32
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 418.95 121.98
   Q 418.26 122.50 417.76 122.21
   Q 416.95 121.74 415.68 120.48
@@ -1524,8 +1549,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 420.00 120.62 419.73 121.15
   Q 419.49 121.64 418.95 121.98
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 316.85 136.11
   L 302.37 133.64
   Q 301.80 133.41 301.43 132.68
@@ -1535,8 +1561,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.60 0.60 0.0 0 1 318.25 132.83
   L 316.85 136.11
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 326.50 138.07
   Q 322.68 136.88 319.51 137.03
   Q 319.58 133.30 321.04 132.51
@@ -1545,8 +1572,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.82 0.82 0.0 0 1 328.21 132.81
   L 326.50 138.07
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 355.22 144.61
   L 390.48 154.85
   A 0.87 0.87 0.0 0 0 391.50 154.40
@@ -1571,8 +1599,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 358.54 146.33 357.32 146.27
   Q 354.52 145.56 355.22 144.61
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 333.37 156.83
   L 324.59 150.88
   Q 326.50 149.39 328.12 150.64
@@ -1580,8 +1609,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.50 0.49 -51.1 0 1 334.69 156.03
   Q 334.30 156.43 333.37 156.83
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 341.56 166.24
   Q 340.68 166.28 339.86 165.89
   L 335.80 157.88
@@ -1589,8 +1619,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.89 0.89 0.0 0 1 338.64 157.24
   C 339.90 159.95 341.96 163.16 341.56 166.24
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 332.81 203.75
   Q 333.40 198.38 332.60 194.18
   Q 331.42 187.98 330.37 181.68
@@ -1603,8 +1634,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 1.07 0.92 -30.4 0 1 337.37 199.71
   Q 335.79 202.17 332.81 203.75
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 301.61 187.30
   Q 298.43 193.53 297.27 200.00
   Q 296.98 201.63 295.24 205.51
@@ -1625,8 +1657,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.52 0.52 0.0 0 1 298.98 175.28
   L 301.61 187.30
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 277.73 196.05
   Q 276.32 196.17 275.51 196.73
   Q 269.92 200.60 268.05 201.20
@@ -1648,8 +1681,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.46 0.45 -18.2 0 1 277.92 194.53
   Q 278.06 195.24 277.73 196.05
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 352.39 209.19
   C 349.20 207.35 345.16 207.80 341.66 207.07
   L 342.15 204.42
@@ -1658,16 +1692,18 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.41 0.37 79.7 0 1 353.67 208.11
   Q 354.21 208.87 352.39 209.19
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 331.48 207.99
   L 331.80 212.57
   Q 331.03 212.86 330.41 212.79
   A 0.65 0.65 0.0 0 1 329.83 212.19
   Q 329.30 204.95 331.48 207.99
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 296.14 299.21
   L 295.93 304.06
   L 293.94 303.49
@@ -1676,10 +1712,11 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.69 0.68 -4.1 0 1 293.86 299.00
   Q 294.89 298.90 296.14 299.21
   Z"
-/>
-</g>
-<g fill="#8b6e51">
-<path d="
+        />
+      </g>
+      <g fill="#8b6e51">
+        <path
+          d="
   M 314.40 54.22
   Q 315.87 57.30 316.29 60.85
   A 0.47 0.47 0.0 0 1 315.48 61.22
@@ -1694,8 +1731,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 311.11 53.61 313.30 54.94
   Q 313.79 55.23 314.40 54.22
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 377.11 77.06
   L 367.56 84.41
   L 366.14 83.92
@@ -1708,8 +1746,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 367.46 78.41 373.33 77.06
   Q 375.15 76.65 377.11 77.06
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 383.71 95.14
   A 0.28 0.28 0.0 0 1 383.95 95.45
   L 383.80 96.58
@@ -1720,8 +1759,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.28 0.28 0.0 0 1 382.15 94.92
   L 383.71 95.14
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 325.83 107.71
   L 324.53 101.72
   L 326.71 100.24
@@ -1730,8 +1770,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.97 0.96 34.9 0 1 329.37 103.43
   Q 328.69 105.58 325.83 107.71
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 353.62 105.39
   Q 349.43 116.32 348.45 119.66
   Q 343.94 135.02 343.30 136.58
@@ -1749,8 +1790,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 350.53 107.14 350.83 105.97
   Q 351.39 105.48 353.62 105.39
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 337.78 148.58
   Q 337.58 149.67 337.37 153.59
   A 0.49 0.49 0.0 0 1 336.72 154.03
@@ -1759,8 +1801,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.49 0.49 0.0 0 1 339.22 143.75
   Q 337.98 147.49 337.78 148.58
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 355.22 144.61
   Q 354.52 145.56 357.32 146.27
   Q 355.78 148.62 355.49 151.59
@@ -1770,8 +1813,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 1.10 1.10 0.0 0 1 344.18 143.35
   Q 350.18 143.12 355.22 144.61
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 391.06 156.50
   Q 391.16 156.50 391.22 156.53
   A 0.31 0.16 -89.8 0 1 391.35 156.78
@@ -1781,8 +1825,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   L 390.19 157.39
   Q 390.30 156.93 391.06 156.50
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 312.40 173.62
   Q 311.73 174.62 308.93 173.15
   Q 302.86 170.15 301.01 164.22
@@ -1790,8 +1835,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 307.27 167.55 309.96 171.28
   Q 310.88 172.55 312.40 173.62
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 339.86 165.89
   Q 340.68 166.28 341.56 166.24
   Q 341.74 169.61 340.51 172.94
@@ -1800,8 +1846,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 330.15 170.73 329.73 166.37
   L 339.86 165.89
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 324.87 188.70
   Q 325.62 190.37 325.51 192.01
   A 0.77 0.75 83.9 0 1 324.98 192.68
@@ -1810,8 +1857,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 321.68 189.92 322.64 189.61
   Q 323.72 188.67 324.87 188.70
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 277.41 198.29
   C 275.52 204.84 269.13 207.96 267.87 215.24
   Q 267.94 214.52 267.73 214.02
@@ -1821,8 +1869,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 2.37 2.33 -10.5 0 1 267.97 203.66
   L 277.41 198.29
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 318.58 212.80
   Q 318.96 216.24 318.47 219.75
   Q 317.34 227.76 316.49 233.24
@@ -1838,9 +1887,17 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.31 0.31 0.0 0 1 318.30 212.69
   Q 318.44 212.74 318.58 212.80
   Z"
-/>
-<rect x="-1.14" y="-4.45" transform="translate(426.63,217.31) rotate(30.1)" width="2.28" height="8.90" rx="1.10"/>
-<path d="
+        />
+        <rect
+          x="-1.14"
+          y="-4.45"
+          transform="translate(426.63,217.31) rotate(30.1)"
+          width="2.28"
+          height="8.90"
+          rx="1.10"
+        />
+        <path
+          d="
   M 311.14 292.16
   L 314.19 300.03
   L 305.52 298.75
@@ -1848,8 +1905,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   C 304.83 296.01 304.91 294.50 307.12 293.47
   Q 309.04 292.58 311.14 292.16
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 381.44 303.97
   Q 380.89 301.89 381.35 299.40
   Q 382.37 298.84 383.14 298.99
@@ -1858,16 +1916,18 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.89 0.89 0.0 0 1 383.31 303.67
   Q 382.50 303.97 381.44 303.97
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 362.21 303.09
   Q 363.37 304.23 362.55 307.77
   L 314.51 307.60
   L 314.47 303.11
   L 362.21 303.09
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 392.70 314.83
   L 392.84 315.79
   A 0.49 0.49 0.0 0 1 392.36 316.34
@@ -1884,10 +1944,11 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 2.07 2.06 -21.8 0 1 385.10 306.56
   L 392.70 314.83
   Z"
-/>
-</g>
-<g fill="#3e637b">
-<path d="
+        />
+      </g>
+      <g fill="#3e637b">
+        <path
+          d="
   M 391.11 71.22
   L 389.20 80.16
   A 0.66 0.66 0.0 0 0 390.24 80.82
@@ -1900,8 +1961,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 384.27 81.27 385.23 77.88
   L 391.11 71.22
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 385.19 98.18
   A 0.40 0.40 0.0 0 1 385.94 98.02
   L 393.45 111.01
@@ -1910,8 +1972,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 1.17 1.15 16.3 0 1 384.38 106.41
   L 385.19 98.18
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 330.45 100.34
   A 0.83 0.83 0.0 0 1 331.58 99.28
   Q 337.95 102.36 338.66 110.14
@@ -1921,8 +1984,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 336.79 107.11 334.42 104.41
   C 333.27 103.11 331.04 101.78 330.45 100.34
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 327.74 129.32
   L 327.55 128.42
   Q 328.72 119.31 326.78 110.32
@@ -1934,8 +1998,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 1.86 1.61 -35.2 0 1 331.81 127.97
   Q 330.58 130.96 327.74 129.32
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 364.68 106.52
   Q 365.21 106.55 365.63 106.76
   A 0.86 0.84 7.6 0 1 366.05 107.30
@@ -1946,8 +2011,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 367.04 135.36 358.83 136.39
   L 364.68 106.52
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 290.78 123.05
   L 292.03 116.27
   Q 294.32 117.51 296.37 118.34
@@ -1955,8 +2021,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.76 0.75 -83.8 0 1 297.83 122.71
   L 290.78 123.05
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 389.73 152.61
   C 389.05 149.80 389.27 146.81 388.80 144.34
   Q 387.80 139.07 386.75 133.47
@@ -1965,8 +2032,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 389.68 140.47 391.98 147.30
   Q 392.97 150.26 389.73 152.61
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 302.37 133.64
   L 316.85 136.11
   L 317.36 139.51
@@ -1974,8 +2042,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.79 0.79 0.0 0 1 303.03 138.26
   Q 302.13 136.12 302.37 133.64
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 332.28 136.15
   Q 331.73 137.60 331.54 138.67
   A 0.56 0.52 69.9 0 1 331.42 138.95
@@ -1985,8 +2054,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 329.23 137.95 329.74 134.74
   Q 330.98 136.59 332.28 136.15
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 375.98 138.54
   L 377.53 148.92
   L 359.61 143.45
@@ -1994,8 +2064,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 366.29 142.11 372.53 139.41
   C 373.47 139.00 374.82 138.89 375.98 138.54
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 311.18 152.06
   C 315.11 149.70 319.30 147.31 323.98 147.01
   A 0.84 0.84 0.0 0 1 324.49 148.55
@@ -2009,8 +2080,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   C 307.33 154.35 309.80 154.36 310.70 152.58
   A 1.34 1.29 88.9 0 1 311.18 152.06
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 363.97 158.80
   Q 363.27 158.77 363.31 160.87
   L 355.00 167.57
@@ -2027,8 +2099,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.89 0.89 0.0 0 1 351.59 151.99
   L 363.97 158.80
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 320.46 154.29
   Q 324.81 157.71 330.56 159.64
   Q 329.71 161.40 328.17 162.38
@@ -2037,8 +2110,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.60 0.60 0.0 0 1 317.41 157.45
   Q 318.96 154.98 320.46 154.29
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 322.91 167.77
   A 0.24 0.24 0.0 0 1 322.60 167.92
   L 322.46 167.88
@@ -2049,16 +2123,18 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.24 0.24 0.0 0 1 323.37 166.38
   L 322.91 167.77
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 393.81 185.58
   Q 393.38 181.65 395.00 177.17
   L 398.16 169.09
   A 0.21 0.21 0.0 0 1 398.56 169.15
   Q 399.03 178.73 393.81 185.58
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 332.42 173.66
   L 330.46 180.26
   A 3.15 3.14 -41.5 0 0 330.37 181.68
@@ -2073,8 +2149,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 1.36 1.30 -46.3 0 1 330.86 172.43
   Q 331.93 172.66 332.42 173.66
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 306.06 173.93
   Q 310.08 179.19 316.33 180.23
   C 320.01 180.85 322.15 180.92 322.24 184.96
@@ -2086,8 +2163,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   C 305.39 180.87 304.87 177.37 304.41 174.05
   L 306.06 173.93
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 306.26 230.16
   C 303.12 229.25 299.89 226.99 297.87 225.99
   Q 292.35 223.24 285.93 219.73
@@ -2106,8 +2184,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   L 294.99 206.79
   L 306.26 230.16
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 322.39 254.23
   C 324.99 250.25 332.78 240.10 336.74 232.34
   A 0.78 0.67 67.5 0 0 336.82 232.10
@@ -2135,8 +2214,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 321.90 257.56 322.07 255.19
   A 2.09 2.09 0.0 0 1 322.39 254.23
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 324.75 300.78
   A 2.50 2.49 -8.2 0 1 322.43 299.05
   L 321.21 295.28
@@ -2154,8 +2234,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   C 370.52 299.50 364.03 300.82 355.82 300.88
   Q 336.68 301.00 324.75 300.78
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 366.94 319.08
   Q 366.82 319.02 366.70 318.96
   L 311.21 318.94
@@ -2175,10 +2256,11 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.89 0.88 78.3 0 1 363.56 310.63
   L 366.94 319.08
   Z"
-/>
-</g>
-<g fill="#adac98">
-<path d="
+        />
+      </g>
+      <g fill="#adac98">
+        <path
+          d="
   M 387.52 94.32
   A 0.25 0.25 0.0 0 1 387.87 94.39
   L 389.15 96.38
@@ -2189,8 +2271,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.25 0.25 0.0 0 1 385.99 95.31
   L 387.52 94.32
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 310.15 101.43
   L 306.96 105.46
   L 300.38 102.03
@@ -2198,8 +2281,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 302.07 98.84 305.55 96.89
   Q 308.94 97.51 310.15 101.43
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 334.42 138.59
   L 334.42 138.57
   A 0.48 0.48 0.0 0 1 334.98 138.17
@@ -2212,22 +2296,25 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 346.48 142.70 334.84 139.23
   A 0.59 0.59 0.0 0 1 334.42 138.59
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 332.28 136.15
   Q 330.98 136.59 329.74 134.74
   Q 329.38 131.62 332.28 136.15
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 324.59 150.88
   L 333.37 156.83
   L 330.56 159.64
   Q 324.81 157.71 320.46 154.29
   L 324.59 150.88
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 363.97 158.80
   L 381.17 168.19
   L 381.73 181.02
@@ -2238,8 +2325,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   L 363.31 160.87
   Q 363.27 158.77 363.97 158.80
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 433.00 197.53
   Q 433.30 198.77 433.04 199.48
   A 0.37 0.37 0.0 0 1 432.40 199.58
@@ -2255,8 +2343,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 1.29 1.28 13.7 0 1 425.76 173.47
   Q 428.10 185.86 433.00 197.53
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 328.53 173.90
   L 327.08 180.03
   A 3.13 3.11 43.4 0 0 327.13 181.64
@@ -2267,8 +2356,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 327.13 188.03 326.04 183.79
   C 325.40 181.30 324.54 174.19 328.53 173.90
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 301.61 187.30
   L 305.90 203.29
   A 0.58 0.58 0.0 0 0 306.71 203.66
@@ -2281,8 +2371,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 296.98 201.63 297.27 200.00
   Q 298.43 193.53 301.61 187.30
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 336.34 212.21
   L 339.37 200.35
   A 2.09 2.08 -7.4 0 1 340.41 199.01
@@ -2293,16 +2384,18 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   L 336.85 212.84
   A 0.51 0.50 6.4 0 1 336.34 212.21
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 341.66 207.07
   C 345.16 207.80 349.20 207.35 352.39 209.19
   L 341.82 210.88
   A 0.47 0.47 0.0 0 1 341.27 210.45
   Q 341.13 208.59 341.66 207.07
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 294.00 240.31
   Q 292.00 246.04 290.41 251.93
   Q 289.07 256.93 285.81 258.55
@@ -2311,18 +2404,20 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.23 0.23 0.0 0 1 293.87 238.64
   L 294.00 240.31
   Z"
-/>
-</g>
-<g fill="#284765">
-<path d="
+        />
+      </g>
+      <g fill="#284765">
+        <path
+          d="
   M 310.02 88.89
   Q 311.50 86.21 310.64 82.22
   Q 315.02 83.87 315.55 88.78
   A 0.36 0.36 0.0 0 1 315.17 89.18
   L 310.02 88.89
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 310.15 101.43
   Q 311.12 104.71 310.80 107.53
   A 1.68 1.62 69.7 0 1 310.41 108.42
@@ -2330,8 +2425,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   L 306.96 105.46
   L 310.15 101.43
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 373.64 109.59
   Q 379.16 118.27 382.48 126.93
   A 1.61 1.61 0.0 0 1 381.65 128.98
@@ -2339,8 +2435,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   L 374.35 131.64
   L 373.64 109.59
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 321.96 130.24
   Q 320.57 131.16 318.84 130.48
   Q 313.69 128.43 308.29 126.19
@@ -2355,8 +2452,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 319.31 130.03 320.83 130.34
   Q 320.93 130.36 321.96 130.24
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 386.75 133.47
   Q 387.80 139.07 388.80 144.34
   C 389.27 146.81 389.05 149.80 389.73 152.61
@@ -2364,8 +2462,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   L 375.98 138.54
   L 386.75 133.47
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 302.91 155.24
   L 305.08 147.15
   L 305.15 147.67
@@ -2375,8 +2474,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 316.95 147.67 311.75 150.13
   C 308.73 151.57 306.01 153.59 302.91 155.24
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 395.00 177.17
   Q 393.38 181.65 393.81 185.58
   Q 386.40 183.65 381.73 181.02
@@ -2384,8 +2484,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 386.51 171.72 390.45 176.05
   Q 391.58 177.29 395.00 177.17
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 433.00 197.53
   C 433.74 198.61 433.97 199.67 433.30 200.89
   Q 430.65 205.72 430.21 211.29
@@ -2409,8 +2510,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.37 0.37 0.0 0 0 433.04 199.48
   Q 433.30 198.77 433.00 197.53
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 312.40 173.62
   Q 317.11 175.75 322.60 175.16
   A 0.93 0.93 0.0 0 1 323.60 176.30
@@ -2422,8 +2524,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 307.39 174.05 308.93 173.15
   Q 311.73 174.62 312.40 173.62
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 367.41 190.38
   L 400.03 195.84
   A 1.42 1.41 -8.2 0 1 401.07 196.61
@@ -2469,8 +2572,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 353.90 179.89 353.70 179.08
   Q 358.90 186.04 367.41 190.38
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 317.75 211.46
   Q 317.10 210.26 316.01 207.23
   Q 315.02 204.49 312.11 203.09
@@ -2483,8 +2587,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.98 0.96 54.9 0 1 319.35 211.31
   Q 317.47 210.04 317.75 211.46
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 324.78 221.33
   A 0.31 0.31 0.0 0 1 324.42 221.11
   L 324.41 221.09
@@ -2505,8 +2610,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   C 343.82 218.12 337.64 218.98 333.97 219.32
   C 330.72 219.62 328.07 220.61 324.78 221.33
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 306.26 230.16
   Q 306.55 230.83 307.34 230.66
   L 308.85 231.77
@@ -2537,8 +2643,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 292.35 223.24 297.87 225.99
   C 299.89 226.99 303.12 229.25 306.26 230.16
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 286.37 316.25
   L 307.31 320.92
   A 15.27 14.87 50.5 0 0 310.58 321.28
@@ -2558,10 +2665,11 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 2.48 2.38 -48.3 0 1 285.47 323.33
   L 286.37 316.25
   Z"
-/>
-</g>
-<g fill="#edc97e">
-<path d="
+        />
+      </g>
+      <g fill="#edc97e">
+        <path
+          d="
   M 314.40 54.22
   Q 313.79 55.23 313.30 54.94
   Q 311.11 53.61 309.83 52.58
@@ -2577,8 +2685,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 308.33 47.60 310.69 50.16
   Q 312.54 52.18 314.40 54.22
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 331.54 81.44
   L 322.12 79.50
   A 0.92 0.91 89.9 0 0 321.05 80.59
@@ -2603,8 +2712,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.96 0.95 -33.9 0 1 329.65 73.99
   Q 331.49 77.32 331.54 81.44
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 378.37 163.73
   L 355.49 151.59
   Q 355.78 148.62 357.32 146.27
@@ -2613,8 +2723,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 2.42 2.41 89.4 0 1 375.97 153.69
   L 378.37 163.73
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 390.19 157.39
   L 382.51 166.17
   L 381.93 165.80
@@ -2624,8 +2735,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 1.33 1.29 -8.6 0 1 389.67 156.68
   L 390.19 157.39
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 397.28 165.78
   L 393.41 174.61
   A 0.40 0.40 0.0 0 1 392.79 174.76
@@ -2638,15 +2750,17 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.72 0.71 37.0 0 1 392.85 155.13
   Q 396.69 159.28 397.28 165.78
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 335.80 157.88
   L 339.86 165.89
   L 329.73 166.37
   Q 329.92 161.68 335.80 157.88
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 304.41 174.05
   C 304.87 177.37 305.39 180.87 306.36 183.98
   Q 308.11 189.55 309.58 195.19
@@ -2659,8 +2773,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 1.76 1.76 0.0 0 1 304.11 172.69
   Q 304.31 172.90 304.41 174.05
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 277.73 196.05
   Q 277.91 196.82 277.71 197.54
   L 277.41 198.29
@@ -2676,8 +2791,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 269.92 200.60 275.51 196.73
   Q 276.32 196.17 277.73 196.05
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 270.13 237.55
   C 269.80 244.19 267.14 250.90 265.43 257.43
   A 2.05 2.03 2.4 0 1 263.79 258.93
@@ -2693,10 +2809,11 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.26 0.26 0.0 0 1 270.01 236.82
   Q 270.16 237.07 270.13 237.55
   Z"
-/>
-</g>
-<g fill="#7a898b">
-<path d="
+        />
+      </g>
+      <g fill="#7a898b">
+        <path
+          d="
   M 326.45 70.75
   Q 320.50 74.07 317.04 75.48
   Q 315.36 76.17 313.12 75.54
@@ -2704,8 +2821,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 312.17 73.60 311.07 73.37
   Q 316.97 64.51 326.45 70.75
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 310.23 94.07
   L 311.35 92.13
   A 0.48 0.48 0.0 0 1 312.24 92.42
@@ -2714,8 +2832,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   L 310.62 94.83
   A 0.51 0.51 0.0 0 1 310.23 94.07
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 327.55 128.42
   L 327.74 129.32
   L 321.96 130.24
@@ -2733,8 +2852,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 326.67 124.41 326.61 127.42
   Q 326.59 128.67 327.55 128.42
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 370.54 173.23
   L 380.07 181.81
   Q 379.67 182.18 378.91 182.41
@@ -2744,8 +2864,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   C 369.25 182.09 370.94 177.40 369.83 173.22
   Q 370.01 173.31 370.54 173.23
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 341.67 196.36
   A 0.21 0.21 0.0 0 1 341.45 196.17
   L 341.43 195.96
@@ -2756,8 +2877,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.21 0.21 0.0 0 1 342.93 196.26
   L 341.67 196.36
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 388.69 200.14
   Q 376.98 201.21 365.99 200.66
   A 3.43 3.41 -15.1 0 1 363.31 199.13
@@ -2770,8 +2892,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.14 0.11 18.9 0 1 390.95 199.91
   Q 389.71 199.70 388.69 200.14
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 408.88 202.32
   L 404.76 220.55
   L 403.88 227.09
@@ -2784,8 +2907,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   L 404.62 203.82
   Q 406.27 203.83 408.88 202.32
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 331.80 212.57
   L 331.48 207.99
   L 335.31 205.16
@@ -2794,8 +2918,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 1.07 1.06 83.6 0 1 334.53 212.17
   Q 333.12 212.65 331.80 212.57
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 286.37 316.25
   L 285.47 323.33
   A 2.48 2.38 -48.3 0 0 285.50 324.12
@@ -2804,10 +2929,11 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 282.36 322.21 283.63 315.96
   L 286.37 316.25
   Z"
-/>
-</g>
-<g fill="#64554c">
-<path d="
+        />
+      </g>
+      <g fill="#64554c">
+        <path
+          d="
   M 366.14 83.92
   L 367.56 84.41
   Q 365.33 86.56 360.99 89.74
@@ -2817,8 +2943,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 354.44 93.07 352.86 91.57
   L 366.14 83.92
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 326.21 171.62
   Q 325.20 167.91 325.68 165.19
   A 1.20 1.20 0.0 0 1 327.93 164.84
@@ -2827,8 +2954,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   L 326.91 171.86
   A 0.44 0.44 0.0 0 1 326.21 171.62
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 277.71 197.54
   Q 277.88 202.28 277.12 204.42
   C 275.09 210.18 274.03 212.44 273.68 217.32
@@ -2847,16 +2975,18 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   C 269.13 207.96 275.52 204.84 277.41 198.29
   L 277.71 197.54
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 346.23 201.56
   A 0.60 0.60 0.0 0 1 345.50 202.49
   Q 343.21 201.27 344.21 199.90
   A 0.33 0.32 -47.7 0 1 344.71 199.87
   L 346.23 201.56
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 393.97 238.26
   Q 390.19 239.53 388.03 242.88
   Q 386.27 236.83 386.68 232.03
@@ -2864,16 +2994,18 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 1.30 1.29 84.2 0 1 391.47 229.24
   Q 391.58 234.45 393.97 238.26
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 381.35 299.40
   Q 380.89 301.89 381.44 303.97
   L 362.55 307.77
   Q 363.37 304.23 362.21 303.09
   Q 371.55 302.15 381.35 299.40
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 390.64 316.38
   L 392.36 316.34
   A 0.49 0.49 0.0 0 0 392.84 315.79
@@ -2885,10 +3017,11 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.49 0.48 14.0 0 1 391.59 325.39
   L 390.64 316.38
   Z"
-/>
-</g>
-<g fill="#be9f73">
-<path d="
+        />
+      </g>
+      <g fill="#be9f73">
+        <path
+          d="
   M 322.70 55.62
   Q 322.58 58.33 319.95 60.74
   A 0.94 0.94 0.0 0 1 318.39 60.25
@@ -2899,8 +3032,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   L 320.38 47.88
   L 322.70 55.62
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 294.06 58.92
   Q 291.52 65.09 291.47 71.88
   A 0.43 0.43 0.0 0 0 292.12 72.25
@@ -2914,16 +3048,18 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 287.40 63.70 291.30 60.17
   Q 294.01 57.16 294.06 58.92
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 385.48 72.18
   C 384.71 75.33 380.66 75.74 378.07 76.53
   L 376.92 75.17
   Q 378.46 75.03 378.29 73.03
   L 385.48 72.18
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 402.32 82.42
   L 396.66 77.21
   A 1.56 1.47 -78.2 0 1 396.22 76.49
@@ -2931,9 +3067,16 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 399.22 74.43 401.52 76.98
   Q 403.65 79.33 402.32 82.42
   Z"
-/>
-<ellipse cx="0.00" cy="0.00" transform="translate(384.81,90.37) rotate(-66.6)" rx="2.91" ry="2.61"/>
-<path d="
+        />
+        <ellipse
+          cx="0.00"
+          cy="0.00"
+          transform="translate(384.81,90.37) rotate(-66.6)"
+          rx="2.91"
+          ry="2.61"
+        />
+        <path
+          d="
   M 358.20 92.92
   L 353.62 105.39
   Q 351.39 105.48 350.83 105.97
@@ -2941,9 +3084,16 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   L 354.39 94.08
   Q 356.61 92.57 358.20 92.92
   Z"
-/>
-<ellipse cx="0.00" cy="0.00" transform="translate(401.89,119.08) rotate(-107.5)" rx="2.91" ry="2.66"/>
-<path d="
+        />
+        <ellipse
+          cx="0.00"
+          cy="0.00"
+          transform="translate(401.89,119.08) rotate(-107.5)"
+          rx="2.91"
+          ry="2.66"
+        />
+        <path
+          d="
   M 301.43 132.68
   Q 301.80 133.41 302.37 133.64
   Q 302.13 136.12 303.03 138.26
@@ -2953,8 +3103,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 1.81 1.79 -16.6 0 1 301.94 139.73
   C 301.15 138.26 299.66 134.03 301.43 132.68
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 341.34 150.79
   A 0.19 0.19 0.0 0 1 341.70 150.79
   L 350.97 179.46
@@ -2973,8 +3124,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 3.61 3.60 33.6 0 1 340.57 154.54
   Q 340.51 153.29 341.34 150.79
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 267.87 215.24
   L 270.13 237.55
   Q 270.16 237.07 270.01 236.82
@@ -2986,26 +3138,29 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.26 0.26 0.0 0 1 267.73 214.02
   Q 267.94 214.52 267.87 215.24
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 393.97 238.26
   Q 394.73 238.56 394.64 239.27
   A 0.59 0.55 -20.1 0 1 394.46 239.63
   Q 390.99 242.98 388.03 242.88
   Q 390.19 239.53 393.97 238.26
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 314.47 303.11
   L 314.51 307.60
   L 295.93 304.06
   L 296.14 299.21
   L 314.47 303.11
   Z"
-/>
-</g>
-<g fill="#e0d3aa">
-<path d="
+        />
+      </g>
+      <g fill="#e0d3aa">
+        <path
+          d="
   M 304.17 40.38
   Q 312.67 42.03 317.13 47.09
   Q 317.59 47.61 318.19 47.25
@@ -3015,8 +3170,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.39 0.39 0.0 0 1 295.98 43.69
   Q 300.42 39.55 304.17 40.38
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 384.27 85.88
   A 0.28 0.28 0.0 0 1 384.06 86.22
   L 383.34 86.38
@@ -3027,8 +3183,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.28 0.28 0.0 0 1 382.41 77.61
   L 384.27 85.88
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 362.67 81.27
   L 366.76 82.94
   A 0.42 0.42 0.0 0 1 366.74 83.72
@@ -3039,8 +3196,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 356.25 86.64 361.03 81.80
   Q 361.92 80.90 362.67 81.27
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 388.98 88.20
   A 0.29 0.29 0.0 0 1 388.58 88.09
   L 388.45 87.84
@@ -3051,8 +3209,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.29 0.29 0.0 0 1 398.69 82.83
   L 388.98 88.20
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 354.02 94.08
   Q 354.26 93.98 354.39 94.08
   L 347.94 106.22
@@ -3061,8 +3220,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 348.74 99.22 349.94 96.96
   Q 350.95 95.07 354.02 94.08
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 290.29 111.41
   A 0.43 0.43 0.0 0 1 290.01 110.86
   L 293.14 101.94
@@ -3087,8 +3247,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.40 0.40 0.0 0 0 292.17 110.45
   L 301.92 112.40
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 324.53 101.72
   L 325.83 107.71
   Q 320.30 106.02 314.96 102.80
@@ -3097,8 +3258,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.29 0.29 0.0 0 1 312.62 97.08
   Q 318.50 100.25 324.53 101.72
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 365.26 103.45
   L 364.68 106.52
   L 358.83 136.39
@@ -3115,8 +3277,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.62 0.61 58.7 0 1 362.78 97.96
   L 365.26 103.45
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 347.70 109.79
   Q 348.68 109.97 348.39 110.68
   Q 344.71 119.90 343.88 122.28
@@ -3125,8 +3288,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 343.60 117.01 346.97 110.45
   Q 347.22 109.95 347.70 109.79
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 406.64 115.67
   A 0.77 0.77 0.0 0 1 405.70 115.67
   L 405.30 115.37
@@ -3137,16 +3301,18 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.67 0.67 0.0 0 1 415.52 112.27
   Q 410.47 112.71 406.64 115.67
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 292.03 116.27
   L 290.78 123.05
   Q 290.23 123.73 289.70 123.79
   A 0.48 0.48 0.0 0 1 289.17 123.22
   Q 289.89 119.47 292.03 116.27
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 292.48 130.16
   L 290.30 125.71
   Q 295.32 124.40 300.39 125.17
@@ -3155,8 +3321,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.36 0.35 -46.7 0 1 294.24 132.48
   L 292.48 130.16
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 363.31 160.87
   L 379.04 169.20
   A 0.58 0.58 0.0 0 1 379.12 170.17
@@ -3166,15 +3333,17 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.62 0.61 34.2 0 1 355.00 167.57
   L 363.31 160.87
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 305.22 164.17
   Q 303.49 164.76 301.01 164.22
   Q 301.05 162.61 302.75 162.49
   Q 303.76 162.42 305.22 164.17
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 378.91 182.41
   L 405.89 192.62
   A 3.26 2.40 81.9 0 1 407.46 194.22
@@ -3188,8 +3357,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 370.86 187.87 374.52 184.77
   Q 376.31 183.25 378.91 182.41
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 295.24 205.51
   Q 294.74 206.42 294.99 206.79
   L 282.46 215.97
@@ -3200,8 +3370,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 288.58 200.30 292.75 204.50
   Q 293.47 205.22 295.24 205.51
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 309.89 289.70
   L 305.73 285.20
   A 7.00 6.92 -80.7 0 1 304.61 283.62
@@ -3218,8 +3389,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.38 0.38 0.0 0 1 313.16 288.81
   Q 311.50 289.64 309.89 289.70
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 314.19 300.03
   L 311.14 292.16
   L 315.26 290.56
@@ -3228,8 +3400,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.51 0.51 0.0 0 1 319.52 299.65
   L 314.19 300.03
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 295.08 306.07
   Q 295.03 306.28 295.02 306.43
   A 0.49 0.47 70.7 0 1 294.90 306.69
@@ -3251,10 +3424,11 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.99 0.97 -64.8 0 1 293.08 305.80
   L 295.08 306.07
   Z"
-/>
-</g>
-<g fill="#506f7e">
-<path d="
+        />
+      </g>
+      <g fill="#506f7e">
+        <path
+          d="
   M 316.27 81.58
   L 332.41 86.83
   A 0.55 0.55 0.0 0 1 332.62 87.75
@@ -3277,8 +3451,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 3.31 0.92 -66.6 0 0 325.8243 89.9854
   A 3.31 0.92 -66.6 0 0 326.2946 86.5822
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 379.92 86.58
   L 380.93 93.64
   A 1.81 1.77 49.1 0 1 380.89 94.29
@@ -3296,8 +3471,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   L 365.26 103.45
   L 379.92 86.58
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 406.28 105.28
   L 408.81 109.25
   L 403.76 112.69
@@ -3312,8 +3488,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 399.77 97.31 401.08 99.15
   Q 403.57 102.64 406.28 105.28
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 305.55 96.89
   Q 302.07 98.84 300.22 101.32
   A 0.48 0.48 0.0 0 0 300.38 102.03
@@ -3326,8 +3503,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   Q 299.38 97.37 301.48 96.23
   Q 302.93 95.45 305.55 96.89
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 411.91 115.19
   Q 412.48 118.29 414.67 119.67
   Q 411.43 120.05 411.65 123.17
@@ -3346,8 +3524,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 3.72 3.71 -40.9 0 1 406.77 118.75
   Q 408.81 116.16 411.91 115.19
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 290.30 125.71
   L 292.48 130.16
   L 288.78 133.26
@@ -3364,8 +3543,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.97 0.97 0.0 0 1 287.36 126.21
   L 290.30 125.71
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 298.80 132.57
   A 0.18 0.18 0.0 0 1 298.55 132.56
   L 298.47 132.48
@@ -3376,16 +3556,18 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.18 0.18 0.0 0 1 303.37 128.34
   L 298.80 132.57
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 326.50 138.07
   L 325.71 140.38
   A 0.76 0.76 0.0 0 1 325.05 140.90
   Q 317.54 141.54 319.51 137.03
   Q 322.68 136.88 326.50 138.07
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 305.08 147.15
   L 302.91 155.24
   Q 302.48 156.73 300.88 157.70
@@ -3397,8 +3579,9 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   A 0.37 0.36 -77.7 0 1 306.06 144.28
   L 305.08 147.15
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 312.11 203.09
   Q 315.02 204.49 316.01 207.23
   Q 317.10 210.26 317.75 211.46
@@ -3410,10 +3593,8 @@ export const Knight: React.FC<PieceProps> = ({ style, className }) => {
   L 307.34 230.66
   L 312.11 203.09
   Z"
-/>
-</g>
-
-
+        />
+      </g>
     </svg>
   );
 };

@@ -21,19 +21,19 @@ export default function DebugPage() {
 
   const testChatAPI = async () => {
     if (!message) return;
-    
+
     setLoading(true);
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message })
+        body: JSON.stringify({ message }),
       });
-      
+
       if (res.ok) {
         const reader = res.body?.getReader();
         let result = '';
-        
+
         if (reader) {
           while (true) {
             const { done, value } = await reader.read();
@@ -54,7 +54,7 @@ export default function DebugPage() {
   return (
     <div style={{ padding: '20px', fontFamily: 'monospace' }}>
       <h1>Chess Butler Debug</h1>
-      
+
       <div style={{ marginBottom: '20px' }}>
         <button onClick={testChat} disabled={loading}>
           Test Environment
@@ -62,8 +62,8 @@ export default function DebugPage() {
       </div>
 
       <div style={{ marginBottom: '20px' }}>
-        <input 
-          type="text" 
+        <input
+          type="text"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Test chat message"
@@ -74,12 +74,14 @@ export default function DebugPage() {
         </button>
       </div>
 
-      <div style={{ 
-        background: '#f0f0f0', 
-        padding: '10px', 
-        whiteSpace: 'pre-wrap',
-        minHeight: '200px'
-      }}>
+      <div
+        style={{
+          background: '#f0f0f0',
+          padding: '10px',
+          whiteSpace: 'pre-wrap',
+          minHeight: '200px',
+        }}
+      >
         {loading ? 'Loading...' : response}
       </div>
     </div>

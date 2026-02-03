@@ -17,7 +17,7 @@ export class PerformanceMonitor {
     const start = performance.now();
     const result = fn();
     const end = performance.now();
-    
+
     this.recordMetric(name, end - start);
     return result;
   }
@@ -27,7 +27,7 @@ export class PerformanceMonitor {
     const start = performance.now();
     const result = await fn();
     const end = performance.now();
-    
+
     this.recordMetric(name, end - start);
     return result;
   }
@@ -37,10 +37,10 @@ export class PerformanceMonitor {
     if (!this.metrics.has(name)) {
       this.metrics.set(name, []);
     }
-    
+
     const values = this.metrics.get(name)!;
     values.push(value);
-    
+
     // Keep only the last 100 measurements
     if (values.length > 100) {
       values.splice(0, values.length - 100);
@@ -51,31 +51,31 @@ export class PerformanceMonitor {
   getAverageMetric(name: string): number | null {
     const values = this.metrics.get(name);
     if (!values || values.length === 0) return null;
-    
+
     return values.reduce((sum, val) => sum + val, 0) / values.length;
   }
 
   // Monitor frame rate
   startFPSMonitoring(): void {
     if (this.rafId) return; // Already monitoring
-    
+
     let lastTime = performance.now();
     let frameCount = 0;
-    
+
     const measureFPS = (currentTime: number) => {
       frameCount++;
-      
+
       if (currentTime - lastTime >= 1000) {
         const fps = Math.round((frameCount * 1000) / (currentTime - lastTime));
         this.recordMetric('fps', fps);
-        
+
         frameCount = 0;
         lastTime = currentTime;
       }
-      
+
       this.rafId = requestAnimationFrame(measureFPS);
     };
-    
+
     this.rafId = requestAnimationFrame(measureFPS);
   }
 
@@ -88,9 +88,9 @@ export class PerformanceMonitor {
 
   // Monitor memory usage (if available)
   getMemoryUsage(): any {
-    // @ts-ignore - performance.memory is not in TypeScript types
+    // @ts-expect-error - performance.memory is not in TypeScript types
     if (typeof performance.memory !== 'undefined') {
-      // @ts-ignore
+      // @ts-expect-error
       const memory = performance.memory;
       return {
         used: Math.round(memory.usedJSHeapSize / 1024 / 1024), // MB
@@ -104,33 +104,33 @@ export class PerformanceMonitor {
   // Clean up all observers and monitoring
   cleanup(): void {
     this.stopFPSMonitoring();
-    
-    this.observers.forEach(observer => {
+
+    this.observers.forEach((observer) => {
       observer.disconnect();
     });
     this.observers = [];
-    
+
     this.metrics.clear();
   }
 
   // Get performance report
   getReport(): Record<string, any> {
     const report: Record<string, any> = {};
-    
+
     this.metrics.forEach((values, name) => {
       report[name] = {
         average: this.getAverageMetric(name),
         min: Math.min(...values),
         max: Math.max(...values),
-        count: values.length
+        count: values.length,
       };
     });
-    
+
     const memory = this.getMemoryUsage();
     if (memory) {
       report.memory = memory;
     }
-    
+
     return report;
   }
 }
@@ -138,13 +138,13 @@ export class PerformanceMonitor {
 // Debounce utility for performance
 export function debounce<T extends (...args: any[]) => any>(
   func: T,
-  wait: number
+  wait: number,
 ): (...args: Parameters<T>) => void {
   let timeout: NodeJS.Timeout | null = null;
-  
+
   return (...args: Parameters<T>) => {
     if (timeout) clearTimeout(timeout);
-    
+
     timeout = setTimeout(() => {
       func(...args);
     }, wait);
@@ -154,15 +154,15 @@ export function debounce<T extends (...args: any[]) => any>(
 // Throttle utility for performance
 export function throttle<T extends (...args: any[]) => any>(
   func: T,
-  limit: number
+  limit: number,
 ): (...args: Parameters<T>) => void {
   let inThrottle: boolean = false;
-  
+
   return (...args: Parameters<T>) => {
     if (!inThrottle) {
       func(...args);
       inThrottle = true;
-      
+
       setTimeout(() => {
         inThrottle = false;
       }, limit);
@@ -173,18 +173,18 @@ export function throttle<T extends (...args: any[]) => any>(
 // Intersection Observer utility for lazy loading
 export function createLazyLoader(
   callback: (entries: IntersectionObserverEntry[]) => void,
-  options: IntersectionObserverInit = {}
+  options: IntersectionObserverInit = {},
 ): IntersectionObserver {
   return new IntersectionObserver(callback, {
     rootMargin: '50px',
     threshold: 0.1,
-    ...options
+    ...options,
   });
 }
 
 // Check if device supports high refresh rates
 export function supportsHighRefreshRate(): boolean {
-  // @ts-ignore - screen.refreshRate is experimental
+  // @ts-expect-error - screen.refreshRate is experimental
   return typeof screen.refreshRate !== 'undefined' && screen.refreshRate > 60;
 }
 

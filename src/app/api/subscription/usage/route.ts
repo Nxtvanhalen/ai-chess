@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
-import { getUserUsage, getUserTier } from '@/lib/supabase/subscription';
+import { NextResponse } from 'next/server';
+import { getUserTier, getUserUsage } from '@/lib/supabase/subscription';
 
 export async function GET() {
   try {
@@ -24,16 +24,15 @@ export async function GET() {
             }
           },
         },
-      }
+      },
     );
 
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     const usage = await getUserUsage(user.id);
@@ -45,9 +44,6 @@ export async function GET() {
     });
   } catch (error) {
     console.error('[Usage API] Error:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch usage data' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch usage data' }, { status: 500 });
   }
 }

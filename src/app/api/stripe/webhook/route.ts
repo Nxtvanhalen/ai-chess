@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { headers } from 'next/headers';
-import Stripe from 'stripe';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { getStripeClient, getPlanFromPriceId, getLimitsFromPlan } from '@/lib/stripe/config';
+import { type NextRequest, NextResponse } from 'next/server';
+import type Stripe from 'stripe';
+import { getLimitsFromPlan, getPlanFromPriceId, getStripeClient } from '@/lib/stripe/config';
 
 // Type alias for service role client
 type ServiceRoleClient = SupabaseClient;
@@ -31,19 +31,13 @@ export async function POST(request: NextRequest) {
   const signature = headersList.get('stripe-signature');
 
   if (!signature) {
-    return NextResponse.json(
-      { error: 'Missing stripe-signature header' },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: 'Missing stripe-signature header' }, { status: 400 });
   }
 
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!webhookSecret) {
     console.error('[Stripe Webhook] Missing STRIPE_WEBHOOK_SECRET');
-    return NextResponse.json(
-      { error: 'Webhook secret not configured' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 500 });
   }
 
   let event: Stripe.Event;
@@ -56,7 +50,7 @@ export async function POST(request: NextRequest) {
     console.error('[Stripe Webhook] Signature verification failed:', message);
     return NextResponse.json(
       { error: `Webhook signature verification failed: ${message}` },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -102,10 +96,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ received: true });
   } catch (error) {
     console.error('[Stripe Webhook] Handler error:', error);
-    return NextResponse.json(
-      { error: 'Webhook handler failed' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Webhook handler failed' }, { status: 500 });
   }
 }
 
@@ -116,7 +107,7 @@ export async function POST(request: NextRequest) {
 async function handleCheckoutCompleted(
   supabase: ServiceRoleClient,
   stripe: Stripe,
-  session: Stripe.Checkout.Session
+  session: Stripe.Checkout.Session,
 ) {
   const userId = session.metadata?.supabase_user_id;
   if (!userId) {
@@ -126,7 +117,7 @@ async function handleCheckoutCompleted(
 
   // Get subscription details
   const subscriptionId = session.subscription as string;
-  const subscription = await stripe.subscriptions.retrieve(subscriptionId) as Stripe.Subscription;
+  const subscription = (await stripe.subscriptions.retrieve(subscriptionId)) as Stripe.Subscription;
   const subscriptionItem = subscription.items.data[0];
   const priceId = subscriptionItem?.price.id;
   const plan = getPlanFromPriceId(priceId);
@@ -157,17 +148,14 @@ async function handleCheckoutCompleted(
   }
 
   // Update user profile subscription tier
-  await supabase
-    .from('user_profiles')
-    .update({ subscription_tier: plan })
-    .eq('id', userId);
+  await supabase.from('user_profiles').update({ subscription_tier: plan }).eq('id', userId);
 
   console.log(`[Stripe Webhook] Checkout completed for user ${userId}: ${plan} plan`);
 }
 
 async function handleSubscriptionUpdate(
   supabase: ServiceRoleClient,
-  subscription: Stripe.Subscription
+  subscription: Stripe.Subscription,
 ) {
   const userId = subscription.metadata?.supabase_user_id;
   if (!userId) {
@@ -228,10 +216,7 @@ async function handleSubscriptionUpdate(
     .single();
 
   if (sub?.user_id) {
-    await supabase
-      .from('user_profiles')
-      .update({ subscription_tier: plan })
-      .eq('id', sub.user_id);
+    await supabase.from('user_profiles').update({ subscription_tier: plan }).eq('id', sub.user_id);
   }
 
   console.log(`[Stripe Webhook] Subscription updated: ${subscription.id} -> ${plan}`);
@@ -239,7 +224,7 @@ async function handleSubscriptionUpdate(
 
 async function handleSubscriptionCanceled(
   supabase: ServiceRoleClient,
-  subscription: Stripe.Subscription
+  subscription: Stripe.Subscription,
 ) {
   // Reset to free tier
   const freeLimits = getLimitsFromPlan('free');
@@ -276,10 +261,7 @@ async function handleSubscriptionCanceled(
   console.log(`[Stripe Webhook] Subscription canceled: ${subscription.id}`);
 }
 
-async function handlePaymentSucceeded(
-  supabase: ServiceRoleClient,
-  invoice: Stripe.Invoice
-) {
+async function handlePaymentSucceeded(supabase: ServiceRoleClient, invoice: Stripe.Invoice) {
   // In Stripe SDK v20, subscription is accessed via parent.subscription_details
   const subscriptionId = getSubscriptionIdFromInvoice(invoice);
   if (!subscriptionId) return;
@@ -300,10 +282,7 @@ async function handlePaymentSucceeded(
   console.log(`[Stripe Webhook] Payment succeeded for subscription: ${subscriptionId}`);
 }
 
-async function handlePaymentFailed(
-  supabase: ServiceRoleClient,
-  invoice: Stripe.Invoice
-) {
+async function handlePaymentFailed(supabase: ServiceRoleClient, invoice: Stripe.Invoice) {
   const subscriptionId = getSubscriptionIdFromInvoice(invoice);
   if (!subscriptionId) return;
 

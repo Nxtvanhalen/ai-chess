@@ -11,28 +11,29 @@ const rateLimitMap = new Map<string, RateLimitEntry>();
 const RATE_LIMIT = 20; // requests per window
 const RATE_LIMIT_WINDOW = 60000; // 1 minute in milliseconds
 
-export function checkRateLimit(ip: string): { 
-  allowed: boolean; 
-  limit: number; 
-  remaining: number; 
+export function checkRateLimit(ip: string): {
+  allowed: boolean;
+  limit: number;
+  remaining: number;
   resetTime: number;
 } {
   const now = Date.now();
   const userLimit = rateLimitMap.get(ip);
-  
+
   // Clean expired entries periodically
-  if (Math.random() < 0.01) { // 1% chance to clean up
+  if (Math.random() < 0.01) {
+    // 1% chance to clean up
     cleanupExpiredEntries(now);
   }
-  
+
   if (!userLimit || now > userLimit.resetTime) {
     // No existing limit or expired - create new entry
-    const newEntry: RateLimitEntry = { 
-      count: 1, 
-      resetTime: now + RATE_LIMIT_WINDOW 
+    const newEntry: RateLimitEntry = {
+      count: 1,
+      resetTime: now + RATE_LIMIT_WINDOW,
     };
     rateLimitMap.set(ip, newEntry);
-    
+
     return {
       allowed: true,
       limit: RATE_LIMIT,
@@ -40,7 +41,7 @@ export function checkRateLimit(ip: string): {
       resetTime: newEntry.resetTime,
     };
   }
-  
+
   // Check if limit exceeded
   if (userLimit.count >= RATE_LIMIT) {
     return {
@@ -50,10 +51,10 @@ export function checkRateLimit(ip: string): {
       resetTime: userLimit.resetTime,
     };
   }
-  
+
   // Increment count
   userLimit.count++;
-  
+
   return {
     allowed: true,
     limit: RATE_LIMIT,
@@ -82,7 +83,7 @@ export function getRateLimitHeaders(rateLimitResult: ReturnType<typeof checkRate
 export function getClientIP(request: Request): string {
   // Check various headers in order of preference
   const headers = request.headers;
-  
+
   return (
     headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
     headers.get('x-real-ip') ||

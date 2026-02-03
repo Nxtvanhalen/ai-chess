@@ -2,22 +2,21 @@
 // STRIPE MODULE EXPORTS - Chester AI Chess
 // =============================================================================
 
-// Server-side
-export {
-  getStripeClient,
-  getStripeClientSafe,
-  STRIPE_PRICES,
-  PRICING,
-  PLAN_FEATURES,
-  getPlanFromPriceId,
-  getLimitsFromPlan,
-} from './config';
-
 // Client-side
 export {
+  createCheckoutSession,
   getStripe,
   redirectToCheckout,
-  createCheckoutSession,
-  startCheckout,
   redirectToCustomerPortal,
+  startCheckout,
 } from './client';
+// Server-side
+export {
+  getLimitsFromPlan,
+  getPlanFromPriceId,
+  getStripeClient,
+  getStripeClientSafe,
+  PLAN_FEATURES,
+  PRICING,
+  STRIPE_PRICES,
+} from './config';

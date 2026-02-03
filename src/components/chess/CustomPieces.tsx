@@ -1,29 +1,28 @@
-import React from 'react';
 import type { CustomPieceFnArgs } from 'react-chessboard/dist/chessboard/types';
-import { Pawn } from './pieces/Pawn';
-import { Knight } from './pieces/Knight';
 import { Bishop } from './pieces/Bishop';
-import { Rook } from './pieces/Rook';
-import { Queen } from './pieces/Queen';
 import { King } from './pieces/King';
+import { Knight } from './pieces/Knight';
+import { Pawn } from './pieces/Pawn';
+import { Queen } from './pieces/Queen';
+import { Rook } from './pieces/Rook';
 
 // Define Piece Palettes for "God Mode" Customization
 const PALETTES = {
   white: {
     // Chrome/Silver Aesthetic
-    primary: '#cbd5e1',    // Slate-300 (Darker Silver for better solidity)
-    secondary: '#f8fafc',  // Slate-50
-    accent: '#64748b',     // Slate-500 (Stronger Grey to define 3D shading)
+    primary: '#cbd5e1', // Slate-300 (Darker Silver for better solidity)
+    secondary: '#f8fafc', // Slate-50
+    accent: '#64748b', // Slate-500 (Stronger Grey to define 3D shading)
   },
   black: {
     // Obsidian/Void Aesthetic (matching the board theme)
-    primary: '#0f172a',    // Slate-900 (Deep Navy/Black)
-    secondary: '#581c87',  // Purple-900 (Dark Purple)
-    accent: '#a855f7',     // Purple-500 (Glowing Purple Accent)
-  }
+    primary: '#0f172a', // Slate-900 (Deep Navy/Black)
+    secondary: '#581c87', // Purple-900 (Dark Purple)
+    accent: '#a855f7', // Purple-500 (Glowing Purple Accent)
+  },
 };
 
-const PIECE_COMPONENTS = {
+const _PIECE_COMPONENTS = {
   p: Pawn,
   n: Knight,
   b: Bishop,

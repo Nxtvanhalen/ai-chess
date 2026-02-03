@@ -1,19 +1,17 @@
-import React from 'react';
-import { PieceProps } from './types';
+import type React from 'react';
+import type { PieceProps } from './types';
 
 export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   return (
-    <svg 
-      viewBox="0.00 0.00 677.00 369.00" 
-      style={style} 
+    <svg
+      viewBox="0.00 0.00 677.00 369.00"
+      style={style}
       className={className}
       xmlns="http://www.w3.org/2000/svg"
     >
-      
-
-
-<g fill="#162a3f">
-<path d="
+      <g fill="#162a3f">
+        <path
+          d="
   M 355.56 57.46
   Q 354.78 60.07 355.45 63.03
   A 0.24 0.24 0.0 0 0 355.89 63.10
@@ -561,8 +559,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 0.76 0.75 -51.6 0 0 263.12 291.44
   Q 261.34 292.98 260.68 295.23
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 308.31 152.50
   Q 312.62 159.92 312.19 167.00
   Q 312.15 167.66 312.55 167.64
@@ -574,10 +573,11 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 2.16 2.14 61.4 0 1 305.17 158.35
   L 308.31 152.50
   Z"
-/>
-</g>
-<g fill="#a09063">
-<path d="
+        />
+      </g>
+      <g fill="#a09063">
+        <path
+          d="
   M 328.86 58.01
   L 328.86 70.88
   A 0.38 0.38 0.0 0 1 328.52 71.26
@@ -590,8 +590,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   L 325.62 55.36
   L 328.86 58.01
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 379.15 75.16
   Q 379.74 75.20 379.89 75.47
   L 379.79 91.28
@@ -604,8 +605,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   L 370.86 72.86
   L 379.15 75.16
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 338.41 80.92
   L 338.51 115.76
   A 0.66 0.65 -60.0 0 1 337.29 116.09
@@ -628,8 +630,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 0.76 0.75 -84.4 0 1 329.02 80.85
   L 338.41 80.92
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 298.21 91.46
   Q 297.23 92.54 298.09 93.68
   Q 302.14 99.03 305.10 105.76
@@ -642,16 +645,18 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   Q 297.03 91.49 297.24 90.20
   Q 297.52 91.61 298.21 91.46
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 359.27 132.97
   L 359.19 138.78
   L 317.17 138.63
   L 318.07 133.08
   L 359.27 132.97
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 319.19 147.57
   L 318.76 169.11
   A 0.38 0.38 0.0 0 1 318.27 169.46
@@ -660,8 +665,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   Q 312.62 159.92 308.31 152.50
   Q 312.55 148.98 319.19 147.57
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 345.74 169.96
   L 343.96 170.33
   A 0.64 0.63 -5.6 0 1 343.20 169.71
@@ -674,8 +680,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 2.13 2.10 17.1 0 1 345.71 165.59
   Q 346.20 167.76 345.74 169.96
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 301.82 166.28
   Q 301.87 166.69 301.95 167.10
   Q 302.03 167.53 301.99 167.92
@@ -701,8 +708,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   Q 301.53 167.24 301.75 166.94
   Q 301.94 166.69 301.82 166.28
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 345.72 171.73
   L 346.09 180.43
   Q 345.88 180.08 345.68 179.73
@@ -711,8 +719,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 0.50 0.50 0.0 0 1 343.61 171.63
   Q 344.39 171.49 345.72 171.73
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 343.43 190.12
   Q 344.52 191.62 345.10 193.71
   L 336.52 194.00
@@ -721,8 +730,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   Q 333.54 192.52 334.17 190.62
   L 343.43 190.12
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 311.47 249.40
   Q 312.14 249.68 312.07 249.94
   L 311.99 258.02
@@ -730,8 +740,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   L 295.42 242.54
   L 311.47 249.40
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 339.27 272.65
   L 372.79 293.13
   A 0.35 0.35 0.0 0 1 372.75 293.75
@@ -747,16 +758,18 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   L 338.37 273.28
   L 339.27 272.65
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 262.43 295.94
   L 263.07 309.22
   C 261.43 309.12 260.67 308.64 260.60 306.89
   Q 260.35 301.10 260.68 295.23
   L 262.43 295.94
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 374.57 310.33
   Q 376.81 311.35 376.88 314.91
   L 338.01 314.91
@@ -764,10 +777,11 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   Q 338.25 312.63 337.96 310.32
   L 374.57 310.33
   Z"
-/>
-</g>
-<g fill="#466369">
-<path d="
+        />
+      </g>
+      <g fill="#466369">
+        <path
+          d="
   M 367.59 58.42
   Q 373.80 61.49 380.16 62.69
   Q 380.32 63.45 379.84 64.32
@@ -776,8 +790,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 0.26 0.26 0.0 0 1 367.14 69.91
   L 367.59 58.42
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 297.47 62.53
   Q 296.98 64.52 295.76 64.57
   Q 291.45 64.71 287.08 64.90
@@ -785,8 +800,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   L 285.96 62.03
   L 297.47 62.53
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 391.50 101.45
   L 391.92 70.07
   Q 393.57 69.75 394.26 69.01
@@ -794,8 +810,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 0.95 0.95 0.0 0 1 393.37 103.84
   Q 392.16 103.30 391.50 101.45
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 351.48 80.79
   L 351.53 95.02
   L 338.90 117.11
@@ -816,8 +833,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   L 338.41 80.92
   L 351.48 80.79
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 379.21 136.64
   Q 379.99 138.91 380.24 141.02
   Q 381.32 150.36 381.98 160.79
@@ -827,8 +845,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   Q 377.91 151.14 377.49 141.51
   Q 377.27 136.58 379.21 136.64
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 337.96 158.71
   L 333.65 164.36
   Q 331.62 165.97 331.16 168.96
@@ -841,8 +860,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 0.93 0.92 -87.7 0 1 338.69 149.05
   L 337.96 158.71
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 382.46 193.07
   Q 382.02 193.24 381.67 193.13
   Q 381.34 193.02 381.30 192.53
@@ -852,8 +872,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   Q 383.28 177.37 384.39 190.50
   Q 384.60 192.90 382.46 193.07
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 360.00 201.48
   Q 359.37 201.78 359.52 201.91
   L 345.81 194.13
@@ -865,8 +886,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 0.77 0.77 0.0 0 1 358.84 173.66
   L 360.00 201.48
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 331.15 173.71
   Q 331.53 174.33 331.48 175.26
   Q 331.06 184.03 331.40 192.79
@@ -881,8 +903,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 0.58 0.58 0.0 0 1 319.69 173.79
   L 331.15 173.71
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 373.89 210.14
   L 373.07 198.92
   A 0.18 0.18 0.0 0 1 373.19 198.73
@@ -901,8 +924,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   L 374.07 210.31
   A 0.18 0.18 0.0 0 1 373.89 210.14
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 302.90 213.73
   Q 303.22 215.03 302.89 216.24
   A 0.46 0.45 18.8 0 1 302.27 216.54
@@ -911,8 +935,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   Q 297.27 200.62 298.01 203.12
   Q 299.86 209.40 302.90 213.73
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 317.02 221.62
   Q 315.61 222.03 314.44 221.61
   Q 309.51 219.83 304.96 217.69
@@ -922,8 +947,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 1.93 1.93 0.0 0 1 317.20 207.18
   L 317.02 221.62
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 383.79 220.48
   L 383.09 215.77
   L 385.15 214.47
@@ -934,8 +960,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 0.56 0.56 0.0 0 1 385.28 230.66
   L 383.79 220.48
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 301.95 218.92
   L 303.43 219.31
   Q 303.48 221.61 304.80 223.71
@@ -947,8 +974,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   Q 298.42 222.21 300.25 220.01
   Q 301.42 219.87 301.95 218.92
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 344.44 225.09
   Q 344.87 226.57 343.75 226.59
   Q 337.29 226.65 336.65 226.69
@@ -958,16 +986,18 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   Q 329.48 224.64 343.00 224.67
   Q 343.85 224.67 344.44 225.09
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 285.37 238.24
   L 295.42 242.54
   L 295.24 250.76
   L 284.06 245.73
   Q 284.10 241.64 285.37 238.24
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 405.72 274.08
   L 392.03 251.47
   Q 392.86 249.18 394.78 250.66
@@ -988,8 +1018,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 0.46 0.46 0.0 0 0 407.77 275.63
   Q 406.61 275.09 405.72 274.08
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 293.17 290.00
   Q 296.77 292.99 301.51 292.54
   L 301.78 303.98
@@ -1003,10 +1034,11 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 0.68 0.68 0.0 0 1 268.58 279.16
   L 293.17 290.00
   Z"
-/>
-</g>
-<g fill="#edd693">
-<path d="
+        />
+      </g>
+      <g fill="#edd693">
+        <path
+          d="
   M 339.36 55.03
   Q 339.46 58.07 338.00 57.98
   L 336.45 58.08
@@ -1014,8 +1046,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   L 325.62 55.36
   Q 332.54 54.46 339.36 55.03
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 297.47 62.53
   L 285.96 62.03
   L 300.69 57.44
@@ -1024,8 +1057,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 0.31 0.31 0.0 0 1 308.19 58.90
   L 297.47 62.53
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 305.24 72.57
   Q 300.76 73.56 297.05 76.01
   L 286.18 71.79
@@ -1040,8 +1074,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 0.33 0.32 36.4 0 1 305.93 72.05
   L 305.24 72.57
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 374.99 70.25
   Q 376.65 72.67 379.58 73.57
   A 0.91 0.91 0.0 0 1 380.01 75.02
@@ -1050,8 +1085,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   Q 370.54 72.03 371.69 71.47
   Q 373.29 70.70 374.99 70.25
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 351.48 80.79
   L 338.41 80.92
   L 329.02 80.85
@@ -1065,8 +1101,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 1.34 1.34 0.0 0 1 348.37 75.60
   Q 350.51 78.00 351.48 80.79
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 322.14 95.46
   L 313.55 94.53
   A 0.28 0.28 0.0 0 1 313.41 94.03
@@ -1075,8 +1112,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 0.61 0.61 0.0 0 1 322.05 90.95
   L 322.14 95.46
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 299.05 91.36
   L 311.36 94.65
   A 0.72 0.71 7.4 0 1 311.90 95.34
@@ -1089,8 +1127,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   Q 297.23 92.54 298.21 91.46
   L 299.05 91.36
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 296.98 125.71
   Q 296.19 128.08 296.60 128.97
   Q 297.09 130.07 297.00 131.09
@@ -1100,8 +1139,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 0.55 0.55 0.0 0 1 293.92 124.72
   Q 295.56 124.89 296.98 125.71
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 297.74 162.18
   L 295.71 161.34
   A 0.75 0.75 0.0 0 1 295.25 160.59
@@ -1109,8 +1149,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   Q 299.77 141.05 299.78 142.99
   Q 299.80 149.02 297.74 162.18
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 301.53 165.83
   L 301.82 166.28
   Q 301.94 166.69 301.75 166.94
@@ -1126,8 +1167,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 0.28 0.27 -77.4 0 1 295.35 163.51
   L 301.53 165.83
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 312.02 169.63
   L 318.90 171.93
   A 3.71 3.69 54.1 0 0 320.07 172.12
@@ -1143,8 +1185,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   Q 314.29 171.77 311.75 172.48
   Q 311.60 170.97 312.02 169.63
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 345.68 179.73
   Q 346.57 187.57 345.81 194.13
   L 345.10 193.71
@@ -1152,8 +1195,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   Q 343.35 189.65 343.39 189.57
   L 345.68 179.73
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 310.97 187.24
   Q 310.38 187.95 310.93 189.59
   A 0.38 0.37 89.1 0 1 310.47 190.07
@@ -1163,8 +1207,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   Q 303.11 185.92 303.41 185.25
   Q 306.66 184.39 310.97 187.24
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 295.44 196.02
   Q 294.91 198.54 295.13 199.15
   L 294.01 212.94
@@ -1174,8 +1219,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 0.46 0.46 0.0 0 1 293.00 194.85
   Q 294.37 195.09 295.44 196.02
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 334.21 204.53
   L 334.58 205.13
   A 0.44 0.44 0.0 0 1 334.22 205.81
@@ -1193,8 +1239,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 2.54 2.47 55.2 0 0 318.72 204.56
   L 334.21 204.53
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 301.95 218.92
   Q 301.42 219.87 300.25 220.01
   L 293.78 217.92
@@ -1207,8 +1254,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 0.43 0.43 0.0 0 1 291.67 214.52
   L 301.95 218.92
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 314.17 245.54
   Q 313.45 248.12 311.47 249.40
   L 295.42 242.54
@@ -1219,8 +1267,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   Q 285.67 233.38 286.53 233.74
   Q 300.24 239.47 314.17 245.54
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 284.52 250.52
   Q 284.72 251.79 284.08 252.41
   A 1.75 0.36 -38.9 0 0 283.47 253.15
@@ -1241,8 +1290,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 1.19 1.16 -85.6 0 1 282.82 250.08
   Q 283.75 249.70 284.52 250.52
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 303.18 293.33
   Q 302.79 293.78 303.68 294.32
   A 0.24 0.22 -87.4 0 1 303.78 294.44
@@ -1257,8 +1307,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 0.85 0.85 0.0 0 1 311.31 263.69
   L 303.18 293.33
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 300.98 310.35
   Q 300.32 312.70 298.28 314.33
   L 278.61 304.33
@@ -1268,11 +1319,19 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 0.76 0.75 -51.6 0 1 263.94 291.34
   L 300.98 310.35
   Z"
-/>
-</g>
-<g fill="#738173">
-<rect x="-1.06" y="-2.02" transform="translate(314.88,64.08) rotate(2.7)" width="2.12" height="4.04" rx="0.70"/>
-<path d="
+        />
+      </g>
+      <g fill="#738173">
+        <rect
+          x="-1.06"
+          y="-2.02"
+          transform="translate(314.88,64.08) rotate(2.7)"
+          width="2.12"
+          height="4.04"
+          rx="0.70"
+        />
+        <path
+          d="
   M 361.29 66.07
   A 0.57 0.57 0.0 0 1 360.73 65.49
   L 360.74 65.17
@@ -1283,8 +1342,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 0.57 0.57 0.0 0 1 363.25 66.09
   L 361.29 66.07
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 363.89 72.95
   Q 363.57 73.71 363.06 73.52
   Q 362.72 73.39 362.66 73.38
@@ -1295,8 +1355,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 0.82 0.80 -2.0 0 1 363.86 70.68
   Q 364.10 71.75 363.89 72.95
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 296.41 92.34
   Q 296.65 92.35 296.84 92.39
   A 0.68 0.66 -85.3 0 1 297.38 93.04
@@ -1307,8 +1368,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   Q 284.48 103.33 285.54 101.90
   L 296.41 92.34
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 319.00 147.41
   Q 319.10 147.49 319.19 147.57
   Q 312.55 148.98 308.31 152.50
@@ -1334,8 +1396,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 1.71 1.34 52.0 0 1 307.21 143.28
   L 319.00 147.41
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 302.90 213.73
   Q 299.86 209.40 298.01 203.12
   Q 297.27 200.62 295.13 199.15
@@ -1344,8 +1407,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 0.69 0.69 0.0 0 1 303.83 199.46
   L 302.90 213.73
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 338.09 204.33
   L 338.25 220.62
   A 0.52 0.52 0.0 0 1 337.40 221.03
@@ -1355,8 +1419,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   L 334.21 204.53
   Q 335.34 203.93 338.09 204.33
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 303.43 219.31
   L 316.37 224.74
   L 316.17 240.37
@@ -1365,8 +1430,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   Q 310.03 232.02 304.80 223.71
   Q 303.48 221.61 303.43 219.31
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 313.99 262.81
   Q 321.61 266.38 329.11 268.38
   Q 331.69 269.07 339.27 272.65
@@ -1392,8 +1458,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   Q 284.83 251.69 284.75 250.70
   L 313.99 262.81
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 298.28 314.33
   Q 298.34 314.77 299.12 314.93
   L 298.60 328.54
@@ -1401,18 +1468,20 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   L 278.61 304.33
   L 298.28 314.33
   Z"
-/>
-</g>
-<g fill="#233c54">
-<path d="
+        />
+      </g>
+      <g fill="#233c54">
+        <path
+          d="
   M 391.92 70.07
   L 391.50 101.45
   L 379.79 91.28
   L 379.89 75.47
   L 391.92 70.07
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 350.23 71.57
   Q 356.76 72.36 362.66 73.38
   Q 362.72 73.39 363.06 73.52
@@ -1427,8 +1496,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   C 355.44 82.77 354.99 79.65 352.78 75.86
   Q 351.58 73.80 350.23 71.57
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 305.24 72.57
   Q 306.53 78.48 306.17 84.44
   A 1.58 1.56 -16.2 0 1 305.50 85.64
@@ -1436,8 +1506,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   L 297.05 76.01
   Q 300.76 73.56 305.24 72.57
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 379.28 91.77
   Q 379.34 91.88 379.40 91.98
   C 379.40 98.62 380.15 104.92 379.47 111.59
@@ -1463,8 +1534,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   Q 364.61 94.94 364.82 94.65
   L 379.28 91.77
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 297.44 112.16
   L 310.83 116.77
   Q 310.91 117.00 311.22 117.25
@@ -1476,8 +1548,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   Q 288.53 107.05 290.25 108.25
   Q 293.68 110.65 297.44 112.16
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 379.21 136.64
   Q 377.27 136.58 377.49 141.51
   Q 377.91 151.14 378.61 160.75
@@ -1511,8 +1584,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 0.63 0.58 69.4 0 1 377.53 136.76
   Q 378.15 136.10 379.21 136.64
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 355.04 146.57
   Q 351.18 150.00 345.19 153.92
   Q 341.98 156.01 339.60 159.63
@@ -1548,8 +1622,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 1.44 1.43 -2.4 0 1 354.82 144.43
   L 355.04 146.57
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 357.89 147.30
   A 0.67 0.67 0.0 0 1 358.84 146.67
   L 367.99 150.93
@@ -1560,16 +1635,18 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 1.03 1.02 81.5 0 1 358.52 168.28
   L 357.89 147.30
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 357.94 205.72
   L 358.95 221.50
   A 0.92 0.91 88.3 0 1 358.03 222.48
   L 339.64 222.38
   C 345.34 216.04 351.56 211.18 357.94 205.72
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 383.09 215.77
   L 383.79 220.48
   Q 383.28 218.10 381.76 218.59
@@ -1585,8 +1662,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   Q 360.78 225.57 360.25 224.80
   L 383.09 215.77
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 315.53 242.06
   Q 316.36 241.37 316.17 240.37
   C 321.88 237.50 327.23 232.73 333.12 228.03
@@ -1599,32 +1677,36 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 0.57 0.57 0.0 0 1 344.89 242.23
   L 315.53 242.06
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 392.03 251.47
   L 405.72 274.08
   Q 395.96 271.90 386.73 268.41
   A 0.86 0.86 0.0 0 1 386.23 267.31
   L 392.03 251.47
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 363.36 262.79
   L 339.09 271.88
   A 0.71 0.70 80.9 0 1 338.14 271.19
   L 338.45 262.56
   L 363.36 262.79
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 374.59 293.62
   L 365.29 262.68
   Q 375.46 264.02 385.13 269.13
   A 1.16 1.15 -61.6 0 1 385.60 270.72
   Q 379.53 281.71 374.59 293.62
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 371.72 293.85
   Q 370.39 295.30 368.48 295.87
   Q 354.69 299.97 340.93 304.15
@@ -1636,8 +1718,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   Q 313.68 294.94 323.80 294.95
   C 339.32 294.97 355.73 294.04 371.72 293.85
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 376.88 314.91
   L 377.72 315.06
   Q 378.58 321.57 377.77 327.82
@@ -1646,10 +1729,11 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   Q 339.68 321.93 338.01 314.91
   L 376.88 314.91
   Z"
-/>
-</g>
-<g fill="#7f6c51">
-<path d="
+        />
+      </g>
+      <g fill="#7f6c51">
+        <path
+          d="
   M 355.56 57.46
   L 360.15 57.57
   Q 361.36 58.72 361.00 61.36
@@ -1660,8 +1744,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 0.24 0.24 0.0 0 1 355.45 63.03
   Q 354.78 60.07 355.56 57.46
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 377.79 90.73
   L 370.44 87.91
   L 370.65 82.97
@@ -1669,8 +1754,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   Q 378.81 90.17 378.46 90.54
   Q 378.24 90.78 377.79 90.73
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 358.77 90.19
   L 364.82 94.65
   Q 364.61 94.94 364.46 94.97
@@ -1680,8 +1766,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 0.78 0.78 0.0 0 1 355.67 90.46
   L 358.77 90.19
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 359.19 138.78
   L 359.27 132.97
   L 382.35 124.90
@@ -1690,8 +1777,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 2.40 2.40 0.0 0 1 382.22 130.35
   L 359.19 138.78
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 376.02 186.89
   L 367.07 190.20
   A 0.50 0.50 0.0 0 1 366.40 189.81
@@ -1700,8 +1788,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 1.31 1.28 -45.7 0 1 372.58 184.78
   Q 374.22 185.27 376.02 186.89
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 300.25 220.01
   Q 298.42 222.21 296.11 224.04
   A 6.24 6.18 0.3 0 0 295.12 225.01
@@ -1710,8 +1799,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 0.43 0.43 0.0 0 1 293.78 217.92
   L 300.25 220.01
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 391.19 233.33
   Q 391.58 236.83 393.99 237.16
   L 391.79 238.46
@@ -1719,8 +1809,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   L 362.35 245.68
   L 391.19 233.33
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 377.72 315.06
   L 376.88 314.91
   Q 376.81 311.35 374.57 310.33
@@ -1732,10 +1823,11 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 1.64 1.63 62.7 0 1 415.11 295.94
   L 377.72 315.06
   Z"
-/>
-</g>
-<g fill="#385563">
-<path d="
+        />
+      </g>
+      <g fill="#385563">
+        <path
+          d="
   M 338.00 57.98
   L 348.20 57.89
   L 348.13 71.46
@@ -1747,8 +1839,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   Q 337.78 58.66 336.45 58.08
   L 338.00 57.98
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 392.69 106.15
   A 0.26 0.25 83.9 0 1 393.08 106.47
   L 386.11 118.54
@@ -1757,16 +1850,18 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 0.50 0.50 0.0 0 1 374.66 122.72
   L 392.69 106.15
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 301.02 123.31
   L 292.52 119.52
   A 1.77 1.70 -3.8 0 1 291.76 118.88
   L 285.51 109.09
   Q 294.44 114.65 301.02 123.31
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 318.99 143.31
   L 319.00 147.41
   L 307.21 143.28
@@ -1776,8 +1871,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   Q 307.47 139.16 315.04 141.47
   Q 316.38 141.88 318.99 143.31
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 355.04 146.57
   L 356.04 169.27
   A 0.65 0.64 80.9 0 1 355.58 169.92
@@ -1792,8 +1888,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   Q 341.98 156.01 345.19 153.92
   Q 351.18 150.00 355.04 146.57
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 345.10 193.71
   L 345.81 194.13
   L 359.52 201.91
@@ -1804,8 +1901,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   L 336.52 194.00
   L 345.10 193.71
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 357.94 205.72
   C 351.56 211.18 345.34 216.04 339.64 222.38
   Q 328.97 223.20 318.00 222.42
@@ -1816,8 +1914,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   Q 347.00 204.19 357.25 204.32
   Q 358.10 204.33 357.94 205.72
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 395.36 236.71
   L 395.59 243.17
   A 2.03 2.01 -17.6 0 1 394.65 244.96
@@ -1827,8 +1926,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   L 393.99 237.16
   L 395.36 236.71
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 364.78 249.92
   Q 364.85 250.08 364.97 250.22
   A 0.73 0.69 -65.3 0 1 365.12 250.66
@@ -1838,8 +1938,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   L 312.07 249.94
   L 364.78 249.92
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 338.45 262.56
   L 338.14 271.19
   A 0.71 0.70 80.9 0 0 339.09 271.88
@@ -1860,8 +1961,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   Q 321.61 266.38 313.99 262.81
   Q 326.34 261.82 338.45 262.56
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 338.37 273.28
   L 338.39 292.79
   A 0.55 0.54 90.0 0 1 337.85 293.34
@@ -1871,16 +1973,18 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   Q 328.40 278.08 336.05 273.56
   Q 337.15 272.91 338.37 273.28
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 262.43 295.94
   L 278.61 304.33
   L 277.71 317.33
   L 263.07 309.22
   L 262.43 295.94
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 337.78 314.91
   Q 338.01 315.19 338.01 314.91
   Q 339.68 321.93 338.01 328.62
@@ -1888,10 +1992,11 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   L 299.12 314.93
   L 337.78 314.91
   Z"
-/>
-</g>
-<g fill="#bda470">
-<path d="
+        />
+      </g>
+      <g fill="#bda470">
+        <path
+          d="
   M 348.20 57.89
   L 338.00 57.98
   Q 339.46 58.07 339.36 55.03
@@ -1899,8 +2004,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 0.37 0.36 11.2 0 1 350.32 55.52
   Q 349.72 56.94 348.20 57.89
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 380.16 62.69
   Q 373.80 61.49 367.59 58.42
   L 375.67 57.33
@@ -1909,8 +2015,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 0.35 0.35 0.0 0 1 390.74 62.07
   L 380.16 62.69
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 394.26 69.01
   Q 393.57 69.75 391.92 70.07
   L 379.89 75.47
@@ -1922,8 +2029,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 3.98 3.92 36.1 0 1 381.91 67.92
   L 394.26 69.01
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 297.05 76.01
   L 297.26 87.55
   L 297.24 90.20
@@ -1933,8 +2041,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 0.41 0.41 0.0 0 1 286.18 71.79
   L 297.05 76.01
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 370.44 87.91
   L 377.79 90.73
   Q 379.31 91.34 379.28 91.77
@@ -1942,8 +2051,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   L 358.77 90.19
   L 370.44 87.91
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 318.07 133.08
   L 317.17 138.63
   L 297.00 131.09
@@ -1951,8 +2061,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   Q 296.19 128.08 296.98 125.71
   L 318.07 133.08
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 299.94 136.57
   L 299.90 140.50
   Q 299.68 141.37 300.07 142.75
@@ -1970,8 +2081,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 0.47 0.46 -77.9 0 1 298.02 136.05
   L 299.94 136.57
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 360.25 224.80
   Q 360.78 225.57 359.76 226.44
   A 0.76 0.75 24.3 0 1 359.27 226.62
@@ -1984,8 +2096,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 0.72 0.71 -0.7 0 1 347.94 224.72
   L 360.25 224.80
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 395.36 236.71
   L 393.99 237.16
   Q 391.58 236.83 391.19 233.33
@@ -1993,15 +2106,17 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   A 0.46 0.46 0.0 0 1 392.35 232.19
   Q 394.28 234.06 395.36 236.71
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 281.76 236.79
   Q 284.21 237.29 285.37 238.24
   Q 284.10 241.64 284.06 245.73
   Q 280.09 245.45 281.76 236.79
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 362.35 245.68
   L 364.97 249.80
   L 364.78 249.92
@@ -2010,8 +2125,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   Q 313.45 248.12 314.17 245.54
   L 362.35 245.68
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 284.75 250.70
   Q 284.83 251.69 285.07 252.54
   Q 287.46 261.14 290.32 267.32
@@ -2024,8 +2140,9 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   Q 284.72 251.79 284.52 250.52
   Q 284.66 250.68 284.75 250.70
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 337.96 310.32
   Q 338.25 312.63 337.78 314.91
   L 299.12 314.93
@@ -2033,10 +2150,8 @@ export const Rook: React.FC<PieceProps> = ({ style, className }) => {
   Q 300.32 312.70 300.98 310.35
   L 337.96 310.32
   Z"
-/>
-</g>
-
-
+        />
+      </g>
     </svg>
   );
 };

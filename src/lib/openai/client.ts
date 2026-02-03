@@ -6,18 +6,18 @@ let openaiClient: OpenAI | null = null;
 export function getOpenAIClient() {
   if (!openaiClient) {
     const apiKey = process.env.OPENAI_API_KEY;
-    
+
     if (!apiKey) {
       throw new Error('OPENAI_API_KEY environment variable is not set');
     }
-    
+
     openaiClient = new OpenAI({
       apiKey: apiKey,
       timeout: 30000, // 30 second timeout
       maxRetries: 0, // We'll handle retries ourselves
     });
   }
-  
+
   return openaiClient;
 }
 
@@ -25,9 +25,11 @@ export function getOpenAIClient() {
 export const openai = getOpenAIClient();
 
 // Wrapper for OpenAI chat completions with retry logic
-export async function createChatCompletion(params: OpenAI.Chat.Completions.ChatCompletionCreateParams) {
+export async function createChatCompletion(
+  params: OpenAI.Chat.Completions.ChatCompletionCreateParams,
+) {
   const client = getOpenAIClient();
-  
+
   // For streaming requests, we need to handle them differently due to retry complexity
   if (params.stream) {
     // For streaming, we'll do a simple call with built-in OpenAI retry (set to 1)
@@ -38,7 +40,7 @@ export async function createChatCompletion(params: OpenAI.Chat.Completions.ChatC
     });
     return streamingClient.chat.completions.create(params);
   }
-  
+
   // For non-streaming, use our custom retry logic
   return withOpenAIRetry(() => client.chat.completions.create(params));
 }
@@ -67,7 +69,7 @@ export async function createResponsesCompletion(params: ResponsesAPIParams) {
     const response = await fetch('https://api.openai.com/v1/responses', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
+        Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(params),
@@ -75,7 +77,9 @@ export async function createResponsesCompletion(params: ResponsesAPIParams) {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(`Responses API error: ${response.status} ${response.statusText} - ${JSON.stringify(errorData)}`);
+      throw new Error(
+        `Responses API error: ${response.status} ${response.statusText} - ${JSON.stringify(errorData)}`,
+      );
     }
 
     return response.json();
@@ -84,7 +88,7 @@ export async function createResponsesCompletion(params: ResponsesAPIParams) {
 
 // Streaming version of Responses API for real-time Chester responses
 export async function createResponsesCompletionStream(
-  params: Omit<ResponsesAPIParams, 'stream'>
+  params: Omit<ResponsesAPIParams, 'stream'>,
 ): Promise<ReadableStream<Uint8Array>> {
   const apiKey = process.env.OPENAI_API_KEY;
 
@@ -95,7 +99,7 @@ export async function createResponsesCompletionStream(
   const response = await fetch('https://api.openai.com/v1/responses', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${apiKey}`,
+      Authorization: `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ ...params, stream: true }),
@@ -103,7 +107,9 @@ export async function createResponsesCompletionStream(
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(`Responses API error: ${response.status} ${response.statusText} - ${JSON.stringify(errorData)}`);
+    throw new Error(
+      `Responses API error: ${response.status} ${response.statusText} - ${JSON.stringify(errorData)}`,
+    );
   }
 
   if (!response.body) {
@@ -115,7 +121,7 @@ export async function createResponsesCompletionStream(
 
 // Parse SSE stream and extract text chunks
 export async function* parseResponsesStream(
-  stream: ReadableStream<Uint8Array>
+  stream: ReadableStream<Uint8Array>,
 ): AsyncGenerator<string, void, unknown> {
   const reader = stream.getReader();
   const decoder = new TextDecoder();

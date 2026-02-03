@@ -7,7 +7,7 @@
 let framerMotionCache: any = null;
 export async function loadFramerMotion() {
   if (framerMotionCache) return framerMotionCache;
-  
+
   const framerMotion = await import('framer-motion');
   framerMotionCache = framerMotion;
   return framerMotion;
@@ -17,7 +17,7 @@ export async function loadFramerMotion() {
 let chessJsCache: any = null;
 export async function loadChessJs() {
   if (chessJsCache) return chessJsCache;
-  
+
   const chessJs = await import('chess.js');
   chessJsCache = chessJs;
   return chessJs;
@@ -27,7 +27,7 @@ export async function loadChessJs() {
 let reactMarkdownCache: any = null;
 export async function loadReactMarkdown() {
   if (reactMarkdownCache) return reactMarkdownCache;
-  
+
   const reactMarkdown = await import('react-markdown');
   reactMarkdownCache = reactMarkdown;
   return reactMarkdown;
@@ -37,7 +37,7 @@ export async function loadReactMarkdown() {
 let remarkGfmCache: any = null;
 export async function loadRemarkGfm() {
   if (remarkGfmCache) return remarkGfmCache;
-  
+
   const remarkGfm = await import('remark-gfm');
   remarkGfmCache = remarkGfm;
   return remarkGfm;
@@ -47,7 +47,7 @@ export async function loadRemarkGfm() {
 let reactChessboardCache: any = null;
 export async function loadReactChessboard() {
   if (reactChessboardCache) return reactChessboardCache;
-  
+
   const reactChessboard = await import('react-chessboard');
   reactChessboardCache = reactChessboard;
   return reactChessboard;
@@ -57,7 +57,7 @@ export async function loadReactChessboard() {
 let uuidCache: any = null;
 export async function loadUuid() {
   if (uuidCache) return uuidCache;
-  
+
   const uuid = await import('uuid');
   uuidCache = uuid;
   return uuid;
@@ -70,13 +70,13 @@ export function preloadCriticalLibraries() {
     // Preload most likely needed libraries
     loadChessJs();
     loadReactChessboard();
-    
+
     // Remove listeners after first interaction
     document.removeEventListener('mousedown', preload);
     document.removeEventListener('touchstart', preload);
     document.removeEventListener('keydown', preload);
   };
-  
+
   // Listen for first user interaction
   document.addEventListener('mousedown', preload, { once: true, passive: true });
   document.addEventListener('touchstart', preload, { once: true, passive: true });
@@ -85,18 +85,18 @@ export function preloadCriticalLibraries() {
 
 // Utility for progressive loading with retries
 export async function loadWithRetry<T>(
-  loader: () => Promise<T>, 
+  loader: () => Promise<T>,
   retries: number = 3,
-  delay: number = 1000
+  delay: number = 1000,
 ): Promise<T> {
   for (let i = 0; i < retries; i++) {
     try {
       return await loader();
     } catch (error) {
       if (i === retries - 1) throw error;
-      
+
       // Wait before retry with exponential backoff
-      await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
+      await new Promise((resolve) => setTimeout(resolve, delay * 2 ** i));
     }
   }
   throw new Error('Max retries exceeded');

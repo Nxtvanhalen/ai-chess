@@ -1,5 +1,4 @@
 import { supabase } from './client';
-import { ChatMessage, Game, GameMove } from '@/types';
 
 // Game management
 export async function createGame(playerColor: 'white' | 'black' = 'white') {
@@ -10,7 +9,7 @@ export async function createGame(playerColor: 'white' | 'black' = 'white') {
       player_color: playerColor,
       fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', // Starting position
       pgn: '',
-      metadata: { created_by: 'Chess Butler AI' }
+      metadata: { created_by: 'Chess Butler AI' },
     })
     .select()
     .single();
@@ -22,10 +21,10 @@ export async function createGame(playerColor: 'white' | 'black' = 'white') {
 export async function updateGamePosition(gameId: string, fen: string, pgn: string) {
   const { data, error } = await supabase
     .from('games')
-    .update({ 
-      fen, 
+    .update({
+      fen,
       pgn,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     })
     .eq('id', gameId)
     .select()
@@ -38,10 +37,10 @@ export async function updateGamePosition(gameId: string, fen: string, pgn: strin
 export async function finishGame(gameId: string, result: string) {
   const { data, error } = await supabase
     .from('games')
-    .update({ 
+    .update({
       status: 'completed',
       result,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     })
     .eq('id', gameId)
     .select()
@@ -58,7 +57,7 @@ export async function saveMove(
   moveNotation: string,
   fenBefore: string,
   fenAfter: string,
-  playerType: 'human' | 'ai'
+  playerType: 'human' | 'ai',
 ) {
   const { data, error } = await supabase
     .from('moves')
@@ -68,7 +67,7 @@ export async function saveMove(
       move_notation: moveNotation,
       fen_before: fenBefore,
       fen_after: fenAfter,
-      player_type: playerType
+      player_type: playerType,
     })
     .select()
     .single();
@@ -83,7 +82,7 @@ export async function createConversation(gameId: string) {
     .from('conversations')
     .insert({
       game_id: gameId,
-      message_count: 0
+      message_count: 0,
     })
     .select()
     .single();
@@ -96,7 +95,7 @@ export async function saveMessage(
   conversationId: string,
   role: 'user' | 'assistant' | 'system',
   content: string,
-  metadata?: any
+  metadata?: any,
 ) {
   const { data, error } = await supabase
     .from('messages')
@@ -104,7 +103,7 @@ export async function saveMessage(
       conversation_id: conversationId,
       role,
       content,
-      metadata: metadata || {}
+      metadata: metadata || {},
     })
     .select()
     .single();
@@ -124,7 +123,7 @@ export async function saveMessage(
         .from('conversations')
         .update({
           message_count: (currentConv.message_count || 0) + 1,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
         .eq('id', conversationId);
     }
@@ -150,7 +149,7 @@ export async function getConversationMessages(conversationId: string) {
 export async function saveMemory(
   category: 'game_pattern' | 'conversation' | 'preference' | 'coaching' | 'player_style',
   content: string,
-  context: any = {}
+  context: any = {},
 ) {
   const { data, error } = await supabase
     .from('memory')
@@ -158,7 +157,7 @@ export async function saveMemory(
       category,
       content,
       context,
-      relevance_score: 1.0
+      relevance_score: 1.0,
     })
     .select()
     .single();

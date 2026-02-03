@@ -4,6 +4,32 @@
 // Centralized exports for Redis functionality
 // =============================================================================
 
+// Caching
+export {
+  type CachedChesterPersonality,
+  type CachedGameContext,
+  type CachedGameState,
+  type CachedSession,
+  type CachedUserProfile,
+  deleteCached,
+  deleteCachedGameState,
+  deleteCachedSession,
+  deleteCachedUserProfile,
+  getCached,
+  getCachedChesterPersonality,
+  getCachedGameContext,
+  getCachedGameState,
+  getCachedSession,
+  getCachedUserProfile,
+  getCacheStats,
+  getOrSet,
+  setCached,
+  setCachedChesterPersonality,
+  setCachedGameContext,
+  setCachedGameState,
+  setCachedSession,
+  setCachedUserProfile,
+} from './cache';
 // Client
 export {
   getRedisClient,
@@ -12,52 +38,24 @@ export {
   Redis,
 } from './client';
 
+// Guardian (IP Blocking)
+export {
+  blockIPInRedis,
+  getBlockedIPsFromRedis,
+  getIPReputation,
+  getRecentThreats,
+  isIPBlockedInRedis,
+  shouldUseRedisGuardian,
+  syncStaticBlocksToRedis,
+  unblockIPInRedis,
+  updateIPReputation,
+} from './guardian';
 // Rate Limiting
 export {
   checkRateLimitRedis,
-  getRateLimitHeadersRedis,
   getClientIPFromRequest,
+  getRateLimitHeadersRedis,
   RATE_LIMITS,
-  type RateLimitType,
   type RateLimitResult,
+  type RateLimitType,
 } from './ratelimit';
-
-// Guardian (IP Blocking)
-export {
-  isIPBlockedInRedis,
-  blockIPInRedis,
-  unblockIPInRedis,
-  getBlockedIPsFromRedis,
-  getRecentThreats,
-  updateIPReputation,
-  getIPReputation,
-  shouldUseRedisGuardian,
-  syncStaticBlocksToRedis,
-} from './guardian';
-
-// Caching
-export {
-  getCached,
-  setCached,
-  deleteCached,
-  getOrSet,
-  getCachedSession,
-  setCachedSession,
-  deleteCachedSession,
-  getCachedGameState,
-  setCachedGameState,
-  deleteCachedGameState,
-  getCachedGameContext,
-  setCachedGameContext,
-  getCachedUserProfile,
-  setCachedUserProfile,
-  deleteCachedUserProfile,
-  getCachedChesterPersonality,
-  setCachedChesterPersonality,
-  getCacheStats,
-  type CachedSession,
-  type CachedGameState,
-  type CachedGameContext,
-  type CachedUserProfile,
-  type CachedChesterPersonality,
-} from './cache';

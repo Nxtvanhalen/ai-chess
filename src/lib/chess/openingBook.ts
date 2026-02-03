@@ -200,7 +200,7 @@ export const OPENING_BOOK: Record<string, BookMove[]> = {
 
   'r1bqkbnr/1ppp1ppp/p1n5/4p3/B3P3/5N2/PPPP1PPP/RNBQK2R b KQkq -': [
     { move: 'Nf6', weight: 70, name: 'Main Line' },
-    { move: 'b5', weight: 20, name: 'Noah\'s Ark Trap' },
+    { move: 'b5', weight: 20, name: "Noah's Ark Trap" },
     { move: 'd6', weight: 10, name: 'Steinitz Deferred' },
   ],
 
@@ -372,7 +372,7 @@ export const OPENING_BOOK: Record<string, BookMove[]> = {
   // Nimzo-Indian
   'rnbqkb1r/pppp1ppp/4pn2/8/2PP4/8/PP2PPPP/RNBQKBNR w KQkq -': [
     { move: 'Nc3', weight: 60, name: 'Nimzo-Indian' },
-    { move: 'Nf3', weight: 40, name: 'Queen\'s Indian' },
+    { move: 'Nf3', weight: 40, name: "Queen's Indian" },
   ],
 
   'rnbqkb1r/pppp1ppp/4pn2/8/2PP4/2N5/PP2PPPP/R1BQKBNR b KQkq -': [

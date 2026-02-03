@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getStripeClient } from '@/lib/stripe/config';
 
 // =============================================================================
@@ -31,16 +31,16 @@ export async function POST(request: NextRequest) {
             }
           },
         },
-      }
+      },
     );
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     // Get user's Stripe customer ID
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     if (!subscription?.stripe_customer_id) {
       return NextResponse.json(
         { error: 'No subscription found. Please subscribe first.' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -69,9 +69,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ url: portalSession.url });
   } catch (error) {
     console.error('[Stripe Portal] Error:', error);
-    return NextResponse.json(
-      { error: 'Failed to access customer portal' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to access customer portal' }, { status: 500 });
   }
 }

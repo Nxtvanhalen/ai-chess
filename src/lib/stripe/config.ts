@@ -22,7 +22,7 @@ export function getStripeClient(): Stripe {
     if (!secretKey) {
       throw new Error(
         'Missing STRIPE_SECRET_KEY environment variable. ' +
-        'Please set it in your .env.local file.'
+          'Please set it in your .env.local file.',
       );
     }
 
@@ -89,11 +89,7 @@ export const PLAN_FEATURES = {
       'Basic Chester AI personality',
       'Last 10 game history',
     ],
-    limitations: [
-      'Limited daily usage',
-      'No game export',
-      'Standard response time',
-    ],
+    limitations: ['Limited daily usage', 'No game export', 'Standard response time'],
   },
   pro: {
     name: 'Pro',

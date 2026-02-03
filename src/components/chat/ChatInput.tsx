@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, KeyboardEvent } from 'react';
+import { type KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { haptics } from '@/lib/utils/haptics';
 
 interface ChatInputProps {
@@ -9,10 +9,10 @@ interface ChatInputProps {
   placeholder?: string;
 }
 
-export default function ChatInput({ 
-  onSendMessage, 
+export default function ChatInput({
+  onSendMessage,
   disabled = false,
-  placeholder = "Message Chester..."
+  placeholder = 'Message Chester...',
 }: ChatInputProps) {
   const [message, setMessage] = useState('');
   const [isLandscape, setIsLandscape] = useState(false);
@@ -37,7 +37,7 @@ export default function ChatInput({
 
     updateOrientation();
     window.addEventListener('resize', updateOrientation);
-    
+
     return () => window.removeEventListener('resize', updateOrientation);
   }, []);
 
@@ -47,10 +47,10 @@ export default function ChatInput({
     if (message.trim() && !disabled) {
       // Enhanced haptic feedback for message send
       await haptics.messageSent();
-      
+
       onSendMessage(message.trim());
       setMessage('');
-      
+
       // Auto-blur on mobile after sending
       if (typeof window !== 'undefined' && window.innerWidth < 1024 && textareaRef.current) {
         textareaRef.current.blur();
@@ -85,34 +85,28 @@ export default function ChatInput({
           enterKeyHint="send"
           // Critical iOS attributes to minimize accessory bar
           data-testid="chat-input"
-          role="textbox"
           aria-label="Chat message input"
           x-webkit-speech=""
           webkit-appearance="none"
           className="chat-text-input"
-          style={{ 
+          style={{
             minHeight: '44px', // Accessibility touch target minimum
             WebkitAppearance: 'none',
             appearance: 'none',
             WebkitUserSelect: 'text',
-            userSelect: 'text'
+            userSelect: 'text',
           }}
         />
-        
+
         <button
+          type="button"
           onClick={handleSubmit}
           disabled={disabled || !message.trim()}
           className="chat-send-button"
           style={{ minWidth: '44px', minHeight: '44px' }} // Accessibility touch target
           aria-label="Send message"
         >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            className="text-current"
-          >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-current">
             <path
               d="M7 11L12 6L17 11M12 18V7"
               stroke="currentColor"

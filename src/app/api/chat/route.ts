@@ -1,13 +1,18 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createResponsesCompletion } from '@/lib/openai/client';
-import { CHESS_BUTLER_SYSTEM_PROMPT, formatMoveContext } from '@/lib/openai/chess-butler-prompt';
-import { checkRateLimitRedis, getRateLimitHeadersRedis, getClientIPFromRequest } from '@/lib/redis';
-import { extractMoveSuggestions, validateMoveSuggestion } from '@/lib/chess/board-validator';
-import { GameMemoryService } from '@/lib/services/GameMemoryService';
-import { ChesterMemoryService } from '@/lib/services/ChesterMemoryService';
-import { chatSchema, validateRequest } from '@/lib/validation/schemas';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getAuthenticatedUser } from '@/lib/auth/getUser';
-import { canUseChat, incrementChatUsage, createUsageLimitError, getUsageHeaders } from '@/lib/supabase/subscription';
+import { extractMoveSuggestions, validateMoveSuggestion } from '@/lib/chess/board-validator';
+import { CHESS_BUTLER_SYSTEM_PROMPT, formatMoveContext } from '@/lib/openai/chess-butler-prompt';
+import { createResponsesCompletion } from '@/lib/openai/client';
+import { checkRateLimitRedis, getClientIPFromRequest, getRateLimitHeadersRedis } from '@/lib/redis';
+import { ChesterMemoryService } from '@/lib/services/ChesterMemoryService';
+import { GameMemoryService } from '@/lib/services/GameMemoryService';
+import {
+  canUseChat,
+  createUsageLimitError,
+  getUsageHeaders,
+  incrementChatUsage,
+} from '@/lib/supabase/subscription';
+import { chatSchema, validateRequest } from '@/lib/validation/schemas';
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,12 +24,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: 'Rate limit exceeded. Please wait before sending another message.',
-          retryAfter: Math.ceil((rateLimitResult.reset - Date.now()) / 1000)
+          retryAfter: Math.ceil((rateLimitResult.reset - Date.now()) / 1000),
         },
         {
           status: 429,
-          headers: getRateLimitHeadersRedis(rateLimitResult)
-        }
+          headers: getRateLimitHeadersRedis(rateLimitResult),
+        },
       );
     }
 
@@ -44,17 +49,19 @@ export async function POST(request: NextRequest) {
     const userId = authUser?.id || null;
 
     // Check subscription usage limit (only for authenticated users with subscriptions)
-    let usageCheck: { allowed: boolean; remaining: number; limit: number; unlimited: boolean } | null = null;
+    let usageCheck: {
+      allowed: boolean;
+      remaining: number;
+      limit: number;
+      unlimited: boolean;
+    } | null = null;
     if (authUser) {
       usageCheck = await canUseChat(authUser.id);
       if (!usageCheck.allowed) {
-        return NextResponse.json(
-          createUsageLimitError('chat', usageCheck),
-          {
-            status: 429,
-            headers: getUsageHeaders('chat', usageCheck)
-          }
-        );
+        return NextResponse.json(createUsageLimitError('chat', usageCheck), {
+          status: 429,
+          headers: getUsageHeaders('chat', usageCheck),
+        });
       }
     }
 
@@ -65,7 +72,7 @@ export async function POST(request: NextRequest) {
       lastMove: gameContext?.lastMove,
       totalMoves: gameContext?.totalMoves,
       messageLength: message.length,
-      hasGameId: !!gameId
+      hasGameId: !!gameId,
     });
 
     // Fetch comprehensive game memory context
@@ -83,33 +90,53 @@ export async function POST(request: NextRequest) {
           commentaryCount: fullGameContext?.chesterCommentary?.length || 0,
           tacticalThemes: fullGameContext?.tacticalThemes || [],
           rapportLevel: chesterPersonality?.rapportLevel || 1,
-          gamesPlayed: chesterPersonality?.gamesPlayed || 0
+          gamesPlayed: chesterPersonality?.gamesPlayed || 0,
         });
       } catch (error) {
         console.error('Error fetching game memory context:', error);
         // Continue without memory context - graceful degradation
       }
     }
-    
+
     // Check if this is a playing style analysis question
     const styleAnalysisKeywords = [
-      'playing style', 'my style', 'how am i playing', 'my gameplay', 'my approach',
-      'my strategy', 'my tactics', 'my moves', 'analyze my play', 'my chess',
-      'how do i play', 'my tendencies', 'my patterns', 'my strengths', 'my weaknesses'
+      'playing style',
+      'my style',
+      'how am i playing',
+      'my gameplay',
+      'my approach',
+      'my strategy',
+      'my tactics',
+      'my moves',
+      'analyze my play',
+      'my chess',
+      'how do i play',
+      'my tendencies',
+      'my patterns',
+      'my strengths',
+      'my weaknesses',
     ];
 
-    const isStyleAnalysis = styleAnalysisKeywords.some(keyword =>
-      message.toLowerCase().includes(keyword)
+    const isStyleAnalysis = styleAnalysisKeywords.some((keyword) =>
+      message.toLowerCase().includes(keyword),
     );
 
     // Check if asking about past games
     const pastGameKeywords = [
-      'last game', 'previous game', 'past game', 'earlier game', 'before this',
-      'our last', 'that game', 'recent game', 'yesterday', 'last match'
+      'last game',
+      'previous game',
+      'past game',
+      'earlier game',
+      'before this',
+      'our last',
+      'that game',
+      'recent game',
+      'yesterday',
+      'last match',
     ];
 
-    const isAskingAboutPastGame = pastGameKeywords.some(keyword =>
-      message.toLowerCase().includes(keyword)
+    const isAskingAboutPastGame = pastGameKeywords.some((keyword) =>
+      message.toLowerCase().includes(keyword),
     );
 
     // Fetch past game context if needed
@@ -125,12 +152,12 @@ export async function POST(request: NextRequest) {
             tacticalThemes: lastGame.tactical_themes || [],
             narrative: lastGame.game_narrative,
             moveHistory: lastGame.full_move_history?.slice(-25) || [], // Last 25 moves
-            commentary: lastGame.chester_commentary?.slice(-10) || [] // Last 10 comments
+            commentary: lastGame.chester_commentary?.slice(-10) || [], // Last 10 comments
           };
           console.log('Past game context loaded:', {
             result: pastGameContext.result,
             moves: pastGameContext.totalMoves,
-            moveHistoryLength: pastGameContext.moveHistory.length
+            moveHistoryLength: pastGameContext.moveHistory.length,
           });
         } else {
           console.log('No past game found for user:', userId);
@@ -139,7 +166,7 @@ export async function POST(request: NextRequest) {
         console.error('Error fetching past game:', error);
       }
     }
-    
+
     // Build comprehensive instructions for Responses API
     let instructions = CHESS_BUTLER_SYSTEM_PROMPT;
 
@@ -191,7 +218,9 @@ export async function POST(request: NextRequest) {
 
       if (pastGameContext.moveHistory.length > 0) {
         const moveSequence = pastGameContext.moveHistory
-          .map((m: any) => `${m.move_number}. ${m.player_type === 'human' ? 'Chris' : 'AI'}: ${m.san}`)
+          .map(
+            (m: any) => `${m.move_number}. ${m.player_type === 'human' ? 'Chris' : 'AI'}: ${m.san}`,
+          )
           .join(', ');
         instructions += `\n- Key Moves: ${moveSequence}`;
       }
@@ -225,7 +254,7 @@ export async function POST(request: NextRequest) {
       const recentCommentary = fullGameContext.chesterCommentary.slice(-5);
       if (recentCommentary.length > 0) {
         instructions += `\n\nYour Recent Commentary:`;
-        recentCommentary.forEach(comment => {
+        recentCommentary.forEach((comment) => {
           instructions += `\n- Move ${comment.move_number}: ${comment.content}`;
         });
       }
@@ -234,7 +263,10 @@ export async function POST(request: NextRequest) {
       if (isStyleAnalysis && fullGameContext.fullMoveHistory.length > 0) {
         const recentMoves = fullGameContext.fullMoveHistory.slice(-50); // Last 50 moves
         const moveSequence = recentMoves
-          .map(m => `${m.move_number}. ${m.player_type === 'human' ? 'Chris' : 'AI'}: ${m.san}${m.captured ? ' (captured ' + m.captured + ')' : ''}`)
+          .map(
+            (m) =>
+              `${m.move_number}. ${m.player_type === 'human' ? 'Chris' : 'AI'}: ${m.san}${m.captured ? ` (captured ${m.captured})` : ''}`,
+          )
           .join(', ');
 
         instructions += `\n\nRecent move history for style analysis (last ${recentMoves.length} moves): ${moveSequence}.
@@ -269,7 +301,7 @@ export async function POST(request: NextRequest) {
         Provide specific, actionable insights about their chess style in your characteristic Chester voice.`;
       }
     }
-    
+
     // Use GPT-5 Responses API with reasoning control for faster responses
     // No need for response chaining - GPT-5 handles turn-by-turn naturally
     const completion = await createResponsesCompletion({
@@ -277,16 +309,18 @@ export async function POST(request: NextRequest) {
       input: message,
       instructions: instructions,
       reasoning: {
-        effort: 'low' // Fast responses for chat
+        effort: 'low', // Fast responses for chat
       },
       max_output_tokens: 1000,
     });
 
     // Parse Responses API format
     const messageOutput = completion.output.find((item: any) => item.type === 'message');
-    const textContent = messageOutput?.content.find((content: any) => content.type === 'output_text');
+    const textContent = messageOutput?.content.find(
+      (content: any) => content.type === 'output_text',
+    );
     let content = textContent?.text || 'Sorry, I encountered an issue.';
-    
+
     // Validate move suggestions if a game context exists
     if (gameContext?.fen) {
       const moveSuggestions = extractMoveSuggestions(content);
@@ -316,7 +350,7 @@ export async function POST(request: NextRequest) {
           type: 'chat',
           content: `User: ${message}`,
           timestamp: new Date().toISOString(),
-          metadata: {}
+          metadata: {},
         });
 
         // Save Chester's response as commentary
@@ -326,8 +360,8 @@ export async function POST(request: NextRequest) {
           content: `Chester: ${content}`,
           timestamp: new Date().toISOString(),
           metadata: {
-            urgency_level: isStyleAnalysis ? 'strategic' : undefined
-          }
+            urgency_level: isStyleAnalysis ? 'strategic' : undefined,
+          },
         });
 
         console.log('Chat interaction saved to game memory');
@@ -348,11 +382,14 @@ export async function POST(request: NextRequest) {
       'Cache-Control': 'no-cache',
     };
     if (usageCheck) {
-      Object.assign(responseHeaders, getUsageHeaders('chat', {
-        remaining: usageCheck.unlimited ? Infinity : usageCheck.remaining - 1,
-        limit: usageCheck.limit,
-        unlimited: usageCheck.unlimited
-      }));
+      Object.assign(
+        responseHeaders,
+        getUsageHeaders('chat', {
+          remaining: usageCheck.unlimited ? Infinity : usageCheck.remaining - 1,
+          limit: usageCheck.limit,
+          unlimited: usageCheck.unlimited,
+        }),
+      );
     }
 
     // Return simple response - GPT-5 handles conversation naturally
@@ -360,11 +397,11 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Chat API error:', error);
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to process chat message',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        details: error instanceof Error ? error.message : 'Unknown error',
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

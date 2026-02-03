@@ -1,19 +1,17 @@
-import React from 'react';
-import { PieceProps } from './types';
+import type React from 'react';
+import type { PieceProps } from './types';
 
 export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   return (
-    <svg 
-      viewBox="0.00 0.00 677.00 369.00" 
-      style={style} 
+    <svg
+      viewBox="0.00 0.00 677.00 369.00"
+      style={style}
       className={className}
       xmlns="http://www.w3.org/2000/svg"
     >
-      
-
-
-<g fill="#152940">
-<path d="
+      <g fill="#152940">
+        <path
+          d="
   M 366.49 138.56
   L 363.15 137.92
   A 1.01 0.99 30.8 0 0 362.33 138.12
@@ -505,8 +503,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.41 0.41 0.0 0 0 359.24 287.37
   L 368.15 288.27
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 367.04 205.40
   Q 361.85 201.20 357.05 196.45
   Q 356.54 195.95 356.49 195.26
@@ -515,10 +514,11 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.30 0.30 0.0 0 1 358.68 181.59
   L 367.04 205.40
   Z"
-/>
-</g>
-<g fill="#857250">
-<path d="
+        />
+      </g>
+      <g fill="#857250">
+        <path
+          d="
   M 344.80 73.10
   L 347.17 66.72
   L 355.92 58.88
@@ -527,8 +527,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 2.19 2.19 0.0 0 1 351.99 71.98
   L 344.80 73.10
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 338.73 79.08
   Q 338.76 77.36 337.75 76.19
   Q 338.68 76.05 342.25 75.97
@@ -538,8 +539,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 1.13 1.12 85.2 0 1 351.93 76.71
   L 338.73 79.08
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 280.19 82.83
   L 283.41 83.40
   A 2.12 2.09 -10.2 0 1 284.84 84.38
@@ -553,8 +555,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 287.96 91.19 279.78 83.65
   A 0.48 0.48 0.0 0 1 280.19 82.83
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 271.71 95.37
   Q 273.64 93.72 275.83 94.16
   A 2.05 2.05 0.0 0 0 278.29 92.00
@@ -565,16 +568,18 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.57 0.56 -55.3 0 1 278.20 106.35
   L 271.71 95.37
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 278.98 112.81
   Q 279.91 111.50 279.23 109.76
   Q 283.15 107.99 285.37 110.67
   A 0.84 0.84 0.0 0 1 284.98 112.00
   Q 281.73 113.07 278.98 112.81
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 341.25 122.50
   L 340.84 121.82
   A 0.84 0.83 -45.5 0 1 340.84 120.93
@@ -585,8 +590,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 1.33 1.29 85.1 0 1 349.43 118.10
   L 341.25 122.50
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 280.24 119.52
   Q 280.10 118.15 279.95 116.73
   Q 279.83 115.62 278.76 115.65
@@ -594,24 +600,27 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.45 0.45 0.0 0 1 283.94 115.09
   Q 284.28 120.09 280.24 119.52
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 280.64 125.05
   Q 280.85 122.46 279.56 122.15
   L 282.97 121.82
   A 1.34 1.34 0.0 0 1 283.86 124.25
   Q 282.50 125.18 280.64 125.05
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 284.03 144.54
   L 281.63 127.76
   Q 283.22 126.98 283.45 128.45
   Q 284.95 137.93 285.44 143.75
   Q 285.51 144.53 284.03 144.54
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 308.05 150.35
   C 309.81 152.09 310.89 154.58 309.93 157.06
   Q 308.51 160.67 304.78 161.14
@@ -621,8 +630,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 305.84 150.17 306.77 149.57
   L 308.05 150.35
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 371.54 152.15
   Q 374.99 153.09 378.87 151.62
   Q 378.91 151.61 379.19 151.59
@@ -637,8 +647,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 1.53 1.53 0.0 0 1 364.79 152.50
   L 371.54 152.15
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 356.29 162.45
   L 346.48 168.03
   A 0.56 0.56 0.0 0 1 345.66 167.65
@@ -647,8 +658,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.66 0.66 0.0 0 1 354.83 161.04
   Q 355.10 162.04 356.29 162.45
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 334.31 169.55
   Q 336.42 169.56 338.48 168.85
   A 1.03 1.01 -1.3 0 0 339.13 168.18
@@ -659,8 +671,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 3.79 3.56 -69.5 0 1 337.50 172.42
   Q 335.84 171.92 334.31 169.55
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 295.31 216.82
   L 300.60 255.61
   L 300.99 260.06
@@ -686,8 +699,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 1.66 1.57 28.2 0 1 292.80 196.35
   L 295.31 216.82
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 306.27 164.17
   L 302.23 186.81
   L 300.91 184.73
@@ -701,8 +715,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 1.11 1.10 -9.1 0 1 303.47 164.38
   Q 304.51 163.80 306.27 164.17
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 356.49 195.26
   Q 356.54 195.95 357.05 196.45
   Q 361.85 201.20 367.04 205.40
@@ -722,8 +737,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 2.87 2.26 11.0 0 1 348.89 172.89
   L 356.49 195.26
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 346.62 185.80
   L 350.10 198.87
   A 2.18 2.18 0.0 0 1 349.46 201.04
@@ -739,8 +755,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.09 0.09 0.0 0 1 346.06 184.73
   L 346.62 185.80
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 380.91 198.64
   L 384.10 212.12
   Q 381.66 213.79 381.42 216.81
@@ -748,8 +765,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.83 0.83 0.0 0 1 378.28 200.45
   L 380.91 198.64
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 364.49 227.88
   Q 365.62 231.00 364.37 233.88
   A 1.65 1.51 -15.9 0 1 364.13 234.27
@@ -759,8 +777,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 364.02 229.22 363.96 228.70
   Q 364.10 228.34 364.49 227.88
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 330.17 229.43
   L 328.35 234.70
   A 1.15 1.13 -9.9 0 1 327.97 235.23
@@ -773,8 +792,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 320.06 232.54 320.06 232.23
   L 330.17 229.43
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 384.59 254.47
   L 385.13 255.17
   A 0.41 0.41 0.0 0 1 384.90 255.82
@@ -785,16 +805,18 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 1.08 1.08 0.0 0 1 378.26 252.13
   L 384.59 254.47
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 373.68 253.70
   Q 374.17 255.38 371.88 258.24
   Q 369.89 260.50 366.88 261.32
   A 0.43 0.43 0.0 0 1 366.34 260.98
   C 365.40 255.92 370.18 255.09 373.68 253.70
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 306.86 259.45
   Q 303.53 258.15 303.86 255.47
   Q 304.45 254.59 306.11 255.10
@@ -803,8 +825,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.51 0.50 -79.4 0 1 310.32 261.06
   Q 308.40 260.64 306.86 259.45
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 338.83 265.01
   Q 339.91 264.99 340.48 264.76
   Q 344.62 263.06 348.24 261.68
@@ -821,8 +844,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 332.98 263.24 337.17 264.81
   Q 337.75 265.03 338.83 265.01
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 362.75 279.64
   L 361.21 274.59
   Q 361.58 274.60 361.82 274.60
@@ -831,8 +855,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.45 0.45 0.0 0 1 365.96 279.53
   L 362.75 279.64
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 314.04 282.40
   Q 316.86 284.04 318.40 286.88
   A 0.60 0.59 63.8 0 1 318.12 287.71
@@ -841,16 +866,18 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 310.07 285.13 312.44 282.25
   L 314.04 282.40
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 368.15 288.27
   L 365.47 282.30
   Q 371.22 281.57 372.93 287.15
   A 0.31 0.31 0.0 0 1 372.68 287.55
   L 368.15 288.27
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 392.23 313.38
   Q 393.95 314.94 393.65 315.96
   Q 392.41 316.55 391.14 316.40
@@ -865,10 +892,11 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 378.41 316.06 389.21 314.04
   Q 390.78 313.29 392.23 313.38
   Z"
-/>
-</g>
-<g fill="#e2ca9c">
-<path d="
+        />
+      </g>
+      <g fill="#e2ca9c">
+        <path
+          d="
   M 339.76 47.74
   Q 339.78 47.76 340.31 48.36
   A 1.24 1.24 0.0 0 1 340.59 49.44
@@ -881,8 +909,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.61 0.61 0.0 0 1 338.84 46.52
   Q 338.97 46.66 339.76 47.74
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 338.52 53.04
   L 338.38 60.59
   L 335.09 66.28
@@ -904,8 +933,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.67 0.67 0.0 0 0 329.94 66.29
   L 338.52 53.04
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 337.75 76.19
   Q 338.76 77.36 338.73 79.08
   L 324.98 76.70
@@ -914,8 +944,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.71 0.71 0.0 0 1 325.05 74.37
   L 337.75 76.19
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 272.69 83.29
   Q 267.99 89.35 266.82 95.98
   L 275.85 106.66
@@ -928,16 +959,18 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 1.60 1.57 79.8 0 1 267.70 85.82
   Q 269.66 84.05 272.69 83.29
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 338.84 90.53
   Q 334.30 90.02 331.25 89.61
   Q 329.96 89.44 330.53 91.02
   Q 328.19 87.31 330.24 86.47
   L 338.84 90.53
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 323.50 116.11
   Q 322.31 117.90 321.25 114.32
   Q 321.06 113.68 320.19 113.72
@@ -946,8 +979,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.42 0.41 -21.8 0 1 319.24 104.51
   L 323.50 116.11
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 335.59 122.43
   Q 330.20 119.87 326.38 116.55
   Q 328.20 115.40 328.67 113.72
@@ -958,8 +992,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.38 0.38 0.0 0 1 336.15 122.15
   Q 336.11 122.64 335.59 122.43
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 278.76 115.65
   Q 279.83 115.62 279.95 116.73
   Q 280.10 118.15 280.24 119.52
@@ -967,8 +1002,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.51 0.50 -23.3 0 1 276.79 115.90
   Q 277.69 115.55 278.76 115.65
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 328.27 121.21
   L 338.21 127.30
   Q 338.78 131.22 337.88 134.98
@@ -978,16 +1014,18 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 328.28 121.96 327.53 121.65
   Q 327.59 121.27 328.27 121.21
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 279.56 122.15
   Q 280.85 122.46 280.64 125.05
   Q 280.02 125.32 279.58 125.28
   A 1.82 1.82 0.0 0 1 277.97 123.10
   Q 278.21 121.98 279.56 122.15
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 281.63 127.76
   L 284.03 144.54
   Q 283.30 145.00 282.78 144.88
@@ -995,16 +1033,18 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 280.80 136.08 280.16 128.24
   Q 280.09 127.40 281.63 127.76
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 308.40 136.54
   L 302.08 138.55
   A 0.36 0.36 0.0 0 1 301.62 138.14
   L 302.39 133.93
   L 308.40 136.54
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 379.77 150.50
   Q 379.62 151.56 379.19 151.59
   Q 378.91 151.61 378.87 151.62
@@ -1013,8 +1053,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.54 0.53 -45.6 0 1 376.59 146.18
   L 379.77 150.50
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 338.18 162.19
   Q 339.90 165.56 339.13 168.18
   A 1.03 1.01 -1.3 0 1 338.48 168.85
@@ -1023,8 +1064,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 1.10 1.10 0.0 0 1 334.79 164.17
   Q 336.49 162.67 338.18 162.19
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 301.67 276.24
   Q 301.16 276.72 300.69 276.71
   Q 300.22 276.70 300.03 276.01
@@ -1039,8 +1081,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 296.26 235.75 298.23 252.19
   Q 299.68 264.25 301.67 276.24
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 329.27 170.77
   Q 329.94 170.86 330.41 171.15
   A 0.71 0.71 0.0 0 1 330.72 171.94
@@ -1050,8 +1093,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 324.77 183.49 328.54 171.25
   Q 328.68 170.81 329.27 170.77
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 302.23 186.81
   L 297.30 209.09
   L 295.86 201.05
@@ -1061,8 +1105,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.82 0.82 0.0 0 1 300.91 184.73
   L 302.23 186.81
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 330.87 196.19
   L 330.73 199.42
   A 0.99 0.98 -68.2 0 0 331.06 200.20
@@ -1076,8 +1121,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 328.89 199.83 329.16 198.63
   Q 330.40 193.13 330.87 196.19
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 357.28 220.45
   Q 357.10 221.27 356.50 221.82
   L 357.06 231.53
@@ -1088,8 +1134,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 355.82 220.02 356.25 220.00
   Q 356.79 219.97 357.28 220.45
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 321.86 220.27
   L 321.23 221.57
   A 2.26 2.20 -30.1 0 0 321.03 222.28
@@ -1098,8 +1145,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   L 313.02 227.97
   Q 314.37 222.85 321.86 220.27
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 312.44 282.25
   Q 310.07 285.13 309.50 287.72
   Q 307.17 288.31 304.80 287.60
@@ -1108,10 +1156,11 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 1.13 1.13 0.0 0 1 307.33 282.88
   L 312.44 282.25
   Z"
-/>
-</g>
-<g fill="#29495b">
-<path d="
+        />
+      </g>
+      <g fill="#29495b">
+        <path
+          d="
   M 338.96 87.07
   Q 338.38 84.35 338.75 82.31
   L 341.89 81.43
@@ -1122,8 +1171,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.50 0.48 -45.8 0 1 347.89 82.80
   L 338.96 87.07
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 338.35 103.45
   L 338.47 90.05
   L 347.25 86.37
@@ -1138,8 +1188,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 342.93 101.26 339.87 103.14
   Q 338.88 103.74 338.35 103.45
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 334.23 109.54
   Q 335.24 109.99 335.79 109.80
   Q 336.46 109.58 336.22 108.45
@@ -1154,8 +1205,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 3.38 3.37 -44.4 0 1 336.47 111.38
   L 334.23 109.54
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 320.19 113.72
   L 321.33 116.97
   A 0.82 0.82 0.0 0 1 321.13 117.81
@@ -1176,8 +1228,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 316.36 107.64 316.84 107.24
   Q 319.04 110.21 320.19 113.72
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 352.23 121.58
   L 355.54 127.55
   L 350.52 141.54
@@ -1192,8 +1245,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.76 0.69 -58.2 0 1 350.59 120.36
   Q 351.55 120.37 352.23 121.58
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 366.49 138.56
   Q 370.87 140.58 373.94 144.11
   A 0.56 0.56 0.0 0 1 373.92 144.86
@@ -1215,8 +1269,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   L 365.94 147.62
   A 0.40 0.39 -90.0 0 0 366.33 148.02
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 307.25 146.36
   Q 307.30 146.29 307.36 146.22
   Q 309.26 144.64 309.87 141.71
@@ -1228,8 +1283,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.84 0.84 0.0 0 1 310.83 150.16
   Q 309.60 147.94 307.25 146.36
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 347.04 149.99
   L 338.62 157.76
   L 338.39 154.46
@@ -1238,8 +1294,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 1.22 1.21 27.4 0 1 348.50 147.20
   L 347.04 149.99
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 294.17 153.96
   Q 298.32 155.79 303.15 154.71
   Q 303.87 157.60 301.99 161.03
@@ -1248,8 +1305,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 1.44 1.44 0.0 0 1 293.50 160.27
   L 294.17 153.96
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 373.23 157.54
   L 375.54 159.29
   A 0.37 0.37 0.0 0 1 375.50 159.91
@@ -1260,8 +1318,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 1.02 1.02 0.0 0 1 367.41 159.41
   Q 370.09 157.84 373.23 157.54
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 287.90 159.16
   A 0.25 0.25 0.0 0 1 288.19 159.36
   L 288.19 159.38
@@ -1272,8 +1331,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.25 0.25 0.0 0 1 280.35 160.42
   L 287.90 159.16
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 379.32 181.17
   Q 376.42 179.61 374.00 180.07
   L 375.13 179.62
@@ -1284,8 +1344,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 379.16 165.11 379.15 165.25
   Q 378.62 172.75 379.32 181.17
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 328.78 170.44
   Q 328.14 170.44 327.48 170.97
   Q 322.46 175.03 318.87 178.61
@@ -1298,8 +1359,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 1.32 1.30 -20.4 0 0 327.45 170.36
   L 328.78 170.44
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 369.67 207.40
   Q 367.83 206.74 367.04 205.40
   L 358.68 181.59
@@ -1324,8 +1386,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   C 368.23 199.53 368.89 200.68 369.02 201.79
   Q 369.34 204.66 369.67 207.40
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 382.11 197.88
   Q 384.89 207.78 388.62 217.30
   Q 389.42 219.35 389.98 220.21
@@ -1338,8 +1401,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   L 380.91 198.64
   Q 380.76 198.39 382.11 197.88
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 320.79 217.40
   Q 322.40 212.85 322.35 207.34
   A 0.67 0.67 0.0 0 0 321.47 206.71
@@ -1353,8 +1417,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 1.71 1.68 -82.6 0 0 327.18 221.03
   L 320.79 217.40
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 364.37 237.29
   A 0.32 0.31 63.9 0 1 364.89 237.47
   C 365.59 241.37 365.94 243.30 365.41 247.49
@@ -1367,8 +1432,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 363.80 250.62 363.04 241.05
   Q 362.85 238.71 364.37 237.29
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 317.94 261.59
   L 319.19 245.09
   Q 322.20 242.98 325.25 241.32
@@ -1387,8 +1453,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 323.80 254.37 322.18 257.89
   Q 320.88 260.70 317.94 261.59
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 381.44 292.95
   Q 380.96 291.25 381.75 289.18
   Q 382.58 288.80 383.49 288.87
@@ -1397,8 +1464,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.84 0.83 -11.8 0 1 383.42 292.62
   Q 382.59 293.11 381.44 292.95
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 357.47 302.32
   Q 349.52 303.95 341.91 305.39
   Q 340.87 305.59 340.63 307.06
@@ -1416,8 +1484,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 4.03 3.72 47.3 0 0 315.73 302.13
   L 357.47 302.32
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 367.76 321.04
   Q 367.90 321.00 368.05 320.96
   L 368.14 329.79
@@ -1430,18 +1499,20 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   L 330.21 321.12
   L 367.76 321.04
   Z"
-/>
-</g>
-<g fill="#70857b">
-<path d="
+        />
+      </g>
+      <g fill="#70857b">
+        <path
+          d="
   M 333.31 56.39
   L 329.77 62.22
   A 0.53 0.52 29.8 0 1 329.06 62.41
   Q 327.89 61.78 327.23 60.61
   Q 329.12 57.69 333.31 56.39
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 338.64 63.99
   L 339.81 65.50
   A 0.81 0.78 35.4 0 1 339.95 66.24
@@ -1452,8 +1523,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 336.75 65.13 337.99 63.95
   A 0.45 0.44 -41.2 0 1 338.64 63.99
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 358.79 126.09
   Q 361.12 124.66 359.65 122.87
   Q 357.01 119.63 356.08 117.26
@@ -1474,16 +1546,18 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.80 0.79 -8.8 0 1 377.05 130.58
   Q 367.97 129.60 358.79 126.09
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 315.92 109.21
   L 319.22 116.26
   A 0.61 0.61 0.0 0 1 318.64 117.13
   L 310.79 116.72
   L 315.92 109.21
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 310.64 116.80
   L 309.75 118.50
   A 8.95 8.88 -11.1 0 1 308.65 120.12
@@ -1496,16 +1570,18 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 1.43 1.43 0.0 0 1 307.19 114.90
   L 310.64 116.80
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 311.74 132.08
   Q 313.14 131.75 310.96 134.76
   Q 309.68 136.29 308.40 136.54
   L 302.39 133.93
   L 311.74 132.08
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 372.32 136.04
   A 0.72 0.72 0.0 0 0 373.36 135.19
   L 372.88 133.74
@@ -1520,8 +1596,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.53 0.53 0.0 0 1 365.24 131.95
   L 372.32 136.04
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 309.04 139.72
   Q 310.24 139.93 309.87 141.71
   Q 309.26 144.64 307.36 146.22
@@ -1529,16 +1606,18 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 304.94 142.47 303.30 141.62
   Q 306.31 141.31 309.04 139.72
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 289.59 151.73
   C 286.92 150.75 287.64 147.95 288.52 145.97
   A 0.87 0.87 0.0 0 1 289.88 145.66
   C 291.60 147.12 291.11 149.48 290.29 151.43
   A 0.55 0.54 21.5 0 1 289.59 151.73
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 380.97 161.78
   L 380.93 165.68
   Q 380.86 173.46 379.32 181.17
@@ -1556,8 +1635,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 1.50 1.49 20.1 0 0 373.32 165.65
   Q 376.76 162.89 380.97 161.78
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 328.78 170.44
   L 329.27 170.77
   Q 328.68 170.81 328.54 171.25
@@ -1576,8 +1656,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 322.46 175.03 327.48 170.97
   Q 328.14 170.44 328.78 170.44
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 338.19 205.99
   Q 338.11 206.15 338.04 206.31
   L 331.06 200.20
@@ -1593,8 +1674,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.48 0.48 0.0 0 1 338.40 177.84
   L 338.19 205.99
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 379.99 193.70
   A 0.63 0.63 0.0 0 1 379.00 194.22
   L 376.18 192.28
@@ -1605,8 +1687,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 1.05 1.05 0.0 0 1 379.99 184.36
   L 379.99 193.70
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 402.00 243.00
   Q 400.91 243.11 400.60 243.60
   Q 394.54 232.55 390.52 221.20
@@ -1618,16 +1701,18 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 390.01 215.38 392.20 220.29
   Q 397.24 231.56 402.00 243.00
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 308.77 276.37
   Q 308.54 277.65 307.78 278.33
   A 0.62 0.61 -45.4 0 1 306.98 278.34
   Q 306.23 277.71 305.85 276.54
   Q 307.04 275.78 308.77 276.37
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 362.52 290.96
   Q 362.80 291.53 362.57 292.42
   L 340.45 292.25
@@ -1637,10 +1722,11 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   L 341.96 290.87
   L 362.52 290.96
   Z"
-/>
-</g>
-<g fill="#999373">
-<path d="
+        />
+      </g>
+      <g fill="#999373">
+        <path
+          d="
   M 325.58 81.13
   L 325.68 85.01
   Q 321.37 92.11 321.19 98.28
@@ -1649,8 +1735,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 323.07 86.81 324.08 83.60
   Q 324.53 82.18 325.58 81.13
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 276.63 86.48
   L 272.01 92.26
   C 271.42 88.73 272.85 85.93 274.05 82.75
@@ -1658,8 +1745,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 1.01 1.00 -2.0 0 1 276.04 83.34
   Q 275.78 84.99 276.63 86.48
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 332.36 99.30
   L 329.27 96.31
   A 1.55 1.52 -70.5 0 1 328.80 95.30
@@ -1668,8 +1756,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 330.53 93.78 331.21 95.26
   Q 332.11 97.25 332.36 99.30
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 338.84 90.53
   Q 338.65 90.29 338.47 90.05
   L 338.35 103.45
@@ -1678,8 +1767,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 329.96 89.44 331.25 89.61
   Q 334.30 90.02 338.84 90.53
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 356.08 117.26
   Q 357.01 119.63 359.65 122.87
   Q 361.12 124.66 358.79 126.09
@@ -1693,8 +1783,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.90 0.87 -32.6 0 0 356.14 116.37
   L 356.08 117.26
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 323.50 116.11
   Q 322.39 120.92 318.64 125.71
   A 1.86 1.83 -81.0 0 1 317.87 126.28
@@ -1712,8 +1803,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 321.06 113.68 321.25 114.32
   Q 322.31 117.90 323.50 116.11
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 347.16 122.56
   Q 346.99 123.64 346.11 124.70
   Q 345.08 125.94 344.72 126.60
@@ -1732,8 +1824,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 338.78 131.22 338.21 127.30
   L 347.16 122.56
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 338.45 140.80
   L 338.39 154.46
   L 338.20 156.65
@@ -1743,9 +1836,17 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 1.18 1.18 0.0 0 1 329.52 145.37
   L 338.45 140.80
   Z"
-/>
-<rect x="-4.40" y="-1.14" transform="translate(282.61,152.85) rotate(-4.6)" width="8.80" height="2.28" rx="0.81"/>
-<path d="
+        />
+        <rect
+          x="-4.40"
+          y="-1.14"
+          transform="translate(282.61,152.85) rotate(-4.6)"
+          width="8.80"
+          height="2.28"
+          rx="0.81"
+        />
+        <path
+          d="
   M 380.97 161.78
   Q 376.76 162.89 373.32 165.65
   A 1.50 1.49 20.1 0 1 372.69 165.94
@@ -1760,8 +1861,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.61 0.61 0.0 0 1 381.05 160.84
   L 380.97 161.78
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 298.74 299.45
   L 315.08 304.45
   L 310.75 317.35
@@ -1775,10 +1877,11 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   L 296.04 299.72
   Q 297.34 298.61 298.74 299.45
   Z"
-/>
-</g>
-<g fill="#3f5e69">
-<path d="
+        />
+      </g>
+      <g fill="#3f5e69">
+        <path
+          d="
   M 347.54 62.17
   L 342.39 55.59
   A 0.75 0.75 0.0 0 1 343.10 54.39
@@ -1787,8 +1890,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   L 348.46 62.25
   A 0.63 0.63 0.0 0 1 347.54 62.17
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 350.67 104.77
   A 0.29 0.29 0.0 0 1 350.29 104.34
   L 356.23 97.26
@@ -1801,8 +1905,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 1.12 1.10 49.3 0 1 358.66 96.02
   Q 355.56 101.67 350.67 104.77
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 274.05 82.75
   C 272.85 85.93 271.42 88.73 272.01 92.26
   Q 271.31 93.49 271.21 94.83
@@ -1810,15 +1915,17 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 267.99 89.35 272.69 83.29
   Q 272.93 83.06 274.05 82.75
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 325.68 85.01
   L 326.39 104.45
   L 321.19 98.28
   Q 321.37 92.11 325.68 85.01
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 371.56 127.13
   Q 367.53 126.83 363.64 125.42
   C 362.48 124.99 361.76 124.22 360.63 124.16
@@ -1827,8 +1934,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 368.28 120.98 369.85 125.38
   Q 370.19 126.34 371.56 127.13
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 347.97 121.91
   L 354.65 127.07
   A 0.93 0.93 0.0 0 1 354.50 128.63
@@ -1839,8 +1947,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 346.99 123.64 347.16 122.56
   Q 347.05 122.29 347.97 121.91
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 365.94 147.62
   L 365.94 142.74
   A 0.50 0.50 0.0 0 1 366.81 142.40
@@ -1849,8 +1958,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   L 366.33 148.02
   A 0.40 0.39 -90.0 0 1 365.94 147.62
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 327.81 156.88
   A 0.69 0.69 0.0 0 1 326.86 157.64
   L 324.29 156.57
@@ -1861,8 +1971,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 2.06 2.06 0.0 0 1 326.08 147.08
   L 327.81 156.88
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 356.36 142.71
   A 0.33 0.33 0.0 0 1 356.84 143.10
   L 352.94 155.50
@@ -1872,8 +1983,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 353.08 147.47 354.07 145.33
   Q 354.89 143.56 356.36 142.71
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 278.94 156.66
   A 0.50 0.50 0.0 0 1 279.38 156.11
   L 281.88 155.81
@@ -1884,8 +1996,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.50 0.50 0.0 0 1 279.14 158.31
   L 278.94 156.66
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 292.96 169.34
   L 296.40 178.34
   Q 297.55 179.27 295.62 180.52
@@ -1894,8 +2007,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 1.77 1.72 32.2 0 0 292.90 175.69
   Q 290.67 172.09 292.96 169.34
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 353.45 174.47
   L 357.30 179.40
   A 1.33 1.33 0.0 0 1 357.60 180.27
@@ -1912,8 +2026,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 1.87 1.85 71.3 0 1 350.63 171.39
   L 353.45 174.47
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 336.07 174.87
   Q 339.79 177.28 341.64 182.86
   C 343.57 188.69 346.28 194.34 345.53 200.73
@@ -1929,8 +2044,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 2.14 2.00 61.4 0 0 331.93 178.85
   Q 333.06 171.34 336.07 174.87
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 319.60 197.48
   L 310.05 205.10
   A 0.34 0.23 -56.3 0 1 309.93 205.15
@@ -1944,8 +2060,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 319.27 188.05 319.88 191.20
   Q 320.51 194.41 319.60 197.48
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 377.60 197.30
   Q 374.82 200.15 371.38 197.71
   A 0.88 0.88 0.0 0 1 371.05 196.70
@@ -1954,8 +2071,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 375.58 194.56 377.48 195.94
   A 0.91 0.90 -50.1 0 1 377.60 197.30
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 354.75 206.95
   L 355.55 215.54
   A 2.96 2.94 -20.5 0 1 354.32 218.22
@@ -1966,8 +2084,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   L 354.15 206.73
   A 0.35 0.35 0.0 0 1 354.75 206.95
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 359.02 263.12
   L 359.97 271.24
   A 0.74 0.74 0.0 0 1 359.51 272.02
@@ -1980,8 +2099,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 349.47 248.89 350.17 249.82
   Q 355.31 256.71 359.02 263.12
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 317.75 274.53
   Q 319.38 275.86 320.91 277.40
   C 322.36 278.87 321.94 279.94 320.99 281.34
@@ -1990,16 +2110,18 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 315.18 278.56 316.93 274.21
   L 317.75 274.53
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 355.84 278.19
   L 359.00 282.31
   C 358.02 284.20 356.73 287.02 354.41 285.81
   A 0.94 0.92 11.8 0 1 353.91 285.06
   Q 353.59 281.23 355.84 278.19
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 340.45 292.25
   L 362.57 292.42
   L 362.26 296.81
@@ -2007,8 +2129,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 315.50 294.64 314.52 292.65
   L 340.45 292.25
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 382.77 301.59
   L 392.23 313.38
   Q 390.78 313.29 389.21 314.04
@@ -2016,8 +2139,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   L 380.37 299.84
   Q 381.66 300.03 382.77 301.59
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 309.95 317.60
   Q 310.12 318.25 309.54 318.31
   L 288.94 314.01
@@ -2026,8 +2150,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 303.66 308.18 308.42 316.09
   Q 309.09 317.21 309.95 317.60
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 340.63 307.06
   C 345.06 309.36 350.33 311.09 354.25 312.92
   C 357.52 314.45 361.80 317.10 365.36 317.38
@@ -2040,8 +2165,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.55 0.55 0.0 0 0 338.58 317.54
   C 338.73 314.01 338.30 310.08 340.63 307.06
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 393.65 315.96
   L 393.94 324.87
   A 0.93 0.92 -3.6 0 1 393.10 325.82
@@ -2050,8 +2176,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   L 391.14 316.40
   Q 392.41 316.55 393.65 315.96
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 303.76 320.11
   L 309.80 323.73
   L 309.93 329.96
@@ -2062,10 +2189,11 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   L 286.20 316.13
   L 303.76 320.11
   Z"
-/>
-</g>
-<g fill="#142735">
-<path d="
+        />
+      </g>
+      <g fill="#142735">
+        <path
+          d="
   M 382.85 173.30
   L 380.93 165.68
   L 380.97 161.78
@@ -2749,8 +2877,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   L 301.92 285.26
   A 0.26 0.26 0.0 0 0 302.28 285.18
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 338.63 72.93
   Q 336.17 70.11 335.02 67.15
   A 1.03 1.02 -40.6 0 1 335.09 66.28
@@ -2769,10 +2898,11 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   L 338.64 63.99
   A 0.45 0.44 -41.2 0 0 337.99 63.95
   Z"
-/>
-</g>
-<g fill="#baae81">
-<path d="
+        />
+      </g>
+      <g fill="#baae81">
+        <path
+          d="
   M 332.16 73.03
   L 325.92 72.12
   L 323.59 63.21
@@ -2781,8 +2911,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 1.22 1.19 -89.4 0 1 329.41 67.57
   L 332.16 73.03
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 338.75 82.31
   Q 338.38 84.35 338.96 87.07
   L 330.16 82.91
@@ -2791,8 +2922,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 1.03 1.02 30.8 0 1 332.34 81.05
   L 338.75 82.31
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 277.83 88.54
   Q 278.17 90.35 278.29 92.00
   A 2.05 2.05 0.0 0 1 275.83 94.16
@@ -2802,8 +2934,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   L 276.63 86.48
   L 277.83 88.54
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 338.56 115.25
   L 338.55 124.49
   Q 336.83 123.79 335.59 122.43
@@ -2820,9 +2953,17 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 1.48 1.46 50.3 0 1 329.22 109.29
   L 338.56 115.25
   Z"
-/>
-<rect x="-3.60" y="-1.11" transform="translate(281.69,148.83) rotate(-8.0)" width="7.20" height="2.22" rx="0.96"/>
-<path d="
+        />
+        <rect
+          x="-3.60"
+          y="-1.11"
+          transform="translate(281.69,148.83) rotate(-8.0)"
+          width="7.20"
+          height="2.22"
+          rx="0.96"
+        />
+        <path
+          d="
   M 356.29 162.45
   Q 355.10 162.04 354.83 161.04
   A 0.66 0.66 0.0 0 0 353.86 160.64
@@ -2831,8 +2972,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.58 0.57 -31.2 0 1 355.53 158.91
   Q 356.67 160.63 356.29 162.45
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 330.87 196.19
   Q 330.40 193.13 329.16 198.63
   Q 328.89 199.83 327.40 200.29
@@ -2841,16 +2983,18 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 330.99 184.97 330.87 186.50
   Q 330.55 190.84 330.87 196.19
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 384.10 212.12
   L 386.64 223.66
   Q 385.29 225.01 383.46 225.12
   L 381.42 216.81
   Q 381.66 213.79 384.10 212.12
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 364.49 227.88
   Q 364.10 228.34 363.96 228.70
   Q 363.03 228.64 362.80 227.71
@@ -2861,8 +3005,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 360.58 222.93 363.69 225.62
   C 364.45 226.28 364.66 226.92 364.49 227.88
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 319.19 245.09
   L 317.94 261.59
   L 317.41 266.80
@@ -2877,8 +3022,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.32 0.32 0.0 0 1 313.17 238.01
   L 319.19 245.09
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 359.02 263.12
   Q 355.31 256.71 350.17 249.82
   Q 349.47 248.89 348.74 248.77
@@ -2888,8 +3034,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 1.12 1.10 16.3 0 1 357.86 245.33
   L 359.02 263.12
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 361.21 274.59
   L 362.75 279.64
   L 359.00 282.31
@@ -2898,8 +3045,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.75 0.74 45.5 0 1 361.28 274.44
   Q 361.70 274.62 361.21 274.59
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 302.28 285.18
   A 0.26 0.26 0.0 0 1 301.92 285.26
   L 301.34 284.89
@@ -2909,16 +3057,18 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.26 0.26 0.0 0 1 305.12 280.70
   L 302.28 285.18
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 365.47 282.30
   L 368.15 288.27
   L 359.24 287.37
   A 0.41 0.41 0.0 0 1 358.90 286.82
   Q 360.61 282.47 365.47 282.30
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 311.29 318.60
   L 328.28 318.55
   L 357.52 318.68
@@ -2929,10 +3079,11 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 310.88 319.63 309.74 318.48
   Q 310.74 318.31 311.29 318.60
   Z"
-/>
-</g>
-<g fill="#d4d6bd">
-<path d="
+        />
+      </g>
+      <g fill="#d4d6bd">
+        <path
+          d="
   M 333.31 56.39
   Q 329.12 57.69 327.23 60.61
   Q 326.60 60.28 326.32 59.87
@@ -2941,16 +3092,18 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.39 0.38 -73.0 0 1 334.49 55.12
   L 333.31 56.39
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 274.66 71.42
   Q 274.74 73.16 274.04 74.72
   Q 273.42 76.09 273.28 76.19
   Q 272.78 76.55 271.66 76.19
   Q 271.88 70.43 274.66 71.42
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 325.58 81.13
   Q 324.53 82.18 324.08 83.60
   Q 323.07 86.81 321.99 89.96
@@ -2964,8 +3117,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.73 0.73 0.0 0 1 325.52 80.18
   Q 325.73 80.65 325.58 81.13
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 330.24 86.47
   Q 328.19 87.31 330.53 91.02
   L 335.07 101.44
@@ -2977,8 +3131,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.30 0.30 0.0 0 1 328.45 85.16
   L 330.24 86.47
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 316.22 108.00
   Q 316.29 108.67 315.92 109.21
   L 310.79 116.72
@@ -3000,16 +3155,18 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 1.71 1.70 88.6 0 1 305.49 112.06
   L 316.22 108.00
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 279.23 109.76
   Q 279.91 111.50 278.98 112.81
   L 274.50 113.34
   A 0.70 0.70 0.0 0 1 273.72 112.65
   C 273.72 110.51 277.74 109.87 279.23 109.76
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 327.53 121.65
   Q 328.28 121.96 328.97 122.62
   A 1.32 1.28 -70.6 0 1 329.37 123.49
@@ -3021,31 +3178,35 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 321.80 128.54 322.25 128.00
   Q 324.89 124.86 327.53 121.65
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 303.30 141.62
   Q 304.94 142.47 303.45 144.11
   Q 302.89 144.11 302.60 143.87
   Q 302.28 143.60 302.44 143.06
   Q 302.65 142.38 303.30 141.62
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 306.77 149.57
   Q 305.84 150.17 304.03 150.08
   L 300.13 147.41
   A 0.83 0.83 0.0 0 1 300.66 145.90
   Q 304.35 146.15 306.77 149.57
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 300.08 150.26
   L 293.70 151.62
   Q 293.79 149.67 295.12 149.07
   Q 298.59 147.53 300.08 150.26
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 331.97 163.33
   Q 330.24 164.73 328.23 162.91
   A 1.70 1.56 77.2 0 0 327.81 162.62
@@ -3056,8 +3217,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.59 0.59 0.0 0 1 322.44 158.71
   L 331.97 163.33
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 320.67 166.28
   Q 319.46 167.47 318.83 169.30
   A 0.67 0.14 -78.0 0 1 318.79 169.39
@@ -3077,8 +3239,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.50 0.50 0.0 0 1 319.66 165.85
   Q 320.24 165.87 320.67 166.28
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 288.79 216.91
   Q 283.26 230.52 277.35 243.30
   Q 276.52 245.09 276.98 246.99
@@ -3091,8 +3254,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.23 0.23 0.0 0 1 288.61 212.16
   Q 289.35 214.85 288.79 216.91
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 316.28 219.78
   Q 315.46 221.35 313.63 222.15
   A 0.36 0.36 0.0 0 1 313.12 221.84
@@ -3101,8 +3265,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 1.28 1.27 77.0 0 1 315.65 213.81
   Q 315.40 217.01 316.28 219.78
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 316.93 274.21
   Q 315.18 278.56 312.21 279.70
   L 310.72 279.90
@@ -3110,8 +3275,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.25 0.24 34.6 0 1 310.43 279.47
   Q 312.62 275.53 316.93 274.21
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 300.10 289.43
   Q 298.84 290.04 297.09 289.99
   A 0.72 0.71 5.5 0 0 296.36 290.59
@@ -3122,8 +3288,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.94 0.93 -84.2 0 1 294.42 288.25
   L 300.10 289.43
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 304.57 290.27
   L 317.45 290.57
   L 341.96 290.87
@@ -3138,8 +3305,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.21 0.21 0.0 0 1 303.65 290.37
   L 304.57 290.27
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 285.26 312.86
   Q 286.71 314.07 288.94 314.01
   L 309.54 318.31
@@ -3150,18 +3318,20 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   L 283.16 315.95
   Q 283.91 314.28 285.26 312.86
   Z"
-/>
-</g>
-<g fill="#58747a">
-<path d="
+        />
+      </g>
+      <g fill="#58747a">
+        <path
+          d="
   M 268.32 81.20
   L 269.12 78.18
   Q 270.17 78.24 270.59 79.11
   Q 271.03 80.03 270.14 80.60
   Q 269.41 81.06 268.32 81.20
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 335.43 106.21
   Q 335.99 107.37 336.22 108.45
   Q 336.46 109.58 335.79 109.80
@@ -3170,8 +3340,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.42 0.42 0.0 0 1 332.18 103.51
   L 335.43 106.21
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 328.27 121.21
   Q 327.59 121.27 327.53 121.65
   Q 324.89 124.86 322.25 128.00
@@ -3187,8 +3358,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.82 0.82 0.0 0 1 326.29 120.23
   Q 327.35 120.40 328.27 121.21
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 338.39 154.46
   L 338.62 157.76
   Q 338.43 159.01 337.54 159.74
@@ -3199,16 +3371,18 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.57 0.57 0.0 0 0 338.20 156.65
   L 338.39 154.46
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 303.15 154.71
   Q 298.32 155.79 294.17 153.96
   L 293.70 151.62
   L 300.08 150.26
   Q 302.57 151.85 303.15 154.71
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 368.76 194.90
   A 0.28 0.27 -26.9 0 1 368.30 194.75
   L 367.59 190.71
@@ -3217,8 +3391,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.89 0.89 0.0 0 1 373.08 184.10
   Q 373.97 190.04 368.76 194.90
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 320.79 217.40
   L 316.28 219.78
   Q 315.40 217.01 315.65 213.81
@@ -3231,8 +3406,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.67 0.67 0.0 0 1 322.35 207.34
   Q 322.40 212.85 320.79 217.40
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 288.79 216.91
   Q 290.42 221.11 290.22 224.17
   Q 289.20 228.52 288.05 232.47
@@ -3245,8 +3421,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 276.52 245.09 277.35 243.30
   Q 283.26 230.52 288.79 216.91
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 305.22 270.58
   L 304.62 264.85
   L 309.51 264.85
@@ -3255,8 +3432,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.88 0.87 -1.7 0 1 309.83 270.81
   L 305.22 270.58
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 304.57 290.27
   L 303.65 290.37
   A 0.21 0.21 0.0 0 0 303.59 290.77
@@ -3271,8 +3449,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 298.84 290.04 300.10 289.43
   L 304.57 290.27
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 311.29 318.60
   Q 310.74 318.31 309.74 318.48
   L 309.54 318.31
@@ -3286,8 +3465,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 313.64 316.90 312.38 317.20
   Q 311.32 317.45 311.29 318.60
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 286.20 316.13
   L 286.44 326.22
   L 284.21 325.91
@@ -3295,10 +3475,11 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   L 283.16 315.95
   L 286.20 316.13
   Z"
-/>
-</g>
-<g fill="#21394e">
-<path d="
+        />
+      </g>
+      <g fill="#21394e">
+        <path
+          d="
   M 361.36 108.37
   L 371.20 113.85
   A 1.09 1.08 6.0 0 1 371.71 114.47
@@ -3310,16 +3491,18 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   L 357.18 116.77
   L 361.36 108.37
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 350.52 141.54
   L 355.54 127.55
   L 358.34 134.40
   A 3.19 3.18 65.8 0 1 356.80 138.47
   L 350.52 141.54
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 347.04 149.99
   L 345.36 160.21
   A 2.10 2.09 16.0 0 1 342.48 161.80
@@ -3327,8 +3510,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 338.43 159.01 338.62 157.76
   L 347.04 149.99
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 346.62 185.80
   L 346.06 184.73
   A 0.09 0.09 0.0 0 0 345.90 184.73
@@ -3339,8 +3523,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 339.79 177.28 336.07 174.87
   C 343.33 174.71 345.28 179.64 346.62 185.80
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 384.59 254.47
   L 378.26 252.13
   A 1.08 1.08 0.0 0 0 376.80 253.14
@@ -3355,8 +3540,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.66 0.65 -33.7 0 1 373.76 229.51
   Q 379.04 242.23 384.59 254.47
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 381.75 289.18
   Q 380.96 291.25 381.44 292.95
   L 362.26 296.81
@@ -3364,16 +3550,18 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 362.80 291.53 362.52 290.96
   C 368.88 291.30 375.41 289.84 381.75 289.18
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 380.37 299.84
   L 385.58 309.22
   L 375.54 305.77
   A 0.89 0.89 0.0 0 1 375.25 304.25
   L 380.37 299.84
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 365.36 317.38
   C 361.80 317.10 357.52 314.45 354.25 312.92
   C 350.33 311.09 345.06 309.36 340.63 307.06
@@ -3383,8 +3571,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 1.37 1.36 -4.8 0 1 360.98 303.17
   Q 364.84 309.81 365.36 317.38
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 303.76 320.11
   L 311.25 320.98
   L 330.21 321.12
@@ -3398,10 +3587,11 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 311.41 326.85 309.80 323.73
   L 303.76 320.11
   Z"
-/>
-</g>
-<g fill="#a48b5c">
-<path d="
+        />
+      </g>
+      <g fill="#a48b5c">
+        <path
+          d="
   M 347.17 66.72
   L 344.80 73.10
   L 338.52 73.96
@@ -3414,8 +3604,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   L 338.52 53.04
   L 347.17 66.72
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 271.66 76.19
   Q 272.78 76.55 273.28 76.19
   Q 273.42 76.09 274.04 74.72
@@ -3426,8 +3617,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.57 0.57 0.0 0 1 274.42 79.20
   L 271.66 76.19
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 347.55 110.04
   L 340.84 120.93
   A 0.84 0.83 -45.5 0 0 340.84 121.82
@@ -3436,8 +3628,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   L 338.56 115.25
   L 347.55 110.04
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 331.97 163.33
   Q 332.41 164.88 331.78 167.04
   A 0.88 0.87 -72.5 0 1 330.66 167.63
@@ -3448,8 +3641,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 1.70 1.56 77.2 0 1 328.23 162.91
   Q 330.24 164.73 331.97 163.33
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 320.97 195.71
   Q 320.94 196.70 322.04 196.54
   Q 323.90 196.26 323.53 197.49
@@ -3464,8 +3658,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   L 319.60 197.48
   Q 320.50 197.05 320.97 195.71
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 330.17 229.43
   L 320.06 232.23
   L 321.03 222.28
@@ -3473,8 +3668,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   L 321.86 220.27
   Q 327.05 224.79 330.17 229.43
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 363.96 228.70
   Q 364.02 229.22 363.66 229.43
   C 361.71 230.58 358.53 230.91 357.69 233.40
@@ -3490,8 +3686,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.93 0.88 16.8 0 1 362.80 227.71
   Q 363.03 228.64 363.96 228.70
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 400.60 243.60
   Q 400.91 243.11 402.00 243.00
   L 402.48 244.06
@@ -3504,8 +3701,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   A 0.40 0.40 0.0 0 0 396.28 258.52
   Q 399.48 251.05 400.60 243.60
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 290.22 224.17
   L 291.47 234.60
   A 0.26 0.24 -42.6 0 1 291.46 234.72
@@ -3520,8 +3718,9 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   Q 286.47 237.90 288.05 232.47
   Q 289.20 228.52 290.22 224.17
   Z"
-/>
-<path d="
+        />
+        <path
+          d="
   M 320.05 232.85
   L 319.34 239.47
   A 0.78 0.78 0.0 0 1 318.73 240.15
@@ -3531,10 +3730,8 @@ export const Queen: React.FC<PieceProps> = ({ style, className }) => {
   L 313.02 227.97
   L 320.05 232.85
   Z"
-/>
-</g>
-
-
+        />
+      </g>
     </svg>
   );
 };

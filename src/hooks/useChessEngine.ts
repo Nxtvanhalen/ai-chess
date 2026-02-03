@@ -36,10 +36,9 @@ export function useChessEngine(options: UseChessEngineOptions = {}) {
 
     try {
       // Create worker using the worker file
-      workerRef.current = new Worker(
-        new URL('../lib/chess/engine.worker.ts', import.meta.url),
-        { type: 'module' }
-      );
+      workerRef.current = new Worker(new URL('../lib/chess/engine.worker.ts', import.meta.url), {
+        type: 'module',
+      });
 
       workerRef.current.onmessage = (e: MessageEvent) => {
         const { type, result } = e.data;
@@ -82,14 +81,14 @@ export function useChessEngine(options: UseChessEngineOptions = {}) {
         workerRef.current = null;
       }
     };
-  }, []);
+  }, [options.onThinking]);
 
   // Get best move from engine
   const getBestMove = useCallback(
     (
       fen: string,
       difficulty: 'easy' | 'medium' | 'hard' = 'medium',
-      playerMoveHistory: string[] = []
+      playerMoveHistory: string[] = [],
     ): Promise<EngineResult | null> => {
       return new Promise((resolve, reject) => {
         if (!workerRef.current) {
@@ -112,7 +111,7 @@ export function useChessEngine(options: UseChessEngineOptions = {}) {
         });
       });
     },
-    [options]
+    [options],
   );
 
   // Clear transposition table (for new game)
@@ -136,7 +135,7 @@ export function useChessEngine(options: UseChessEngineOptions = {}) {
 export async function getEngineMoveSync(
   fen: string,
   difficulty: 'easy' | 'medium' | 'hard' = 'medium',
-  playerMoveHistory: string[] = []
+  playerMoveHistory: string[] = [],
 ): Promise<EngineResult | null> {
   // Dynamic import to avoid loading in client bundle
   const { EnhancedChessEngine } = await import('../lib/chess/engineEnhanced');

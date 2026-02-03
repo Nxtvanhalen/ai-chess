@@ -1,13 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { type NextRequest, NextResponse } from 'next/server';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
   try {
     const supabase = createClient(supabaseUrl, supabaseKey);
-    
+
     // Tables SQL
     const createTablesSQL = `
       -- Games table
@@ -70,23 +70,25 @@ export async function POST(request: NextRequest) {
 
     // Execute the SQL
     const { data, error } = await supabase.rpc('exec_sql', { sql: createTablesSQL });
-    
+
     if (error) {
       console.error('Database setup error:', error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       message: 'Chess Butler database setup complete!',
-      data 
+      data,
     });
-
   } catch (error) {
     console.error('Setup error:', error);
-    return NextResponse.json({ 
-      error: 'Failed to setup database',
-      details: error instanceof Error ? error.message : 'Unknown error'
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: 'Failed to setup database',
+        details: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 },
+    );
   }
 }

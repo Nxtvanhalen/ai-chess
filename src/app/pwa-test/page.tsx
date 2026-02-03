@@ -1,12 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { PWAManager, PWAInstallButton, PWAInstallBanner, usePWAInstall } from '@/components/pwa';
-import { useInteractiveWidgetSupport, useBrowserInfo } from '@/hooks/useInteractiveWidgetSupport';
+import { PWAInstallBanner, PWAInstallButton, PWAManager, usePWAInstall } from '@/components/pwa';
+import { useBrowserInfo, useInteractiveWidgetSupport } from '@/hooks/useInteractiveWidgetSupport';
 
 /**
  * PWA Installation Test Page
- * 
+ *
  * Comprehensive testing interface for PWA installation components
  * Allows manual testing of all PWA features in development
  */
@@ -14,7 +14,9 @@ export default function PWATestPage() {
   const [showBanner, setShowBanner] = useState(false);
   const [showFloatingButton, setShowFloatingButton] = useState(true);
   const [bannerVariant, setBannerVariant] = useState<'banner' | 'toast' | 'card'>('toast');
-  const [buttonVariant, setButtonVariant] = useState<'primary' | 'secondary' | 'minimal' | 'floating'>('primary');
+  const [buttonVariant, setButtonVariant] = useState<
+    'primary' | 'secondary' | 'minimal' | 'floating'
+  >('primary');
 
   const pwaState = usePWAInstall();
   const supportsInteractiveWidget = useInteractiveWidgetSupport();
@@ -23,15 +25,10 @@ export default function PWATestPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 p-8">
       <div className="max-w-4xl mx-auto">
-        
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-white mb-4">
-            PWA Installation Test Suite
-          </h1>
-          <p className="text-xl text-purple-200">
-            Test all PWA installation components and flows
-          </p>
+          <h1 className="text-4xl font-bold text-white mb-4">PWA Installation Test Suite</h1>
+          <p className="text-xl text-purple-200">Test all PWA installation components and flows</p>
         </div>
 
         {/* PWA State Display */}
@@ -45,19 +42,25 @@ export default function PWATestPage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-purple-300">Installable:</span>
-                <span className={`font-mono ${pwaState.isInstallable ? 'text-green-400' : 'text-red-400'}`}>
+                <span
+                  className={`font-mono ${pwaState.isInstallable ? 'text-green-400' : 'text-red-400'}`}
+                >
                   {String(pwaState.isInstallable)}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-purple-300">Installed:</span>
-                <span className={`font-mono ${pwaState.isInstalled ? 'text-green-400' : 'text-red-400'}`}>
+                <span
+                  className={`font-mono ${pwaState.isInstalled ? 'text-green-400' : 'text-red-400'}`}
+                >
                   {String(pwaState.isInstalled)}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-purple-300">Standalone:</span>
-                <span className={`font-mono ${pwaState.isStandalone ? 'text-green-400' : 'text-red-400'}`}>
+                <span
+                  className={`font-mono ${pwaState.isStandalone ? 'text-green-400' : 'text-red-400'}`}
+                >
                   {String(pwaState.isStandalone)}
                 </span>
               </div>
@@ -65,25 +68,33 @@ export default function PWATestPage() {
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span className="text-purple-300">Can Show Banner:</span>
-                <span className={`font-mono ${pwaState.canShowBanner ? 'text-green-400' : 'text-red-400'}`}>
+                <span
+                  className={`font-mono ${pwaState.canShowBanner ? 'text-green-400' : 'text-red-400'}`}
+                >
                   {String(pwaState.canShowBanner)}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-purple-300">Show Install Banner:</span>
-                <span className={`font-mono ${pwaState.showInstallBanner ? 'text-green-400' : 'text-red-400'}`}>
+                <span
+                  className={`font-mono ${pwaState.showInstallBanner ? 'text-green-400' : 'text-red-400'}`}
+                >
                   {String(pwaState.showInstallBanner)}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-purple-300">Permanently Dismissed:</span>
-                <span className={`font-mono ${pwaState.permanentlyDismissed ? 'text-red-400' : 'text-green-400'}`}>
+                <span
+                  className={`font-mono ${pwaState.permanentlyDismissed ? 'text-red-400' : 'text-green-400'}`}
+                >
                   {String(pwaState.permanentlyDismissed)}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-purple-300">Prompt Dismissed:</span>
-                <span className={`font-mono ${pwaState.hasInstallPromptDismissed ? 'text-red-400' : 'text-green-400'}`}>
+                <span
+                  className={`font-mono ${pwaState.hasInstallPromptDismissed ? 'text-red-400' : 'text-green-400'}`}
+                >
                   {String(pwaState.hasInstallPromptDismissed)}
                 </span>
               </div>
@@ -101,7 +112,9 @@ export default function PWATestPage() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-purple-300">Interactive Widget:</span>
-                  <span className={`font-mono ${supportsInteractiveWidget ? 'text-green-400' : 'text-yellow-400'}`}>
+                  <span
+                    className={`font-mono ${supportsInteractiveWidget ? 'text-green-400' : 'text-yellow-400'}`}
+                  >
                     {supportsInteractiveWidget ? 'Supported' : 'CSS-only fallback'}
                   </span>
                 </div>
@@ -112,18 +125,28 @@ export default function PWATestPage() {
                   </span>
                 </div>
               </div>
-              
+
               <div className="mt-4 p-3 bg-black/40 rounded-lg text-sm text-purple-200">
                 <p className="font-semibold mb-2">What this means:</p>
                 {supportsInteractiveWidget ? (
-                  <p>✅ Your browser supports the cutting-edge <code className="bg-purple-900/50 px-1 rounded">interactive-widget</code> viewport property! Virtual keyboards will resize only the visual viewport, providing the smoothest keyboard experience.</p>
+                  <p>
+                    ✅ Your browser supports the cutting-edge{' '}
+                    <code className="bg-purple-900/50 px-1 rounded">interactive-widget</code>{' '}
+                    viewport property! Virtual keyboards will resize only the visual viewport,
+                    providing the smoothest keyboard experience.
+                  </p>
                 ) : (
-                  <p>🎨 Your browser uses our elegant CSS-only solution with <code className="bg-purple-900/50 px-1 rounded">100dvh</code> and <code className="bg-purple-900/50 px-1 rounded">env(keyboard-height)</code> for ChatGPT-style keyboard handling.</p>
+                  <p>
+                    🎨 Your browser uses our elegant CSS-only solution with{' '}
+                    <code className="bg-purple-900/50 px-1 rounded">100dvh</code> and{' '}
+                    <code className="bg-purple-900/50 px-1 rounded">env(keyboard-height)</code> for
+                    ChatGPT-style keyboard handling.
+                  </p>
                 )}
               </div>
             </div>
           </div>
-          
+
           <div className="mt-4 pt-4 border-t border-purple-500/20">
             <button
               onClick={pwaState.resetPreferences}
@@ -136,11 +159,10 @@ export default function PWATestPage() {
 
         {/* Component Testing Controls */}
         <div className="grid md:grid-cols-2 gap-8">
-          
           {/* Install Button Testing */}
           <div className="bg-black/30 backdrop-blur-sm rounded-2xl p-6 border border-purple-500/20">
             <h3 className="text-xl font-semibold text-white mb-4">Install Button Testing</h3>
-            
+
             <div className="space-y-4 mb-6">
               <div>
                 <label className="block text-purple-300 mb-2">Variant:</label>
@@ -167,7 +189,7 @@ export default function PWATestPage() {
           {/* Banner Testing */}
           <div className="bg-black/30 backdrop-blur-sm rounded-2xl p-6 border border-purple-500/20">
             <h3 className="text-xl font-semibold text-white mb-4">Banner Testing</h3>
-            
+
             <div className="space-y-4 mb-6">
               <div>
                 <label className="block text-purple-300 mb-2">Variant:</label>
@@ -181,7 +203,7 @@ export default function PWATestPage() {
                   <option value="card">Card</option>
                 </select>
               </div>
-              
+
               <div>
                 <label className="flex items-center text-purple-300">
                   <input
@@ -214,7 +236,7 @@ export default function PWATestPage() {
           <p className="text-purple-200 mb-4">
             The PWA Manager orchestrates all components automatically based on installation state.
           </p>
-          
+
           <div>
             <label className="flex items-center text-purple-300">
               <input
@@ -232,7 +254,6 @@ export default function PWATestPage() {
         <div className="mt-8 bg-black/30 backdrop-blur-sm rounded-2xl p-6 border border-purple-500/20">
           <h3 className="text-xl font-semibold text-white mb-4">Platform-Specific Testing</h3>
           <div className="grid md:grid-cols-3 gap-4 text-sm">
-            
             <div className="p-4 bg-blue-500/10 rounded-lg border border-blue-500/30">
               <h4 className="font-semibold text-blue-300 mb-2">iOS Safari</h4>
               <ul className="space-y-1 text-blue-100">
@@ -269,11 +290,24 @@ export default function PWATestPage() {
         <div className="mt-8 bg-black/30 backdrop-blur-sm rounded-2xl p-6 border border-purple-500/20">
           <h3 className="text-xl font-semibold text-white mb-4">Testing Instructions</h3>
           <div className="space-y-3 text-purple-200">
-            <p>1. <strong>Desktop:</strong> Open in Chrome/Edge, look for install button in address bar</p>
-            <p>2. <strong>Android:</strong> Open in Chrome, wait for automatic install prompt</p>
-            <p>3. <strong>iOS:</strong> Open in Safari, tap Share button → Add to Home Screen</p>
-            <p>4. <strong>Development:</strong> Use Chrome DevTools Application tab to simulate install events</p>
-            <p>5. <strong>Testing:</strong> Use "Reset All Preferences" to clear localStorage and test fresh states</p>
+            <p>
+              1. <strong>Desktop:</strong> Open in Chrome/Edge, look for install button in address
+              bar
+            </p>
+            <p>
+              2. <strong>Android:</strong> Open in Chrome, wait for automatic install prompt
+            </p>
+            <p>
+              3. <strong>iOS:</strong> Open in Safari, tap Share button → Add to Home Screen
+            </p>
+            <p>
+              4. <strong>Development:</strong> Use Chrome DevTools Application tab to simulate
+              install events
+            </p>
+            <p>
+              5. <strong>Testing:</strong> Use "Reset All Preferences" to clear localStorage and
+              test fresh states
+            </p>
           </div>
         </div>
 

@@ -1,8 +1,8 @@
 'use client';
 
+import { AnimatePresence, motion } from 'framer-motion';
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { boardThemes, BoardTheme } from '@/lib/chess/boardThemes';
+import { type BoardTheme, boardThemes } from '@/lib/chess/boardThemes';
 
 interface ThemeSelectorProps {
   currentTheme: BoardTheme;
@@ -43,10 +43,7 @@ export default function ThemeSelector({ currentTheme, onThemeChange }: ThemeSele
         {isOpen && (
           <>
             {/* Backdrop */}
-            <div
-              className="fixed inset-0 z-40"
-              onClick={() => setIsOpen(false)}
-            />
+            <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
 
             {/* Theme Grid - Opens upward, centered on mobile */}
             <motion.div
@@ -100,19 +97,31 @@ export default function ThemeSelector({ currentTheme, onThemeChange }: ThemeSele
                     </div>
 
                     {/* Theme Name */}
-                    <div className={`text-xs text-center truncate ${
-                      currentTheme.id === theme.id
-                        ? 'text-purple-300 font-medium'
-                        : 'text-slate-400 group-hover:text-slate-200'
-                    }`}>
+                    <div
+                      className={`text-xs text-center truncate ${
+                        currentTheme.id === theme.id
+                          ? 'text-purple-300 font-medium'
+                          : 'text-slate-400 group-hover:text-slate-200'
+                      }`}
+                    >
                       {theme.name}
                     </div>
 
                     {/* Selected Indicator */}
                     {currentTheme.id === theme.id && (
                       <div className="absolute top-1 right-1 w-4 h-4 bg-purple-500 rounded-full flex items-center justify-center">
-                        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                        <svg
+                          className="w-3 h-3 text-white"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={3}
+                            d="M5 13l4 4L19 7"
+                          />
                         </svg>
                       </div>
                     )}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { usePWAInstall } from '@/hooks/usePWAInstall';
 import PWAInstallButton from './PWAInstallButton';
 
@@ -15,7 +15,7 @@ interface PWAInstallBannerProps {
 
 /**
  * PWA Install Banner Component
- * 
+ *
  * Subtle, elegant notification that:
  * - Shows when app is installable and user hasn't dismissed
  * - Provides platform-specific installation guidance
@@ -59,17 +59,6 @@ export default function PWAInstallBanner({
     }
   }, [showInstallBanner, canShowBanner, isInstalled, permanentlyDismissed, autoShowDelay]);
 
-  // Auto-hide logic
-  useEffect(() => {
-    if (isVisible && autoHideAfter) {
-      const timer = setTimeout(() => {
-        handleDismiss();
-      }, autoHideAfter);
-
-      return () => clearTimeout(timer);
-    }
-  }, [isVisible, autoHideAfter]);
-
   // Handle banner dismissal with animation
   const handleDismiss = useCallback(() => {
     setIsAnimating(true);
@@ -80,6 +69,17 @@ export default function PWAInstallBanner({
       console.log('[PWA Install Banner] Banner dismissed');
     }, 300);
   }, [dismissBanner]);
+
+  // Auto-hide logic
+  useEffect(() => {
+    if (isVisible && autoHideAfter) {
+      const timer = setTimeout(() => {
+        handleDismiss();
+      }, autoHideAfter);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isVisible, autoHideAfter, handleDismiss]);
 
   // Handle permanent dismissal
   const handlePermanentDismiss = useCallback(() => {
@@ -93,7 +93,7 @@ export default function PWAInstallBanner({
   }, [permanentlyDismiss]);
 
   // Handle install button click
-  const handleInstallClick = useCallback(async () => {
+  const _handleInstallClick = useCallback(async () => {
     if (platform === 'ios') {
       setShowInstructions(true);
       return;
@@ -116,11 +116,14 @@ export default function PWAInstallBanner({
 
   // Get banner styles based on variant and position
   const getBannerStyles = () => {
-    const baseStyles = 'fixed z-50 max-w-sm mx-auto backdrop-blur-md transition-all duration-300 ease-out';
-    
+    const baseStyles =
+      'fixed z-50 max-w-sm mx-auto backdrop-blur-md transition-all duration-300 ease-out';
+
     const variantStyles = {
-      banner: 'left-4 right-4 bg-gradient-to-r from-purple-900/95 to-indigo-900/95 border border-purple-500/30 rounded-xl shadow-2xl',
-      toast: 'bg-white/95 dark:bg-gray-900/95 border border-gray-200/50 dark:border-gray-700/50 rounded-2xl shadow-2xl backdrop-blur-xl',
+      banner:
+        'left-4 right-4 bg-gradient-to-r from-purple-900/95 to-indigo-900/95 border border-purple-500/30 rounded-xl shadow-2xl',
+      toast:
+        'bg-white/95 dark:bg-gray-900/95 border border-gray-200/50 dark:border-gray-700/50 rounded-2xl shadow-2xl backdrop-blur-xl',
       card: 'bg-gradient-to-br from-blue-900/95 to-purple-900/95 border border-blue-500/30 rounded-2xl shadow-3xl',
     };
 
@@ -133,7 +136,9 @@ export default function PWAInstallBanner({
       'bottom-right': 'bottom-4 right-4',
     };
 
-    const animationStyles = isAnimating ? 'opacity-0 transform scale-95' : 'opacity-100 transform scale-100';
+    const animationStyles = isAnimating
+      ? 'opacity-0 transform scale-95'
+      : 'opacity-100 transform scale-100';
 
     return `${baseStyles} ${variantStyles[variant]} ${positionStyles[position]} ${animationStyles} ${className}`;
   };
@@ -144,15 +149,23 @@ export default function PWAInstallBanner({
       <h4 className="text-sm font-semibold text-blue-200 mb-2">How to install on iOS:</h4>
       <div className="space-y-2 text-xs text-blue-100">
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center text-[10px] font-bold">1</div>
-          <span>Tap the Share button <span className="text-blue-300">⎋</span> in Safari</span>
+          <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center text-[10px] font-bold">
+            1
+          </div>
+          <span>
+            Tap the Share button <span className="text-blue-300">⎋</span> in Safari
+          </span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center text-[10px] font-bold">2</div>
+          <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center text-[10px] font-bold">
+            2
+          </div>
           <span>Scroll and tap "Add to Home Screen"</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center text-[10px] font-bold">3</div>
+          <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center text-[10px] font-bold">
+            3
+          </div>
           <span>Tap "Add" to install Chester</span>
         </div>
       </div>
@@ -177,7 +190,12 @@ export default function PWAInstallBanner({
           aria-label="Dismiss install banner"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
       )}
@@ -189,11 +207,10 @@ export default function PWAInstallBanner({
             <ChessIcon />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-lg font-semibold text-white mb-1">
-              Install Chester AI Chess
-            </h3>
+            <h3 className="text-lg font-semibold text-white mb-1">Install Chester AI Chess</h3>
             <p className="text-sm text-gray-300 leading-relaxed">
-              Get the full chess experience! Install Chester for offline play, faster loading, and a native app feel.
+              Get the full chess experience! Install Chester for offline play, faster loading, and a
+              native app feel.
             </p>
           </div>
         </div>
@@ -217,7 +234,7 @@ export default function PWAInstallBanner({
                 console.log('[PWA Install Banner] Install completed:', success);
               }}
             />
-            
+
             {platform === 'ios' && !showInstructions && (
               <button
                 onClick={() => setShowInstructions(true)}
@@ -241,25 +258,41 @@ export default function PWAInstallBanner({
           <div className="grid grid-cols-2 gap-2 text-xs text-gray-300">
             <div className="flex items-center gap-1.5">
               <svg className="w-3 h-3 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                <path
+                  fillRule="evenodd"
+                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                  clipRule="evenodd"
+                />
               </svg>
               <span>Offline play</span>
             </div>
             <div className="flex items-center gap-1.5">
               <svg className="w-3 h-3 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                <path
+                  fillRule="evenodd"
+                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                  clipRule="evenodd"
+                />
               </svg>
               <span>Faster loading</span>
             </div>
             <div className="flex items-center gap-1.5">
               <svg className="w-3 h-3 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                <path
+                  fillRule="evenodd"
+                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                  clipRule="evenodd"
+                />
               </svg>
               <span>Home screen</span>
             </div>
             <div className="flex items-center gap-1.5">
               <svg className="w-3 h-3 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                <path
+                  fillRule="evenodd"
+                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                  clipRule="evenodd"
+                />
               </svg>
               <span>Native feel</span>
             </div>

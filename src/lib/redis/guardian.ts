@@ -50,7 +50,7 @@ export async function blockIPInRedis(
   ip: string,
   reason: string,
   severity: 'low' | 'medium' | 'high' | 'critical',
-  ttl?: number // Optional TTL in seconds (for temporary blocks)
+  ttl?: number, // Optional TTL in seconds (for temporary blocks)
 ): Promise<boolean> {
   const redis = getRedisClientSafe();
   if (!redis) return false;
@@ -60,13 +60,16 @@ export async function blockIPInRedis(
     await redis.sadd(REDIS_KEYS.blockedIPs, ip);
 
     // Log the threat
-    await redis.lpush(REDIS_KEYS.threatLog, JSON.stringify({
-      ip,
-      reason,
-      severity,
-      blockedAt: new Date().toISOString(),
-      ttl: ttl || 'permanent',
-    }));
+    await redis.lpush(
+      REDIS_KEYS.threatLog,
+      JSON.stringify({
+        ip,
+        reason,
+        severity,
+        blockedAt: new Date().toISOString(),
+        ttl: ttl || 'permanent',
+      }),
+    );
 
     // Trim log to last 1000 entries
     await redis.ltrim(REDIS_KEYS.threatLog, 0, 999);
@@ -146,7 +149,7 @@ export async function getRecentThreats(count: number = 50): Promise<unknown[]> {
 export async function updateIPReputation(
   ip: string,
   delta: number, // Positive = more suspicious, negative = less suspicious
-  reason: string
+  reason: string,
 ): Promise<number | null> {
   const redis = getRedisClientSafe();
   if (!redis) return null;
@@ -160,7 +163,9 @@ export async function updateIPReputation(
 
     // Log significant reputation changes
     if (Math.abs(delta) >= 10) {
-      console.log(`[Guardian] IP ${ip} reputation: ${newScore} (${delta > 0 ? '+' : ''}${delta}: ${reason})`);
+      console.log(
+        `[Guardian] IP ${ip} reputation: ${newScore} (${delta > 0 ? '+' : ''}${delta}: ${reason})`,
+      );
     }
 
     return newScore;
@@ -211,7 +216,7 @@ export async function shouldUseRedisGuardian(): Promise<boolean> {
  */
 export async function syncStaticBlocksToRedis(
   staticIPs: string[],
-  staticSubnets: Array<{ base: string; mask: number; reason: string }>
+  staticSubnets: Array<{ base: string; mask: number; reason: string }>,
 ): Promise<boolean> {
   const redis = getRedisClientSafe();
   if (!redis) return false;
@@ -230,7 +235,9 @@ export async function syncStaticBlocksToRedis(
       await redis.set(REDIS_KEYS.blockedSubnets, JSON.stringify(staticSubnets));
     }
 
-    console.log(`[Guardian] Synced ${staticIPs.length} IPs and ${staticSubnets.length} subnets to Redis`);
+    console.log(
+      `[Guardian] Synced ${staticIPs.length} IPs and ${staticSubnets.length} subnets to Redis`,
+    );
     return true;
   } catch (error) {
     console.error('[Guardian] Failed to sync to Redis:', error);

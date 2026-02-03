@@ -1,14 +1,17 @@
 'use client';
 
-import { MoveSuggestion } from '@/types';
 import { motion } from 'framer-motion';
+import type { MoveSuggestion } from '@/types';
 
 interface SuggestionBubbleProps {
   suggestions: MoveSuggestion[];
   onSelectSuggestion?: (move: string) => void;
 }
 
-export default function SuggestionBubble({ suggestions, onSelectSuggestion }: SuggestionBubbleProps) {
+export default function SuggestionBubble({
+  suggestions,
+  onSelectSuggestion,
+}: SuggestionBubbleProps) {
   if (!suggestions || suggestions.length === 0) return null;
 
   return (
@@ -23,7 +26,7 @@ export default function SuggestionBubble({ suggestions, onSelectSuggestion }: Su
         <span className="text-blue-400 text-lg">💭</span>
         <span className="text-sm text-blue-300 font-medium">Chester's thinking...</span>
       </div>
-      
+
       <div className="space-y-2">
         {suggestions.map((suggestion, i) => (
           <motion.div
@@ -43,15 +46,13 @@ export default function SuggestionBubble({ suggestions, onSelectSuggestion }: Su
                 {suggestion.move}
               </p>
               {suggestion.reasoning && (
-                <p className="text-sm text-gray-400 mt-1">
-                  {suggestion.reasoning}
-                </p>
+                <p className="text-sm text-gray-400 mt-1">{suggestion.reasoning}</p>
               )}
             </div>
           </motion.div>
         ))}
       </div>
-      
+
       {onSelectSuggestion && (
         <p className="text-xs text-gray-500 mt-3 italic">
           Click a suggestion to preview it on the board

@@ -23,7 +23,7 @@ export async function createSupabaseServerClient() {
           }
         },
       },
-    }
+    },
   );
 }
 
@@ -45,6 +45,6 @@ export async function createSupabaseServerClientWithCookies() {
           });
         },
       },
-    }
+    },
   );
 }

@@ -1,12 +1,17 @@
-import { NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
-import { createResponsesCompletionStream, parseResponsesStream } from '@/lib/openai/client';
+import type { NextRequest } from 'next/server';
+import { checkRateLimit, getClientIP, getRateLimitHeaders } from '@/lib/middleware/rate-limit';
 import { CHESS_BUTLER_SYSTEM_PROMPT, formatMoveContext } from '@/lib/openai/chess-butler-prompt';
-import { checkRateLimit, getRateLimitHeaders, getClientIP } from '@/lib/middleware/rate-limit';
-import { GameMemoryService } from '@/lib/services/GameMemoryService';
+import { createResponsesCompletionStream, parseResponsesStream } from '@/lib/openai/client';
 import { ChesterMemoryService } from '@/lib/services/ChesterMemoryService';
-import { canUseChat, incrementChatUsage, createUsageLimitError, getUsageHeaders } from '@/lib/supabase/subscription';
+import { GameMemoryService } from '@/lib/services/GameMemoryService';
+import {
+  canUseChat,
+  createUsageLimitError,
+  getUsageHeaders,
+  incrementChatUsage,
+} from '@/lib/supabase/subscription';
 
 /**
  * Streaming Chat API for Chester
@@ -21,15 +26,15 @@ export async function POST(request: NextRequest) {
     return new Response(
       JSON.stringify({
         error: 'Rate limit exceeded. Please wait before sending another message.',
-        retryAfter: Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000)
+        retryAfter: Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000),
       }),
       {
         status: 429,
         headers: {
           'Content-Type': 'application/json',
-          ...getRateLimitHeaders(rateLimitResult)
-        }
-      }
+          ...getRateLimitHeaders(rateLimitResult),
+        },
+      },
     );
   }
 
@@ -43,40 +48,43 @@ export async function POST(request: NextRequest) {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
         cookies: {
-          getAll() { return cookieStore.getAll(); },
+          getAll() {
+            return cookieStore.getAll();
+          },
           setAll(cookiesToSet) {
             try {
               cookiesToSet.forEach(({ name, value, options }) => {
                 cookieStore.set(name, value, options);
               });
-            } catch { /* Server Component context */ }
+            } catch {
+              /* Server Component context */
+            }
           },
         },
-      }
+      },
     );
 
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (user) {
       const usageCheck = await canUseChat(user.id);
       if (!usageCheck.allowed) {
-        return new Response(
-          JSON.stringify(createUsageLimitError('chat', usageCheck)),
-          {
-            status: 429,
-            headers: {
-              'Content-Type': 'application/json',
-              ...getUsageHeaders('chat', usageCheck)
-            }
-          }
-        );
+        return new Response(JSON.stringify(createUsageLimitError('chat', usageCheck)), {
+          status: 429,
+          headers: {
+            'Content-Type': 'application/json',
+            ...getUsageHeaders('chat', usageCheck),
+          },
+        });
       }
     }
 
     if (!message) {
       return new Response(JSON.stringify({ error: 'Message is required' }), {
         status: 400,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
       });
     }
 
@@ -125,7 +133,7 @@ export async function POST(request: NextRequest) {
       const recentCommentary = fullGameContext.chesterCommentary.slice(-3);
       if (recentCommentary.length > 0) {
         instructions += `\n\nYour Recent Commentary:`;
-        recentCommentary.forEach(comment => {
+        recentCommentary.forEach((comment) => {
           instructions += `\n- Move ${comment.move_number}: ${comment.content}`;
         });
       }
@@ -159,7 +167,9 @@ export async function POST(request: NextRequest) {
           }
 
           // Send completion signal
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ done: true, fullContent })}\n\n`));
+          controller.enqueue(
+            encoder.encode(`data: ${JSON.stringify({ done: true, fullContent })}\n\n`),
+          );
           controller.close();
 
           // Save to game memory after stream completes
@@ -170,7 +180,7 @@ export async function POST(request: NextRequest) {
                 type: 'chat',
                 content: `User: ${message}`,
                 timestamp: new Date().toISOString(),
-                metadata: {}
+                metadata: {},
               });
 
               await GameMemoryService.addCommentary(gameId, {
@@ -178,7 +188,7 @@ export async function POST(request: NextRequest) {
                 type: 'chat',
                 content: `Chester: ${fullContent}`,
                 timestamp: new Date().toISOString(),
-                metadata: {}
+                metadata: {},
               });
 
               console.log('[Chester Stream] Chat saved to game memory');
@@ -193,31 +203,33 @@ export async function POST(request: NextRequest) {
           }
         } catch (error) {
           console.error('[Chester Stream] Stream error:', error);
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: 'Stream error' })}\n\n`));
+          controller.enqueue(
+            encoder.encode(`data: ${JSON.stringify({ error: 'Stream error' })}\n\n`),
+          );
           controller.close();
         }
-      }
+      },
     });
 
     return new Response(readable, {
       headers: {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-        ...getRateLimitHeaders(rateLimitResult)
-      }
+        Connection: 'keep-alive',
+        ...getRateLimitHeaders(rateLimitResult),
+      },
     });
   } catch (error) {
     console.error('[Chester Stream] Error:', error);
     return new Response(
       JSON.stringify({
         error: 'Failed to process chat message',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        details: error instanceof Error ? error.message : 'Unknown error',
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' }
-      }
+        headers: { 'Content-Type': 'application/json' },
+      },
     );
   }
 }

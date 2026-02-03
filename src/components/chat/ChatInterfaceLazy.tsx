@@ -1,7 +1,7 @@
 'use client';
 
 import { lazy, Suspense } from 'react';
-import { ChatMessage as ChatMessageType } from '@/types';
+import type { ChatMessage as ChatMessageType } from '@/types';
 
 // Lazy load the chat interface and its heavy dependencies
 const ChatInterfaceComponent = lazy(() => import('./ChatInterface'));

@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
 // =============================================================================
 // THREAT DETECTION PROXY - Chester AI Chess (Next.js 16+)
@@ -24,10 +24,10 @@ const BLOCKED_IPS: Set<string> = new Set([
   '43.131.45.213',
   '43.157.179.227',
   // Cross-deployment threats - December 2025
-  '68.218.100.201',   // Web shell/script scanning (14 req/5s)
-  '43.135.183.82',    // Tencent Cloud - iPhone UA spoofing
-  '197.156.242.209',  // Credential hunting attempts
-  '104.23.160.84',    // Credential hunting attempts
+  '68.218.100.201', // Web shell/script scanning (14 req/5s)
+  '43.135.183.82', // Tencent Cloud - iPhone UA spoofing
+  '197.156.242.209', // Credential hunting attempts
+  '104.23.160.84', // Credential hunting attempts
 ]);
 
 // -----------------------------------------------------------------------------
@@ -71,8 +71,8 @@ function parseIP(ip: string): number[] | null {
   const parts = ip.split('.');
   if (parts.length !== 4) return null;
 
-  const nums = parts.map(p => parseInt(p, 10));
-  if (nums.some(n => isNaN(n) || n < 0 || n > 255)) return null;
+  const nums = parts.map((p) => parseInt(p, 10));
+  if (nums.some((n) => Number.isNaN(n) || n < 0 || n > 255)) return null;
 
   return nums;
 }
@@ -125,21 +125,14 @@ function isDatacenterIP(ip: string): { isDatacenter: boolean; provider?: string 
 }
 
 function isMobileUserAgent(ua: string): boolean {
-  const mobilePatterns = [
-    /iPhone/i,
-    /iPad/i,
-    /Android/i,
-    /Mobile/i,
-    /CFNetwork/i,
-    /Darwin/i,
-  ];
+  const mobilePatterns = [/iPhone/i, /iPad/i, /Android/i, /Mobile/i, /CFNetwork/i, /Darwin/i];
 
-  return mobilePatterns.some(pattern => pattern.test(ua));
+  return mobilePatterns.some((pattern) => pattern.test(ua));
 }
 
-function isSuspiciousMobileUA(ua: string): boolean {
+function _isSuspiciousMobileUA(ua: string): boolean {
   // Detect common spoofed mobile UAs from bots
-  const spoofedPatterns = [
+  const _spoofedPatterns = [
     // Generic iOS spoofing patterns
     /iPhone.*?CPU.*?OS.*?like Mac OS X/i,
   ];
@@ -154,7 +147,7 @@ function isSuspiciousMobileUA(ua: string): boolean {
   ];
 
   const isMobile = isMobileUserAgent(ua);
-  const hasLegitBrowser = legitimateBrowserIndicators.some(p => p.test(ua));
+  const hasLegitBrowser = legitimateBrowserIndicators.some((p) => p.test(ua));
 
   // If it claims to be mobile but has no legitimate browser signature, suspicious
   if (isMobile && !hasLegitBrowser && ua.length > 50) {
@@ -284,7 +277,7 @@ export async function proxy(request: NextRequest) {
           'Content-Type': 'application/json',
           'X-Blocked-Reason': 'security-policy',
         },
-      }
+      },
     );
   }
 
@@ -310,11 +303,11 @@ export async function proxy(request: NextRequest) {
             request,
           });
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
+            supabaseResponse.cookies.set(name, value, options),
           );
         },
       },
-    }
+    },
   );
 
   // Refresh session if expired - important for Server Components
@@ -324,9 +317,7 @@ export async function proxy(request: NextRequest) {
 
   // Public routes that don't require authentication
   const publicRoutes = ['/login', '/signup', '/auth'];
-  const isPublicRoute = publicRoutes.some(route =>
-    request.nextUrl.pathname.startsWith(route)
-  );
+  const isPublicRoute = publicRoutes.some((route) => request.nextUrl.pathname.startsWith(route));
 
   // API routes - let them handle their own auth
   const isApiRoute = request.nextUrl.pathname.startsWith('/api/');

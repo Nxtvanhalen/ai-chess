@@ -1,4 +1,4 @@
-import { Move as ChessMove } from 'chess.js';
+import type { Move as ChessMove } from 'chess.js';
 
 export interface ChatMessage {
   id: string;
@@ -272,7 +272,11 @@ export interface GameMemorySnapshot {
   id: string;
   game_memory_id: string;
   move_number: number;
-  snapshot_type: 'move_completed' | 'suggestion_given' | 'tactical_pattern_detected' | 'phase_transition';
+  snapshot_type:
+    | 'move_completed'
+    | 'suggestion_given'
+    | 'tactical_pattern_detected'
+    | 'phase_transition';
   snapshot_data: Record<string, any>;
   created_at: string;
 }

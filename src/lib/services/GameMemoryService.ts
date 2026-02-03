@@ -13,16 +13,16 @@ import { createAdminClient } from '../supabase/client';
 const getSupabase = () => createAdminClient();
 
 // Check if we're on server-side (admin client available)
-const isServerSide = () => getSupabase() !== null;
+const _isServerSide = () => getSupabase() !== null;
 
-import {
-  GameMemory,
-  GameMoveEntry,
+import type {
   ChesterCommentary,
-  SuggestionEntry,
-  PositionEvaluation,
+  GameMemory,
+  GameMemorySnapshot,
+  GameMoveEntry,
   GamePhaseTransition,
-  GameMemorySnapshot
+  PositionEvaluation,
+  SuggestionEntry,
 } from '@/types';
 
 // UUID v4 regex pattern
@@ -36,7 +36,10 @@ export class GameMemoryService {
   /**
    * Initialize game memory for a new game
    */
-  static async createGameMemory(gameId: string, userId?: string | null): Promise<GameMemory | null> {
+  static async createGameMemory(
+    gameId: string,
+    userId?: string | null,
+  ): Promise<GameMemory | null> {
     const supabase = getSupabase();
     if (!supabase) {
       // Client-side: skip memory operations
@@ -52,7 +55,7 @@ export class GameMemoryService {
       tactical_themes: [],
       position_evaluations: {},
       game_phase_transitions: [],
-      total_moves: 0
+      total_moves: 0,
     };
 
     // Only include user_id if it's a valid UUID
@@ -62,11 +65,7 @@ export class GameMemoryService {
       console.log('[GameMemory] Ignoring invalid userId format:', userId);
     }
 
-    const { data, error } = await supabase
-      .from('game_memory')
-      .insert(insertData)
-      .select()
-      .single();
+    const { data, error } = await supabase.from('game_memory').insert(insertData).select().single();
 
     if (error) {
       console.error('Error creating game memory:', error);
@@ -107,17 +106,20 @@ export class GameMemoryService {
   /**
    * Get or create game memory (ensures it exists)
    */
-  static async getOrCreateGameMemory(gameId: string, userId?: string | null): Promise<GameMemory | null> {
+  static async getOrCreateGameMemory(
+    gameId: string,
+    userId?: string | null,
+  ): Promise<GameMemory | null> {
     const supabase = getSupabase();
     if (!supabase) {
       // Client-side: skip memory operations
       return null;
     }
 
-    let memory = await this.getGameMemory(gameId);
+    let memory = await GameMemoryService.getGameMemory(gameId);
 
     if (!memory) {
-      memory = await this.createGameMemory(gameId, userId);
+      memory = await GameMemoryService.createGameMemory(gameId, userId);
     }
 
     return memory;
@@ -126,17 +128,14 @@ export class GameMemoryService {
   /**
    * Add a move to game history
    */
-  static async addMove(
-    gameId: string,
-    moveEntry: GameMoveEntry
-  ): Promise<void> {
+  static async addMove(gameId: string, moveEntry: GameMoveEntry): Promise<void> {
     const supabase = getSupabase();
     if (!supabase) {
       // Client-side: skip memory operations
       return;
     }
 
-    const memory = await this.getOrCreateGameMemory(gameId);
+    const memory = await GameMemoryService.getOrCreateGameMemory(gameId);
     if (!memory) return;
 
     const updatedHistory = [...memory.full_move_history, moveEntry];
@@ -145,7 +144,7 @@ export class GameMemoryService {
       .from('game_memory')
       .update({
         full_move_history: updatedHistory,
-        total_moves: updatedHistory.length
+        total_moves: updatedHistory.length,
       })
       .eq('game_id', gameId);
 
@@ -155,19 +154,16 @@ export class GameMemoryService {
     }
 
     // Create snapshot for this move
-    await this.createSnapshot(memory.id, moveEntry.move_number, 'move_completed', {
-      move: moveEntry
+    await GameMemoryService.createSnapshot(memory.id, moveEntry.move_number, 'move_completed', {
+      move: moveEntry,
     });
   }
 
   /**
    * Add Chester's commentary
    */
-  static async addCommentary(
-    gameId: string,
-    commentary: ChesterCommentary
-  ): Promise<void> {
-    const memory = await this.getOrCreateGameMemory(gameId);
+  static async addCommentary(gameId: string, commentary: ChesterCommentary): Promise<void> {
+    const memory = await GameMemoryService.getOrCreateGameMemory(gameId);
     if (!memory) return;
 
     const updatedCommentary = [...memory.chester_commentary, commentary];
@@ -178,7 +174,7 @@ export class GameMemoryService {
     const { error } = await supabase
       .from('game_memory')
       .update({
-        chester_commentary: updatedCommentary
+        chester_commentary: updatedCommentary,
       })
       .eq('game_id', gameId);
 
@@ -191,11 +187,8 @@ export class GameMemoryService {
   /**
    * Add move suggestions and track them
    */
-  static async addSuggestions(
-    gameId: string,
-    suggestion: SuggestionEntry
-  ): Promise<void> {
-    const memory = await this.getOrCreateGameMemory(gameId);
+  static async addSuggestions(gameId: string, suggestion: SuggestionEntry): Promise<void> {
+    const memory = await GameMemoryService.getOrCreateGameMemory(gameId);
     if (!memory) return;
 
     const updatedSuggestions = [...memory.suggestions_given, suggestion];
@@ -206,7 +199,7 @@ export class GameMemoryService {
     const { error } = await supabase
       .from('game_memory')
       .update({
-        suggestions_given: updatedSuggestions
+        suggestions_given: updatedSuggestions,
       })
       .eq('game_id', gameId);
 
@@ -216,8 +209,8 @@ export class GameMemoryService {
     }
 
     // Create snapshot for suggestion
-    await this.createSnapshot(memory.id, suggestion.move_number, 'suggestion_given', {
-      suggestion
+    await GameMemoryService.createSnapshot(memory.id, suggestion.move_number, 'suggestion_given', {
+      suggestion,
     });
   }
 
@@ -230,15 +223,15 @@ export class GameMemoryService {
     followed: boolean,
     followedMove?: string,
     outcome?: 'good' | 'neutral' | 'bad',
-    outcomeReason?: string
+    outcomeReason?: string,
   ): Promise<void> {
-    const memory = await this.getGameMemory(gameId);
+    const memory = await GameMemoryService.getGameMemory(gameId);
     if (!memory) return;
 
-    const updatedSuggestions = memory.suggestions_given.map(s =>
+    const updatedSuggestions = memory.suggestions_given.map((s) =>
       s.move_number === moveNumber
         ? { ...s, followed, followed_move: followedMove, outcome, outcome_reason: outcomeReason }
-        : s
+        : s,
     );
 
     const supabase = getSupabase();
@@ -247,7 +240,7 @@ export class GameMemoryService {
     const { error } = await supabase
       .from('game_memory')
       .update({
-        suggestions_given: updatedSuggestions
+        suggestions_given: updatedSuggestions,
       })
       .eq('game_id', gameId);
 
@@ -261,7 +254,7 @@ export class GameMemoryService {
    * Add tactical theme detected during game
    */
   static async addTacticalTheme(gameId: string, theme: string): Promise<void> {
-    const memory = await this.getGameMemory(gameId);
+    const memory = await GameMemoryService.getGameMemory(gameId);
     if (!memory) return;
 
     // Avoid duplicates
@@ -275,7 +268,7 @@ export class GameMemoryService {
     const { error } = await supabase
       .from('game_memory')
       .update({
-        tactical_themes: updatedThemes
+        tactical_themes: updatedThemes,
       })
       .eq('game_id', gameId);
 
@@ -285,10 +278,15 @@ export class GameMemoryService {
     }
 
     // Create snapshot for tactical pattern
-    await this.createSnapshot(memory.id, memory.total_moves, 'tactical_pattern_detected', {
-      theme,
-      move_number: memory.total_moves
-    });
+    await GameMemoryService.createSnapshot(
+      memory.id,
+      memory.total_moves,
+      'tactical_pattern_detected',
+      {
+        theme,
+        move_number: memory.total_moves,
+      },
+    );
   }
 
   /**
@@ -297,14 +295,14 @@ export class GameMemoryService {
   static async addPositionEvaluation(
     gameId: string,
     moveNumber: number,
-    evaluation: PositionEvaluation
+    evaluation: PositionEvaluation,
   ): Promise<void> {
-    const memory = await this.getGameMemory(gameId);
+    const memory = await GameMemoryService.getGameMemory(gameId);
     if (!memory) return;
 
     const updatedEvaluations = {
       ...memory.position_evaluations,
-      [moveNumber]: evaluation
+      [moveNumber]: evaluation,
     };
 
     const supabase = getSupabase();
@@ -313,7 +311,7 @@ export class GameMemoryService {
     const { error } = await supabase
       .from('game_memory')
       .update({
-        position_evaluations: updatedEvaluations
+        position_evaluations: updatedEvaluations,
       })
       .eq('game_id', gameId);
 
@@ -326,11 +324,8 @@ export class GameMemoryService {
   /**
    * Record a game phase transition
    */
-  static async addPhaseTransition(
-    gameId: string,
-    transition: GamePhaseTransition
-  ): Promise<void> {
-    const memory = await this.getGameMemory(gameId);
+  static async addPhaseTransition(gameId: string, transition: GamePhaseTransition): Promise<void> {
+    const memory = await GameMemoryService.getGameMemory(gameId);
     if (!memory) return;
 
     const updatedTransitions = [...memory.game_phase_transitions, transition];
@@ -341,7 +336,7 @@ export class GameMemoryService {
     const { error } = await supabase
       .from('game_memory')
       .update({
-        game_phase_transitions: updatedTransitions
+        game_phase_transitions: updatedTransitions,
       })
       .eq('game_id', gameId);
 
@@ -351,8 +346,8 @@ export class GameMemoryService {
     }
 
     // Create snapshot for phase transition
-    await this.createSnapshot(memory.id, transition.move_number, 'phase_transition', {
-      transition
+    await GameMemoryService.createSnapshot(memory.id, transition.move_number, 'phase_transition', {
+      transition,
     });
   }
 
@@ -366,7 +361,7 @@ export class GameMemoryService {
     const { error } = await supabase
       .from('game_memory')
       .update({
-        game_narrative: narrative
+        game_narrative: narrative,
       })
       .eq('game_id', gameId);
 
@@ -382,7 +377,7 @@ export class GameMemoryService {
   static async finalizeGame(
     gameId: string,
     result: string,
-    durationSeconds: number
+    durationSeconds: number,
   ): Promise<void> {
     const supabase = getSupabase();
     if (!supabase) {
@@ -394,7 +389,7 @@ export class GameMemoryService {
       .from('game_memory')
       .update({
         final_result: result,
-        game_duration_seconds: durationSeconds
+        game_duration_seconds: durationSeconds,
       })
       .eq('game_id', gameId);
 
@@ -415,7 +410,7 @@ export class GameMemoryService {
     gameNarrative: string | null;
     totalMoves: number;
   } | null> {
-    const memory = await this.getGameMemory(gameId);
+    const memory = await GameMemoryService.getGameMemory(gameId);
 
     if (!memory) return null;
 
@@ -425,15 +420,18 @@ export class GameMemoryService {
       suggestionsGiven: memory.suggestions_given,
       tacticalThemes: memory.tactical_themes,
       gameNarrative: memory.game_narrative,
-      totalMoves: memory.total_moves
+      totalMoves: memory.total_moves,
     };
   }
 
   /**
    * Get recent commentary (last N moves)
    */
-  static async getRecentCommentary(gameId: string, lastNMoves: number = 5): Promise<ChesterCommentary[]> {
-    const memory = await this.getGameMemory(gameId);
+  static async getRecentCommentary(
+    gameId: string,
+    lastNMoves: number = 5,
+  ): Promise<ChesterCommentary[]> {
+    const memory = await GameMemoryService.getGameMemory(gameId);
 
     if (!memory) return [];
 
@@ -444,7 +442,7 @@ export class GameMemoryService {
    * Get recent moves (last N moves)
    */
   static async getRecentMoves(gameId: string, lastNMoves: number = 10): Promise<GameMoveEntry[]> {
-    const memory = await this.getGameMemory(gameId);
+    const memory = await GameMemoryService.getGameMemory(gameId);
 
     if (!memory) return [];
 
@@ -458,21 +456,20 @@ export class GameMemoryService {
     gameMemoryId: string,
     moveNumber: number,
     type: GameMemorySnapshot['snapshot_type'],
-    data: Record<string, any>
+    data: Record<string, any>,
   ): Promise<void> {
     const supabase = getSupabase();
     if (!supabase) return;
 
-    const { error } = await supabase
-      .from('game_memory_snapshots')
-      .insert({
-        game_memory_id: gameMemoryId,
-        move_number: moveNumber,
-        snapshot_type: type,
-        snapshot_data: data
-      });
+    const { error } = await supabase.from('game_memory_snapshots').insert({
+      game_memory_id: gameMemoryId,
+      move_number: moveNumber,
+      snapshot_type: type,
+      snapshot_data: data,
+    });
 
-    if (error && error.code !== '23505') { // Ignore unique constraint violations
+    if (error && error.code !== '23505') {
+      // Ignore unique constraint violations
       console.error('Error creating snapshot:', error);
     }
   }
@@ -482,7 +479,7 @@ export class GameMemoryService {
    */
   static async getSnapshots(
     gameMemoryId: string,
-    type?: GameMemorySnapshot['snapshot_type']
+    type?: GameMemorySnapshot['snapshot_type'],
   ): Promise<GameMemorySnapshot[]> {
     const supabase = getSupabase();
     if (!supabase) return [];
@@ -514,10 +511,7 @@ export class GameMemoryService {
     const supabase = getSupabase();
     if (!supabase) return;
 
-    const { error } = await supabase
-      .from('game_memory')
-      .delete()
-      .eq('game_id', gameId);
+    const { error } = await supabase.from('game_memory').delete().eq('game_id', gameId);
 
     if (error) {
       console.error('Error deleting game memory:', error);
@@ -550,7 +544,10 @@ export class GameMemoryService {
   /**
    * Get the last game (not the current one) - doesn't require finalization
    */
-  static async getLastCompletedGame(userId?: string | null, currentGameId?: string): Promise<GameMemory | null> {
+  static async getLastCompletedGame(
+    userId?: string | null,
+    currentGameId?: string,
+  ): Promise<GameMemory | null> {
     const supabase = getSupabase();
     if (!supabase) return null;
 
@@ -590,13 +587,14 @@ export class GameMemoryService {
     narrative: string | null;
     keyMoments: ChesterCommentary[];
   } | null> {
-    const memory = await this.getGameMemory(gameId);
+    const memory = await GameMemoryService.getGameMemory(gameId);
     if (!memory) return null;
 
     // Get key moments (tactical commentary based on urgency level, not routine moves)
-    const keyMoments = memory.chester_commentary.filter(c =>
-      c.type === 'post_move' &&
-      (c.metadata?.urgency_level === 'emergency' || c.metadata?.urgency_level === 'tactical')
+    const keyMoments = memory.chester_commentary.filter(
+      (c) =>
+        c.type === 'post_move' &&
+        (c.metadata?.urgency_level === 'emergency' || c.metadata?.urgency_level === 'tactical'),
     );
 
     return {
@@ -605,7 +603,7 @@ export class GameMemoryService {
       duration: memory.game_duration_seconds,
       tacticalThemes: memory.tactical_themes,
       narrative: memory.game_narrative,
-      keyMoments
+      keyMoments,
     };
   }
 }

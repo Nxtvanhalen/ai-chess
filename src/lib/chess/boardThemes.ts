@@ -67,7 +67,8 @@ export const boardThemes: BoardTheme[] = [
     },
     boardStyle: {
       borderRadius: '8px',
-      boxShadow: '0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 4px hsl(25 40% 18%), 0 0 0 8px hsl(25 30% 12%)',
+      boxShadow:
+        '0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 4px hsl(25 40% 18%), 0 0 0 8px hsl(25 30% 12%)',
       border: '2px solid hsl(25 40% 30%)',
       background: 'hsl(25 35% 15%)',
     },
@@ -169,7 +170,8 @@ export const boardThemes: BoardTheme[] = [
     },
     boardStyle: {
       borderRadius: '2px',
-      boxShadow: '0 20px 40px rgba(0, 0, 0, 0.5), 0 0 0 2px hsl(220 10% 40%), 0 0 0 4px hsl(220 10% 20%)',
+      boxShadow:
+        '0 20px 40px rgba(0, 0, 0, 0.5), 0 0 0 2px hsl(220 10% 40%), 0 0 0 4px hsl(220 10% 20%)',
       border: '1px solid hsl(220 10% 50%)',
       background: 'linear-gradient(180deg, hsl(220 10% 30%), hsl(220 10% 20%))',
     },
@@ -187,7 +189,8 @@ export const boardThemes: BoardTheme[] = [
           rgba(50, 70, 110, 0.7) 100%
         )
       `,
-      boxShadow: 'inset 0 1px 2px rgba(255, 255, 255, 0.1), inset 0 -1px 2px rgba(0, 0, 0, 0.2), 0 0 10px rgba(100, 150, 255, 0.1)',
+      boxShadow:
+        'inset 0 1px 2px rgba(255, 255, 255, 0.1), inset 0 -1px 2px rgba(0, 0, 0, 0.2), 0 0 10px rgba(100, 150, 255, 0.1)',
     },
     lightSquare: {
       background: `
@@ -197,11 +200,13 @@ export const boardThemes: BoardTheme[] = [
           rgba(190, 210, 250, 0.6) 100%
         )
       `,
-      boxShadow: 'inset 0 1px 3px rgba(255, 255, 255, 0.4), inset 0 -1px 2px rgba(0, 0, 0, 0.1), 0 0 15px rgba(200, 220, 255, 0.2)',
+      boxShadow:
+        'inset 0 1px 3px rgba(255, 255, 255, 0.4), inset 0 -1px 2px rgba(0, 0, 0, 0.1), 0 0 15px rgba(200, 220, 255, 0.2)',
     },
     boardStyle: {
       borderRadius: '16px',
-      boxShadow: '0 25px 50px rgba(0, 0, 0, 0.3), 0 0 40px rgba(100, 150, 255, 0.2), inset 0 0 30px rgba(255, 255, 255, 0.1)',
+      boxShadow:
+        '0 25px 50px rgba(0, 0, 0, 0.3), 0 0 40px rgba(100, 150, 255, 0.2), inset 0 0 30px rgba(255, 255, 255, 0.1)',
       border: '1px solid rgba(255, 255, 255, 0.3)',
       background: 'linear-gradient(135deg, rgba(100, 150, 200, 0.3), rgba(50, 100, 150, 0.4))',
     },
@@ -263,7 +268,8 @@ export const boardThemes: BoardTheme[] = [
     },
     boardStyle: {
       borderRadius: '8px',
-      boxShadow: '0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 4px hsl(150 40% 15%), 0 0 20px rgba(100, 200, 150, 0.2)',
+      boxShadow:
+        '0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 4px hsl(150 40% 15%), 0 0 20px rgba(100, 200, 150, 0.2)',
       border: '2px solid hsl(150 40% 25%)',
       background: 'hsl(150 40% 12%)',
     },
@@ -299,7 +305,8 @@ export const boardThemes: BoardTheme[] = [
     },
     boardStyle: {
       borderRadius: '12px',
-      boxShadow: '0 25px 50px rgba(0, 0, 0, 0.6), 0 0 60px rgba(100, 50, 150, 0.2), inset 0 0 20px rgba(150, 100, 200, 0.05)',
+      boxShadow:
+        '0 25px 50px rgba(0, 0, 0, 0.6), 0 0 60px rgba(100, 50, 150, 0.2), inset 0 0 20px rgba(150, 100, 200, 0.05)',
       border: '2px solid hsl(260 30% 20%)',
       background: 'linear-gradient(135deg, hsl(260 20% 5%), hsl(260 25% 10%))',
     },
@@ -349,7 +356,8 @@ export const boardThemes: BoardTheme[] = [
     },
     boardStyle: {
       borderRadius: '6px',
-      boxShadow: '0 20px 40px rgba(0, 0, 0, 0.45), 0 0 0 4px hsl(0 35% 15%), 0 0 0 8px hsl(0 30% 10%)',
+      boxShadow:
+        '0 20px 40px rgba(0, 0, 0, 0.45), 0 0 0 4px hsl(0 35% 15%), 0 0 0 8px hsl(0 30% 10%)',
       border: '2px solid hsl(0 35% 25%)',
       background: 'hsl(0 35% 12%)',
     },
@@ -364,15 +372,15 @@ export function getRandomTheme(): BoardTheme {
 
 // Get theme by ID
 export function getThemeById(id: string): BoardTheme | undefined {
-  return boardThemes.find(theme => theme.id === id);
+  return boardThemes.find((theme) => theme.id === id);
 }
 
 // Get next theme (for cycling)
 export function getNextTheme(currentId: string): BoardTheme {
-  const currentIndex = boardThemes.findIndex(theme => theme.id === currentId);
+  const currentIndex = boardThemes.findIndex((theme) => theme.id === currentId);
   const nextIndex = (currentIndex + 1) % boardThemes.length;
   return boardThemes[nextIndex];
 }
 
 // Default theme
-export const defaultTheme = boardThemes.find(theme => theme.id === 'obsidian') || boardThemes[0];
+export const defaultTheme = boardThemes.find((theme) => theme.id === 'obsidian') || boardThemes[0];

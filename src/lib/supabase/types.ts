@@ -5,7 +5,13 @@
 // =============================================================================
 
 export type SubscriptionTier = 'free' | 'pro' | 'premium';
-export type SubscriptionStatus = 'active' | 'inactive' | 'past_due' | 'canceled' | 'trialing' | 'unpaid';
+export type SubscriptionStatus =
+  | 'active'
+  | 'inactive'
+  | 'past_due'
+  | 'canceled'
+  | 'trialing'
+  | 'unpaid';
 export type GameStatus = 'active' | 'completed' | 'abandoned';
 export type PlayerColor = 'white' | 'black';
 export type PlayerType = 'human' | 'ai';
@@ -96,19 +102,18 @@ export interface SubscriptionUsage {
 }
 
 // Plan limits configuration
-export const PLAN_LIMITS: Record<SubscriptionTier, {
-  daily_ai_moves: number;
-  daily_chat_messages: number;
-  features: string[];
-}> = {
+export const PLAN_LIMITS: Record<
+  SubscriptionTier,
+  {
+    daily_ai_moves: number;
+    daily_chat_messages: number;
+    features: string[];
+  }
+> = {
   free: {
     daily_ai_moves: 50,
     daily_chat_messages: 20,
-    features: [
-      'Play against Chester AI',
-      'Basic move suggestions',
-      'Game history (last 10 games)',
-    ],
+    features: ['Play against Chester AI', 'Basic move suggestions', 'Game history (last 10 games)'],
   },
   pro: {
     daily_ai_moves: 500,
@@ -268,12 +273,15 @@ export interface GameMemory {
     outcome: 'good' | 'neutral' | 'bad';
   }>;
   tactical_themes: string[];
-  position_evaluations: Record<number, {
-    evaluation: number;
-    threats: string[];
-    opportunities: string[];
-    urgency_level: number;
-  }>;
+  position_evaluations: Record<
+    number,
+    {
+      evaluation: number;
+      threats: string[];
+      opportunities: string[];
+      urgency_level: number;
+    }
+  >;
   game_narrative: string | null;
   game_phase_transitions: Array<{
     move_number: number;
@@ -405,15 +413,15 @@ export interface Database {
       };
       increment_ai_move_usage: {
         Args: { p_user_id: string };
-        Returns: void;
+        Returns: undefined;
       };
       increment_chat_usage: {
         Args: { p_user_id: string };
-        Returns: void;
+        Returns: undefined;
       };
       reset_daily_usage: {
         Args: Record<string, never>;
-        Returns: void;
+        Returns: undefined;
       };
     };
   };

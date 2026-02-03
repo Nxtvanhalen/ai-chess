@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface UsageData {
@@ -77,9 +77,11 @@ export default function UsageDisplay() {
                 style={{ width: `${movesPercentage}%` }}
               />
             </div>
-            <span className={`font-medium ${
-              isEmpty ? 'text-red-400' : isLow ? 'text-yellow-400' : 'text-gray-300'
-            }`}>
+            <span
+              className={`font-medium ${
+                isEmpty ? 'text-red-400' : isLow ? 'text-yellow-400' : 'text-gray-300'
+              }`}
+            >
               {usage.ai_moves.remaining}/{usage.ai_moves.limit}
             </span>
           </>

@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
-import { getStripeClient, STRIPE_PRICES } from '@/lib/stripe/config';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { getStripeClient, STRIPE_PRICES } from '@/lib/stripe/config';
 
 // =============================================================================
 // STRIPE CHECKOUT SESSION API - Chester AI Chess
@@ -10,17 +10,18 @@ import { z } from 'zod';
 // Creates Stripe checkout sessions for subscription purchases
 // =============================================================================
 
-const checkoutSchema = z.object({
-  // Support both direct priceId or plan+interval
-  priceId: z.string().min(1).optional(),
-  plan: z.enum(['pro', 'premium']).optional(),
-  interval: z.enum(['monthly', 'yearly']).optional(),
-  successUrl: z.string().url().optional(),
-  cancelUrl: z.string().url().optional(),
-}).refine(
-  data => data.priceId || (data.plan && data.interval),
-  { message: 'Either priceId or both plan and interval are required' }
-);
+const checkoutSchema = z
+  .object({
+    // Support both direct priceId or plan+interval
+    priceId: z.string().min(1).optional(),
+    plan: z.enum(['pro', 'premium']).optional(),
+    interval: z.enum(['monthly', 'yearly']).optional(),
+    successUrl: z.string().url().optional(),
+    cancelUrl: z.string().url().optional(),
+  })
+  .refine((data) => data.priceId || (data.plan && data.interval), {
+    message: 'Either priceId or both plan and interval are required',
+  });
 
 export async function POST(request: NextRequest) {
   try {
@@ -44,15 +45,18 @@ export async function POST(request: NextRequest) {
             }
           },
         },
-      }
+      },
     );
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
       return NextResponse.json(
         { error: 'Authentication required. Please log in to subscribe.' },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -61,10 +65,7 @@ export async function POST(request: NextRequest) {
     const validation = checkoutSchema.safeParse(body);
 
     if (!validation.success) {
-      return NextResponse.json(
-        { error: validation.error.errors[0].message },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: validation.error.errors[0].message }, { status: 400 });
     }
 
     const { priceId: directPriceId, plan, interval, successUrl, cancelUrl } = validation.data;
@@ -84,10 +85,7 @@ export async function POST(request: NextRequest) {
     ];
 
     if (!priceId || !validPrices.includes(priceId)) {
-      return NextResponse.json(
-        { error: 'Invalid price ID or plan selection' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid price ID or plan selection' }, { status: 400 });
     }
 
     const stripe = getStripeClient();
@@ -131,7 +129,8 @@ export async function POST(request: NextRequest) {
           quantity: 1,
         },
       ],
-      success_url: successUrl || `${origin}/subscription?success=true&session_id={CHECKOUT_SESSION_ID}`,
+      success_url:
+        successUrl || `${origin}/subscription?success=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: cancelUrl || `${origin}/pricing?canceled=true`,
       metadata: {
         supabase_user_id: user.id,
@@ -147,9 +146,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ sessionId: session.id, url: session.url });
   } catch (error) {
     console.error('[Stripe Checkout] Error:', error);
-    return NextResponse.json(
-      { error: 'Failed to create checkout session' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 });
   }
 }

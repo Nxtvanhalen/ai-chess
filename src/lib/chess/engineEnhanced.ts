@@ -76,96 +76,74 @@ class LRUTranspositionTable {
 // ===== PIECE-SQUARE TABLES =====
 // Positional bonuses for each piece type (from white's perspective)
 const PAWN_TABLE = [
-  0,  0,  0,  0,  0,  0,  0,  0,
-  50, 50, 50, 50, 50, 50, 50, 50,
-  10, 10, 20, 30, 30, 20, 10, 10,
-  5,  5, 10, 25, 25, 10,  5,  5,
-  0,  0,  0, 20, 20,  0,  0,  0,
-  5, -5,-10,  0,  0,-10, -5,  5,
-  5, 10, 10,-20,-20, 10, 10,  5,
-  0,  0,  0,  0,  0,  0,  0,  0
+  0, 0, 0, 0, 0, 0, 0, 0, 50, 50, 50, 50, 50, 50, 50, 50, 10, 10, 20, 30, 30, 20, 10, 10, 5, 5, 10,
+  25, 25, 10, 5, 5, 0, 0, 0, 20, 20, 0, 0, 0, 5, -5, -10, 0, 0, -10, -5, 5, 5, 10, 10, -20, -20, 10,
+  10, 5, 0, 0, 0, 0, 0, 0, 0, 0,
 ];
 
 const KNIGHT_TABLE = [
-  -50,-40,-30,-30,-30,-30,-40,-50,
-  -40,-20,  0,  0,  0,  0,-20,-40,
-  -30,  0, 10, 15, 15, 10,  0,-30,
-  -30,  5, 15, 20, 20, 15,  5,-30,
-  -30,  0, 15, 20, 20, 15,  0,-30,
-  -30,  5, 10, 15, 15, 10,  5,-30,
-  -40,-20,  0,  5,  5,  0,-20,-40,
-  -50,-40,-30,-30,-30,-30,-40,-50
+  -50, -40, -30, -30, -30, -30, -40, -50, -40, -20, 0, 0, 0, 0, -20, -40, -30, 0, 10, 15, 15, 10, 0,
+  -30, -30, 5, 15, 20, 20, 15, 5, -30, -30, 0, 15, 20, 20, 15, 0, -30, -30, 5, 10, 15, 15, 10, 5,
+  -30, -40, -20, 0, 5, 5, 0, -20, -40, -50, -40, -30, -30, -30, -30, -40, -50,
 ];
 
 const BISHOP_TABLE = [
-  -20,-10,-10,-10,-10,-10,-10,-20,
-  -10,  0,  0,  0,  0,  0,  0,-10,
-  -10,  0,  5, 10, 10,  5,  0,-10,
-  -10,  5,  5, 10, 10,  5,  5,-10,
-  -10,  0, 10, 10, 10, 10,  0,-10,
-  -10, 10, 10, 10, 10, 10, 10,-10,
-  -10,  5,  0,  0,  0,  0,  5,-10,
-  -20,-10,-10,-10,-10,-10,-10,-20
+  -20, -10, -10, -10, -10, -10, -10, -20, -10, 0, 0, 0, 0, 0, 0, -10, -10, 0, 5, 10, 10, 5, 0, -10,
+  -10, 5, 5, 10, 10, 5, 5, -10, -10, 0, 10, 10, 10, 10, 0, -10, -10, 10, 10, 10, 10, 10, 10, -10,
+  -10, 5, 0, 0, 0, 0, 5, -10, -20, -10, -10, -10, -10, -10, -10, -20,
 ];
 
 const ROOK_TABLE = [
-  0,  0,  0,  0,  0,  0,  0,  0,
-  5, 10, 10, 10, 10, 10, 10,  5,
-  -5,  0,  0,  0,  0,  0,  0, -5,
-  -5,  0,  0,  0,  0,  0,  0, -5,
-  -5,  0,  0,  0,  0,  0,  0, -5,
-  -5,  0,  0,  0,  0,  0,  0, -5,
-  -5,  0,  0,  0,  0,  0,  0, -5,
-  0,  0,  0,  5,  5,  0,  0,  0
+  0, 0, 0, 0, 0, 0, 0, 0, 5, 10, 10, 10, 10, 10, 10, 5, -5, 0, 0, 0, 0, 0, 0, -5, -5, 0, 0, 0, 0, 0,
+  0, -5, -5, 0, 0, 0, 0, 0, 0, -5, -5, 0, 0, 0, 0, 0, 0, -5, -5, 0, 0, 0, 0, 0, 0, -5, 0, 0, 0, 5,
+  5, 0, 0, 0,
 ];
 
 const QUEEN_TABLE = [
-  -20,-10,-10, -5, -5,-10,-10,-20,
-  -10,  0,  0,  0,  0,  0,  0,-10,
-  -10,  0,  5,  5,  5,  5,  0,-10,
-  -5,  0,  5,  5,  5,  5,  0, -5,
-  0,  0,  5,  5,  5,  5,  0, -5,
-  -10,  5,  5,  5,  5,  5,  0,-10,
-  -10,  0,  5,  0,  0,  0,  0,-10,
-  -20,-10,-10, -5, -5,-10,-10,-20
+  -20, -10, -10, -5, -5, -10, -10, -20, -10, 0, 0, 0, 0, 0, 0, -10, -10, 0, 5, 5, 5, 5, 0, -10, -5,
+  0, 5, 5, 5, 5, 0, -5, 0, 0, 5, 5, 5, 5, 0, -5, -10, 5, 5, 5, 5, 5, 0, -10, -10, 0, 5, 0, 0, 0, 0,
+  -10, -20, -10, -10, -5, -5, -10, -10, -20,
 ];
 
 const KING_MIDDLEGAME_TABLE = [
-  -30,-40,-40,-50,-50,-40,-40,-30,
-  -30,-40,-40,-50,-50,-40,-40,-30,
-  -30,-40,-40,-50,-50,-40,-40,-30,
-  -30,-40,-40,-50,-50,-40,-40,-30,
-  -20,-30,-30,-40,-40,-30,-30,-20,
-  -10,-20,-20,-20,-20,-20,-20,-10,
-  20, 20,  0,  0,  0,  0, 20, 20,
-  20, 30, 10,  0,  0, 10, 30, 20
+  -30, -40, -40, -50, -50, -40, -40, -30, -30, -40, -40, -50, -50, -40, -40, -30, -30, -40, -40,
+  -50, -50, -40, -40, -30, -30, -40, -40, -50, -50, -40, -40, -30, -20, -30, -30, -40, -40, -30,
+  -30, -20, -10, -20, -20, -20, -20, -20, -20, -10, 20, 20, 0, 0, 0, 0, 20, 20, 20, 30, 10, 0, 0,
+  10, 30, 20,
 ];
 
 const KING_ENDGAME_TABLE = [
-  -50,-40,-30,-20,-20,-30,-40,-50,
-  -30,-20,-10,  0,  0,-10,-20,-30,
-  -30,-10, 20, 30, 30, 20,-10,-30,
-  -30,-10, 30, 40, 40, 30,-10,-30,
-  -30,-10, 30, 40, 40, 30,-10,-30,
-  -30,-10, 20, 30, 30, 20,-10,-30,
-  -30,-30,  0,  0,  0,  0,-30,-30,
-  -50,-30,-30,-30,-30,-30,-30,-50
+  -50, -40, -30, -20, -20, -30, -40, -50, -30, -20, -10, 0, 0, -10, -20, -30, -30, -10, 20, 30, 30,
+  20, -10, -30, -30, -10, 30, 40, 40, 30, -10, -30, -30, -10, 30, 40, 40, 30, -10, -30, -30, -10,
+  20, 30, 30, 20, -10, -30, -30, -30, 0, 0, 0, 0, -30, -30, -50, -30, -30, -30, -30, -30, -30, -50,
 ];
 
 function getPieceSquareValue(piece: string, square: number, isEndgame: boolean): number {
   // Tables are from white's perspective, flip for black
   const isBlack = piece === piece.toLowerCase();
-  const idx = isBlack ? (63 - square) : square;
+  const idx = isBlack ? 63 - square : square;
   const pieceType = piece.toLowerCase();
 
   let value = 0;
   switch (pieceType) {
-    case 'p': value = PAWN_TABLE[idx]; break;
-    case 'n': value = KNIGHT_TABLE[idx]; break;
-    case 'b': value = BISHOP_TABLE[idx]; break;
-    case 'r': value = ROOK_TABLE[idx]; break;
-    case 'q': value = QUEEN_TABLE[idx]; break;
-    case 'k': value = isEndgame ? KING_ENDGAME_TABLE[idx] : KING_MIDDLEGAME_TABLE[idx]; break;
+    case 'p':
+      value = PAWN_TABLE[idx];
+      break;
+    case 'n':
+      value = KNIGHT_TABLE[idx];
+      break;
+    case 'b':
+      value = BISHOP_TABLE[idx];
+      break;
+    case 'r':
+      value = ROOK_TABLE[idx];
+      break;
+    case 'q':
+      value = QUEEN_TABLE[idx];
+      break;
+    case 'k':
+      value = isEndgame ? KING_ENDGAME_TABLE[idx] : KING_MIDDLEGAME_TABLE[idx];
+      break;
   }
 
   return isBlack ? value : -value;
@@ -188,7 +166,12 @@ export class EnhancedChessEngine {
     if (chess.isDraw()) return 0;
 
     const pieceValues: Record<string, number> = {
-      p: 100, n: 320, b: 330, r: 500, q: 900, k: 0,
+      p: 100,
+      n: 320,
+      b: 330,
+      r: 500,
+      q: 900,
+      k: 0,
     };
 
     let evaluation = 0;
@@ -207,7 +190,7 @@ export class EnhancedChessEngine {
           const positionalValue = getPieceSquareValue(
             piece.color === 'w' ? piece.type.toUpperCase() : piece.type,
             squareIndex,
-            isEndgame
+            isEndgame,
           );
 
           if (piece.color === 'b') {
@@ -280,7 +263,7 @@ export class EnhancedChessEngine {
     depth: number,
     isMaximizing: boolean,
     alpha: number = -Infinity,
-    beta: number = Infinity
+    beta: number = Infinity,
   ): number {
     this.nodesSearched++;
 
@@ -354,7 +337,7 @@ export class EnhancedChessEngine {
   getBestMove(
     fen: string,
     difficulty: 'easy' | 'medium' | 'hard' = 'medium',
-    playerMoveHistory: string[] = []
+    playerMoveHistory: string[] = [],
   ): {
     move: string;
     evaluation: number;
@@ -417,7 +400,10 @@ export class EnhancedChessEngine {
 
     // Calculate search depth
     let depth = { easy: 2, medium: 3, hard: 4 }[difficulty];
-    const pieceCount = chess.board().flat().filter((p) => p !== null).length;
+    const pieceCount = chess
+      .board()
+      .flat()
+      .filter((p) => p !== null).length;
     const evaluation = this.evaluatePosition(chess);
 
     // Deeper search in endgame
@@ -449,7 +435,7 @@ export class EnhancedChessEngine {
       moveEvaluations,
       chess,
       playerUnpredictability,
-      evaluation
+      evaluation,
     );
 
     // Calculate thinking time
@@ -457,7 +443,7 @@ export class EnhancedChessEngine {
       pieceCount,
       depth,
       Math.abs(selectedMove.eval),
-      playerUnpredictability
+      playerUnpredictability,
     );
 
     // Get TT stats
@@ -495,7 +481,7 @@ export class EnhancedChessEngine {
     moveEvaluations: { move: string; eval: number }[],
     chess: Chess,
     unpredictability: number,
-    positionEval: number
+    positionEval: number,
   ): { move: string; eval: number } {
     const bestEval = moveEvaluations[0].eval;
 
@@ -518,7 +504,7 @@ export class EnhancedChessEngine {
       forcingMoves.length > 0 && Math.abs(positionEval) > 2.0 ? forcingMoves : candidates;
 
     // Weighted random selection
-    const weights = finalCandidates.map((_, i) => Math.pow(2, finalCandidates.length - i - 1));
+    const weights = finalCandidates.map((_, i) => 2 ** (finalCandidates.length - i - 1));
     const totalWeight = weights.reduce((sum, w) => sum + w, 0);
     let random = Math.random() * totalWeight;
 
@@ -534,9 +520,9 @@ export class EnhancedChessEngine {
     pieceCount: number,
     depth: number,
     evalMagnitude: number,
-    unpredictability: number
+    unpredictability: number,
   ): number {
-    let baseTime = 1200;
+    const baseTime = 1200;
 
     const complexityFactor = (32 - pieceCount) * 25;
     const depthFactor = depth * 150;
@@ -552,7 +538,7 @@ export class EnhancedChessEngine {
     pieceCount: number,
     evaluation: number,
     depth: number,
-    move: string
+    move: string,
   ): string {
     const isEndgame = pieceCount <= 12;
     const isTactical = Math.abs(evaluation) > 2;

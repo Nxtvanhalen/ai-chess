@@ -1,8 +1,8 @@
 'use client';
 
+import type { Move } from 'chess.js';
 import { lazy, Suspense } from 'react';
-import { Move, Square } from 'chess.js';
-import { BoardTheme } from '@/lib/chess/boardThemes';
+import type { BoardTheme } from '@/lib/chess/boardThemes';
 
 // Lazy load the heavy ChessBoard component
 const ChessBoardComponent = lazy(() => import('./ChessBoard'));

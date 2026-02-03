@@ -51,7 +51,7 @@ function getRateLimiters(): Map<RateLimitType, Ratelimit> | null {
         limiter: Ratelimit.slidingWindow(config.requests, config.window),
         prefix: `chester:ratelimit:${key}`,
         analytics: true,
-      })
+      }),
     );
   }
 
@@ -72,7 +72,7 @@ const inMemoryLimits = new Map<string, InMemoryEntry>();
 
 function checkInMemoryLimit(
   identifier: string,
-  type: RateLimitType
+  type: RateLimitType,
 ): { success: boolean; limit: number; remaining: number; reset: number } {
   const config = RATE_LIMITS[type];
   const key = `${type}:${identifier}`;
@@ -125,11 +125,16 @@ function parseWindow(window: string): number {
   const unit = match[2];
 
   switch (unit) {
-    case 's': return value * 1000;
-    case 'm': return value * 60 * 1000;
-    case 'h': return value * 60 * 60 * 1000;
-    case 'd': return value * 24 * 60 * 60 * 1000;
-    default: return 60000;
+    case 's':
+      return value * 1000;
+    case 'm':
+      return value * 60 * 1000;
+    case 'h':
+      return value * 60 * 60 * 1000;
+    case 'd':
+      return value * 24 * 60 * 60 * 1000;
+    default:
+      return 60000;
   }
 }
 
@@ -151,7 +156,7 @@ export interface RateLimitResult {
  */
 export async function checkRateLimitRedis(
   identifier: string,
-  type: RateLimitType = 'default'
+  type: RateLimitType = 'default',
 ): Promise<RateLimitResult> {
   const limiters = getRateLimiters();
 

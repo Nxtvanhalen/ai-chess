@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 /**
  * Feature detection hook for interactive-widget viewport support
- * 
+ *
  * Browser Support (2024):
  * ✅ Chrome 108+ (Nov 2022)
- * ✅ Firefox 132+ (2024)  
+ * ✅ Firefox 132+ (2024)
  * ❌ Safari/iOS (not yet supported)
- * 
+ *
  * @returns boolean indicating if interactive-widget is supported
  */
 export function useInteractiveWidgetSupport(): boolean {
@@ -25,22 +25,22 @@ export function useInteractiveWidgetSupport(): boolean {
       const meta = document.createElement('meta');
       meta.name = 'viewport';
       meta.content = 'interactive-widget=resizes-visual';
-      
+
       // Method 2: User agent detection as fallback
       const userAgent = navigator.userAgent;
       const isChrome = /Chrome\/(\d+)/.test(userAgent);
       const isFirefox = /Firefox\/(\d+)/.test(userAgent);
-      
+
       if (isChrome) {
-        const chromeVersion = parseInt(userAgent.match(/Chrome\/(\d+)/)?.[1] || '0');
+        const chromeVersion = parseInt(userAgent.match(/Chrome\/(\d+)/)?.[1] || '0', 10);
         return chromeVersion >= 108;
       }
-      
+
       if (isFirefox) {
-        const firefoxVersion = parseInt(userAgent.match(/Firefox\/(\d+)/)?.[1] || '0');
+        const firefoxVersion = parseInt(userAgent.match(/Firefox\/(\d+)/)?.[1] || '0', 10);
         return firefoxVersion >= 132;
       }
-      
+
       // Safari and other browsers don't support it yet
       return false;
     };
@@ -70,24 +70,23 @@ export function useBrowserInfo() {
 
     if (/Chrome\/(\d+)/.test(userAgent)) {
       name = 'Chrome';
-      version = parseInt(userAgent.match(/Chrome\/(\d+)/)?.[1] || '0');
+      version = parseInt(userAgent.match(/Chrome\/(\d+)/)?.[1] || '0', 10);
     } else if (/Firefox\/(\d+)/.test(userAgent)) {
       name = 'Firefox';
-      version = parseInt(userAgent.match(/Firefox\/(\d+)/)?.[1] || '0');
+      version = parseInt(userAgent.match(/Firefox\/(\d+)/)?.[1] || '0', 10);
     } else if (/Safari\//.test(userAgent) && !/Chrome/.test(userAgent)) {
       name = 'Safari';
       // Safari version detection is more complex, simplified here
-      version = parseInt(userAgent.match(/Version\/(\d+)/)?.[1] || '0');
+      version = parseInt(userAgent.match(/Version\/(\d+)/)?.[1] || '0', 10);
     }
 
-    const supportsInteractiveWidget = 
-      (name === 'Chrome' && version >= 108) ||
-      (name === 'Firefox' && version >= 132);
+    const supportsInteractiveWidget =
+      (name === 'Chrome' && version >= 108) || (name === 'Firefox' && version >= 132);
 
     setBrowserInfo({
       name,
       version,
-      supportsInteractiveWidget
+      supportsInteractiveWidget,
     });
   }, []);
 

@@ -10,7 +10,7 @@ export default function ServiceWorkerRegistration() {
           .register('/sw.js')
           .then((registration) => {
             console.log('Service Worker registered:', registration);
-            
+
             // Check for updates periodically
             setInterval(() => {
               registration.update();

@@ -8,7 +8,7 @@ export default function LoadingIndicator() {
           🤔
         </div>
       </div>
-      
+
       <div className="flex-1 overflow-hidden">
         <div className="flex items-baseline gap-2 mb-1">
           <span className="font-bold text-sm bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -18,7 +18,7 @@ export default function LoadingIndicator() {
             thinking...
           </span>
         </div>
-        
+
         <div className="bg-purple-900/15 p-4 rounded-2xl border border-purple-400/30 shadow-lg backdrop-blur-sm">
           <div className="flex gap-1.5">
             <span className="loading-dot inline-block w-2 h-2 bg-purple-400 rounded-full"></span>

@@ -1,13 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getOpenAIClient } from '@/lib/openai/client';
-import { formatMoveContext } from '@/lib/openai/chess-butler-prompt';
-import { PositionAnalyzer } from '@/lib/chess/positionAnalyzer';
-import { MoveSuggestion } from '@/types';
-import { GameMemoryService } from '@/lib/services/GameMemoryService';
-import { ChesterMemoryService } from '@/lib/services/ChesterMemoryService';
-import { preMoveAnalysisSchema, validateRequest } from '@/lib/validation/schemas';
-import { checkRateLimitRedis, getRateLimitHeadersRedis, getClientIPFromRequest } from '@/lib/redis';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getAuthenticatedUser } from '@/lib/auth/getUser';
+import { PositionAnalyzer } from '@/lib/chess/positionAnalyzer';
+import { formatMoveContext } from '@/lib/openai/chess-butler-prompt';
+import { getOpenAIClient } from '@/lib/openai/client';
+import { checkRateLimitRedis, getClientIPFromRequest, getRateLimitHeadersRedis } from '@/lib/redis';
+import { ChesterMemoryService } from '@/lib/services/ChesterMemoryService';
+import { GameMemoryService } from '@/lib/services/GameMemoryService';
+import { preMoveAnalysisSchema, validateRequest } from '@/lib/validation/schemas';
+import type { MoveSuggestion } from '@/types';
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,12 +19,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: 'Rate limit exceeded. Please wait before requesting analysis.',
-          retryAfter: Math.ceil((rateLimitResult.reset - Date.now()) / 1000)
+          retryAfter: Math.ceil((rateLimitResult.reset - Date.now()) / 1000),
         },
         {
           status: 429,
-          headers: getRateLimitHeadersRedis(rateLimitResult)
-        }
+          headers: getRateLimitHeadersRedis(rateLimitResult),
+        },
       );
     }
 
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
     console.log('Pre-move analysis - Starting:', {
       hasGameId: !!gameId,
       currentPhase: gamePhase,
-      totalMoves: gameContext?.totalMoves
+      totalMoves: gameContext?.totalMoves,
     });
 
     // Fetch comprehensive game memory context
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
         console.log('Pre-move analysis - Memory loaded:', {
           totalMovesInMemory: fullGameContext?.totalMoves || 0,
           previousSuggestions: fullGameContext?.suggestionsGiven?.length || 0,
-          tacticalThemes: fullGameContext?.tacticalThemes || []
+          tacticalThemes: fullGameContext?.tacticalThemes || [],
         });
       } catch (error) {
         console.error('Error fetching game memory:', error);
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
     const context = formatMoveContext(fen);
     const analyzer = new PositionAnalyzer(fen);
     const analysis = analyzer.analyzePosition();
-    
+
     // Create urgency-based system prompt
     let systemPrompt = `You are Chester, Chris's chess buddy watching him play. `;
 
@@ -99,9 +99,15 @@ export async function POST(request: NextRequest) {
       const recentSuggestions = fullGameContext.suggestionsGiven.slice(-3);
       if (recentSuggestions.length > 0) {
         systemPrompt += `\n\nYour recent suggestions:`;
-        recentSuggestions.forEach(s => {
-          const outcome = s.followed ? (s.outcome === 'good' ? '✓ Good!' : s.outcome === 'bad' ? '✗ Bad' : '~ Okay') : '(ignored)';
-          systemPrompt += `\n- Move ${s.move_number}: ${s.suggestions.map(sg => sg.move).join(' or ')} ${outcome}`;
+        recentSuggestions.forEach((s) => {
+          const outcome = s.followed
+            ? s.outcome === 'good'
+              ? '✓ Good!'
+              : s.outcome === 'bad'
+                ? '✗ Bad'
+                : '~ Okay'
+            : '(ignored)';
+          systemPrompt += `\n- Move ${s.move_number}: ${s.suggestions.map((sg) => sg.move).join(' or ')} ${outcome}`;
         });
         systemPrompt += `\n\nLearn from these outcomes when making new suggestions.`;
       }
@@ -110,7 +116,7 @@ export async function POST(request: NextRequest) {
       if (fullGameContext.fullMoveHistory.length > 0) {
         const moveSequence = fullGameContext.fullMoveHistory
           .slice(-20) // Last 20 moves
-          .map(m => `${m.move_number}. ${m.player_type === 'human' ? 'Chris' : 'AI'}: ${m.san}`)
+          .map((m) => `${m.move_number}. ${m.player_type === 'human' ? 'Chris' : 'AI'}: ${m.san}`)
           .join(', ');
         systemPrompt += `\n\nRecent moves: ${moveSequence}`;
       }
@@ -125,7 +131,6 @@ export async function POST(request: NextRequest) {
       - If can capture high-value piece: take it
 
       Be direct: "Dude, save that Knight!" or "Grab that free piece!"`;
-
     } else if (analysis.urgencyLevel === 'tactical') {
       systemPrompt += `There might be tactics here, but DON'T obsess over saving pawns. Prioritize:
       - Active piece play over passive defense
@@ -134,7 +139,6 @@ export async function POST(request: NextRequest) {
       - Only mention pawn saves if it's actually significant (like a passed pawn)
 
       Be proactive: "Create some chaos!" or "Let's put pressure on"`;
-
     } else {
       // Strategic - most common case, needs variety
       const strategicIdeas = [
@@ -207,7 +211,7 @@ export async function POST(request: NextRequest) {
     {"suggestions": [{"move": "Castle Kingside", "reasoning": "King safety"}], "casualComment": "King safety is key right now"}
 
     DO NOT respond with empty JSON. ALWAYS provide at least one suggestion and a comment.`;
-    
+
     const openai = getOpenAIClient();
     const completion = await openai.chat.completions.create({
       model: 'gpt-5.2-2025-12-11',
@@ -215,28 +219,29 @@ export async function POST(request: NextRequest) {
         { role: 'system', content: systemPrompt },
         {
           role: 'user',
-          content: `${context}\n\nGame phase: ${gamePhase || 'opening'}\nRecent moves: ${moveHistory?.slice(-3).join(', ') || 'None yet'}\n\nWhat moves would you casually suggest to Chris?`
-        }
+          content: `${context}\n\nGame phase: ${gamePhase || 'opening'}\nRecent moves: ${moveHistory?.slice(-3).join(', ') || 'None yet'}\n\nWhat moves would you casually suggest to Chris?`,
+        },
       ],
       max_completion_tokens: 300,
-      response_format: { type: 'json_object' }
+      response_format: { type: 'json_object' },
     });
-    
+
     const response = JSON.parse(completion.choices[0].message.content || '{}');
 
     console.log('Pre-move analysis raw response:', JSON.stringify(response, null, 2));
 
-    const suggestions: MoveSuggestion[] = response.suggestions?.map((s: any) => ({
-      move: s.move,
-      reasoning: s.reasoning,
-      casual: true
-    })) || [];
+    const suggestions: MoveSuggestion[] =
+      response.suggestions?.map((s: any) => ({
+        move: s.move,
+        reasoning: s.reasoning,
+        casual: true,
+      })) || [];
 
     console.log('Pre-move analysis formatted suggestions:', JSON.stringify(suggestions, null, 2));
 
     const result = {
       suggestions: suggestions.slice(0, 2), // Ensure max 2 suggestions
-      comment: response.casualComment || "Your turn!"
+      comment: response.casualComment || 'Your turn!',
     };
 
     console.log('Pre-move analysis final result:', JSON.stringify(result, null, 2));
@@ -250,18 +255,18 @@ export async function POST(request: NextRequest) {
           move_number: moveNumber,
           suggestions: result.suggestions,
           followed: false, // Will be updated when user makes move
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
 
         // Also save as commentary
         await GameMemoryService.addCommentary(gameId, {
           move_number: moveNumber,
           type: 'suggestion',
-          content: `Chester suggests: ${result.suggestions.map(s => s.move).join(' or ')}. ${result.comment}`,
+          content: `Chester suggests: ${result.suggestions.map((s) => s.move).join(' or ')}. ${result.comment}`,
           timestamp: new Date().toISOString(),
           metadata: {
-            urgency_level: analysis.urgencyLevel
-          }
+            urgency_level: analysis.urgencyLevel,
+          },
         });
 
         console.log('Suggestions saved to game memory');
@@ -272,12 +277,8 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(result);
-    
   } catch (error) {
     console.error('Pre-move analysis error:', error);
-    return NextResponse.json(
-      { error: 'Failed to generate move suggestions' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to generate move suggestions' }, { status: 500 });
   }
 }
