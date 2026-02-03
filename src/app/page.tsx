@@ -89,23 +89,19 @@ export default function Home() {
     messagesRef.current = messages;
   }, [messages]);
 
-  // Initialize performance monitoring and preload libraries
+  // Initialize and preload libraries
   useEffect(() => {
-    performanceMonitor.current = PerformanceMonitor.getInstance();
-    performanceMonitor.current.startFPSMonitoring();
-
     // Preload critical libraries on user interaction
     preloadCriticalLibraries();
 
-    // Log performance report every 30 seconds in development
-    const reportInterval = setInterval(() => {
-      if (process.env.NODE_ENV === 'development') {
-      }
-    }, 30000);
+    // Only run FPS monitoring in development (it uses requestAnimationFrame constantly)
+    if (process.env.NODE_ENV === 'development') {
+      performanceMonitor.current = PerformanceMonitor.getInstance();
+      performanceMonitor.current.startFPSMonitoring();
+    }
 
     return () => {
       performanceMonitor.current?.cleanup();
-      clearInterval(reportInterval);
     };
   }, []);
 
