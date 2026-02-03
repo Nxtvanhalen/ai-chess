@@ -449,38 +449,27 @@ export default function ChessBoard({
     const ranks = ['8', '7', '6', '5', '4', '3', '2', '1'];
     const identifiers = [];
 
-    // Use actual rendered board size for accurate positioning
-    const actualBoardSize = boardContainerRef.current?.getBoundingClientRect().width || boardWidth;
-    const borderSize = 2;
-    const squareSize = (actualBoardSize - borderSize * 2) / 8;
-
     for (let rank = 0; rank < 8; rank++) {
       for (let file = 0; file < 8; file++) {
-        const _isLight = (rank + file) % 2 === 0;
-
-        // Improved positioning calculation
-        const leftPosition = borderSize + file * squareSize;
-        const topPosition = borderSize + rank * squareSize;
-
         identifiers.push(
           <div
             key={`${files[file]}${ranks[rank]}`}
             className="absolute pointer-events-none"
             style={{
-              left: `${leftPosition}px`,
-              top: `${topPosition}px`,
-              width: `${squareSize}px`,
-              height: `${squareSize}px`,
+              left: `${(file / 8) * 100}%`,
+              top: `${(rank / 8) * 100}%`,
+              width: '12.5%',
+              height: '12.5%',
               display: 'flex',
               alignItems: 'flex-start',
               justifyContent: 'flex-start',
-              padding: `${Math.max(1, squareSize * 0.05)}px`,
+              padding: '2px',
             }}
           >
             <span
               className="font-bold leading-none text-black"
               style={{
-                fontSize: `${Math.max(6, squareSize * 0.15)}px`,
+                fontSize: 'clamp(6px, 1.5cqi, 14px)',
                 background: 'rgba(245, 240, 230, 0.65)',
                 padding: '0px 1px',
                 borderRadius: '1px',
@@ -510,40 +499,28 @@ export default function ChessBoard({
         const piece = game.get(square);
 
         if (piece) {
-          // Use actual rendered board size for accurate positioning
-          const actualBoardSize =
-            boardContainerRef.current?.getBoundingClientRect().width || boardWidth;
-          const borderSize = 2;
-          const squareSize = (actualBoardSize - borderSize * 2) / 8;
           const pieceKey = `${piece.color}${piece.type.toUpperCase()}`;
           const pieceName = getPieceName(pieceKey, square);
-
-          // Improved positioning calculation matching square identifiers
-          const leftPosition = borderSize + file * squareSize;
-          const topPosition =
-            borderSize + rank * squareSize + squareSize - Math.max(8, squareSize * 0.15);
 
           pieceNames.push(
             <div
               key={`name-${square}`}
               className="absolute pointer-events-none transition-all duration-200"
               style={{
-                left: `${leftPosition}px`,
-                top: `${topPosition}px`,
-                width: `${squareSize}px`,
-                height: `${Math.max(8, squareSize * 0.15)}px`,
+                left: `${(file / 8) * 100}%`,
+                top: `${(rank / 8) * 100}%`,
+                width: '12.5%',
+                height: '12.5%',
                 display: 'flex',
-                alignItems: 'center',
+                alignItems: 'flex-end',
                 justifyContent: 'center',
+                paddingBottom: '0',
               }}
             >
               <span
-                className={`
-                font-black tracking-[0.15em] uppercase
-                ${piece.color === 'w' ? 'text-white' : 'text-white'}
-              `}
+                className="font-black tracking-[0.15em] uppercase text-white"
                 style={{
-                  fontSize: `${Math.max(6, squareSize * 0.12)}px`,
+                  fontSize: 'clamp(6px, 1.2cqi, 12px)',
                   transform: 'scale(0.95)',
                   transformOrigin: 'center',
                   textShadow:
@@ -645,6 +622,7 @@ export default function ChessBoard({
             height: '100%',
             borderRadius: '16px',
             overflow: 'hidden',
+            containerType: 'inline-size',
           }}
         >
           {renderSquareIdentifiers()}
@@ -661,6 +639,7 @@ export default function ChessBoard({
             height: '100%',
             borderRadius: '16px',
             overflow: 'hidden',
+            containerType: 'inline-size',
           }}
         >
           {renderPieceNames()}
