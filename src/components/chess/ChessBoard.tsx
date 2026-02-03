@@ -579,7 +579,7 @@ export default function ChessBoard({
   return (
     <div
       className={`chess-board-container flex items-center justify-center bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-indigo-900/20 ${
-        isMobile && isLandscape ? 'p-2 h-full' : 'p-1 lg:p-6 pt-2 lg:pt-6'
+        isMobile && isLandscape ? 'p-2 h-full' : 'px-1 pt-2 pb-0 lg:px-6 lg:pt-6 lg:pb-0'
       }`}
       style={{
         width: boardWidth,

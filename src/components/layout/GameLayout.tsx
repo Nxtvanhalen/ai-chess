@@ -42,7 +42,7 @@ export default function GameLayout({ chessBoard, chat, controls }: GameLayoutPro
           </div>
 
           {/* Controls Section - Between board and chat */}
-          {controls && <div className="controls-section">{controls}</div>}
+          {controls && <div className="controls-section !py-0">{controls}</div>}
 
           {/* Chat Section */}
           <div className="chat-section">{chat}</div>
@@ -73,7 +73,7 @@ export default function GameLayout({ chessBoard, chat, controls }: GameLayoutPro
           <div className="board-desktop-wrapper">
             <div className="board-desktop">{chessBoard}</div>
             {controls && (
-              <div className="controls-desktop">
+              <div className="controls-desktop !py-0">
                 {controls}
                 <div className="text-xs text-slate-500 mt-4 text-center font-mono select-none opacity-50">
                   System v2.19 (Polished Avatar)

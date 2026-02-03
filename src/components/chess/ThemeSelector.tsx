@@ -16,8 +16,9 @@ export default function ThemeSelector({ currentTheme, onThemeChange }: ThemeSele
     <div className="relative">
       {/* Toggle Button */}
       <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 bg-slate-800/80 hover:bg-slate-700/80 border border-slate-600/50 rounded-lg transition-all duration-200 backdrop-blur-sm"
+        className="flex items-center gap-2 px-3 py-1 hover:bg-gray-800/30 rounded-lg transition-all duration-200"
         title="Change board theme"
       >
         {/* Mini preview of current theme */}

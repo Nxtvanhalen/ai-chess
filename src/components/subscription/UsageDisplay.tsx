@@ -62,7 +62,7 @@ export default function UsageDisplay() {
   const isEmpty = !usage.ai_moves.unlimited && usage.ai_moves.remaining === 0;
 
   return (
-    <div className="flex items-center gap-3 px-3 py-2 bg-gray-800/50 rounded-lg text-sm">
+    <div className="flex items-center gap-3 px-3 py-1 rounded-lg text-sm">
       <div className="flex items-center gap-2">
         <span className="text-gray-400">Moves:</span>
         {usage.ai_moves.unlimited ? (
