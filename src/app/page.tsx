@@ -38,6 +38,7 @@ export default function Home() {
   const [gameOver, setGameOver] = useState<{ checkmate: boolean; winner?: 'white' | 'black' }>({
     checkmate: false,
   });
+  const checkmateHandledRef = useRef(false);
   const [boardTheme, setBoardTheme] = useState<BoardTheme>(defaultTheme);
   const [upgradeModal, setUpgradeModal] = useState<{
     isOpen: boolean;
@@ -224,6 +225,12 @@ export default function Home() {
 
   const handleCheckmate = useCallback(
     async (winner: 'white' | 'black') => {
+      // Guard against multiple calls (from both page.tsx and ChessBoard component)
+      if (checkmateHandledRef.current) {
+        return;
+      }
+      checkmateHandledRef.current = true;
+
       setGameOver({ checkmate: true, winner });
 
       // Finalize game in database
@@ -403,6 +410,13 @@ export default function Home() {
               const thinkingTime = aiMoveData.analysis?.thinkingTime || 1500;
 
               const aiMoveTimeout = setTimeout(async () => {
+                // Bail out if checkmate was already handled (prevents duplicate processing)
+                if (checkmateHandledRef.current) {
+                  timeoutRefs.current.delete(aiMoveTimeout);
+                  setIsLoading(false);
+                  return;
+                }
+
                 try {
                   // Update the board with AI's move
                   setCurrentPosition(aiMoveData.fen);
@@ -464,7 +478,12 @@ export default function Home() {
                   if (isEngineCheckmate) {
                     // Engine plays black, so black wins
                     handleCheckmate('black');
-                  } else {
+                    setIsLoading(false);
+                    return;
+                  }
+
+                  // Only proceed with analysis if game is still ongoing
+                  if (!checkmateHandledRef.current) {
                     // Get Chester's analysis of BOTH moves (user + engine) - skip on checkmate
                     const analysisResponse = await fetch('/api/chess/engine-move-analysis', {
                       method: 'POST',
@@ -635,6 +654,7 @@ export default function Home() {
 
   const handleRestart = useCallback(async () => {
     // Reset game state
+    checkmateHandledRef.current = false;
     setGameOver({ checkmate: false });
     setMoveCount(0);
     gameStartTimeRef.current = Date.now();
