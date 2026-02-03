@@ -48,13 +48,13 @@ export default function ThemeSelector({ currentTheme, onThemeChange }: ThemeSele
               onClick={() => setIsOpen(false)}
             />
 
-            {/* Theme Grid - Opens upward, responsive for small screens */}
+            {/* Theme Grid - Opens upward, centered on mobile */}
             <motion.div
               initial={{ opacity: 0, y: 10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.95 }}
               transition={{ duration: 0.2 }}
-              className="absolute bottom-full right-0 mb-2 z-[100] p-2 sm:p-3 bg-slate-900/95 border border-slate-700/50 rounded-xl shadow-2xl backdrop-blur-md w-[240px] sm:min-w-[280px] max-h-[50vh] overflow-y-auto"
+              className="fixed bottom-24 left-4 right-4 mx-auto z-[100] p-3 bg-slate-900/95 border border-slate-700/50 rounded-xl shadow-2xl backdrop-blur-md max-w-[280px] max-h-[50vh] overflow-y-auto"
             >
               <div className="text-xs text-slate-400 mb-2 px-1">Board Theme</div>
               <div className="grid grid-cols-2 gap-1.5 sm:gap-2">
