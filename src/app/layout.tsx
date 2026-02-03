@@ -78,10 +78,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <GoogleAnalytics />
         <JsonLd />
       </head>
       <body className="antialiased">
-        <GoogleAnalytics />
         <Providers>
           <ServiceWorkerRegistration />
           {children}
