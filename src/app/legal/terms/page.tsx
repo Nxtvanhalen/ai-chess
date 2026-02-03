@@ -1,4 +1,16 @@
+import { Metadata } from 'next';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title: 'Terms of Service - Chester AI Chess',
+  description:
+    'Terms of Service for Chester AI Chess. Rules and guidelines for using our AI chess companion application.',
+  openGraph: {
+    title: 'Terms of Service - Chester AI Chess',
+    description: 'Terms of Service for Chester AI Chess.',
+    url: 'https://chesterchess.com/legal/terms',
+  },
+};
 
 export default function TermsOfServicePage() {
   return (

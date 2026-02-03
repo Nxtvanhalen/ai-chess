@@ -1,0 +1,18 @@
+# robots.txt for chesterchess.com
+
+User-agent: *
+Allow: /
+Allow: /pricing
+Allow: /legal/privacy
+Allow: /legal/terms
+
+# Disallow private/auth routes
+Disallow: /api/
+Disallow: /login
+Disallow: /signup
+Disallow: /debug
+Disallow: /pwa-test
+Disallow: /subscription
+
+# Sitemap location
+Sitemap: https://chesterchess.com/sitemap.xml

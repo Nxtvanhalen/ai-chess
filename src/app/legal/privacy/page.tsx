@@ -1,4 +1,16 @@
+import { Metadata } from 'next';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title: 'Privacy Policy - Chester AI Chess',
+  description:
+    'Privacy Policy and Cookie Disclosure for Chester AI Chess. Learn how we collect, use, and protect your data.',
+  openGraph: {
+    title: 'Privacy Policy - Chester AI Chess',
+    description: 'Privacy Policy and Cookie Disclosure for Chester AI Chess.',
+    url: 'https://chesterchess.com/legal/privacy',
+  },
+};
 
 export default function PrivacyPolicyPage() {
   return (

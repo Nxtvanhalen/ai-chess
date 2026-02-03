@@ -2,11 +2,13 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { Providers } from '@/components/Providers';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
+import GoogleAnalytics from '@/components/analytics/GoogleAnalytics';
+import JsonLd from '@/components/seo/JsonLd';
 
 export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NODE_ENV === 'production'
-      ? 'https://chess.chrisbergstrom.com'
+      ? 'https://chesterchess.com'
       : 'http://localhost:3000',
   ),
   title: 'Chester AI Chess',
@@ -20,7 +22,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Chester AI Chess',
     description: 'Play chess with Chester, your witty AI companion',
-    url: 'https://chess.chrisbergstrom.com',
+    url: 'https://chesterchess.com',
     siteName: 'Chester AI Chess',
     images: [
       {
@@ -75,7 +77,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <JsonLd />
+      </head>
       <body className="antialiased">
+        <GoogleAnalytics />
         <Providers>
           <ServiceWorkerRegistration />
           {children}
