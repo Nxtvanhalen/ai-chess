@@ -3,6 +3,7 @@ import './globals.css';
 import { Providers } from '@/components/Providers';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import GoogleAnalytics from '@/components/analytics/GoogleAnalytics';
+import CookieConsent from '@/components/cookies/CookieConsent';
 import JsonLd from '@/components/seo/JsonLd';
 
 export const metadata: Metadata = {
@@ -78,13 +79,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <GoogleAnalytics />
         <JsonLd />
       </head>
       <body className="antialiased">
+        <GoogleAnalytics />
         <Providers>
           <ServiceWorkerRegistration />
           {children}
+          <CookieConsent />
         </Providers>
       </body>
     </html>
