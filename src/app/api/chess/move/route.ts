@@ -248,8 +248,10 @@ export async function POST(request: NextRequest) {
 
       // Fire and forget - save in background
       (async () => {
+        const bgStart = Date.now();
         try {
           // Save the move to game memory
+          const moveStart = Date.now();
           await GameMemoryService.addMove(gameId, {
             move_number: moveNumber,
             san: moveDetails.san || move,
@@ -262,8 +264,10 @@ export async function POST(request: NextRequest) {
             player_type: moveDetails.player_type || 'human',
             evaluation: moveDetails.evaluation,
           });
+          console.log(`[Move] addMove: ${Date.now() - moveStart}ms`);
 
           // Save Chester's commentary
+          const commentStart = Date.now();
           await GameMemoryService.addCommentary(gameId, {
             move_number: moveNumber,
             type: 'post_move',
@@ -271,6 +275,7 @@ export async function POST(request: NextRequest) {
             timestamp: new Date().toISOString(),
             metadata: {},
           });
+          console.log(`[Move] addCommentary: ${Date.now() - commentStart}ms`);
 
           // Detect and save tactical themes from commentary (batched for performance)
           const tacticalKeywords: Record<string, string> = {
@@ -293,11 +298,14 @@ export async function POST(request: NextRequest) {
 
           // Single batched DB operation instead of up to 10 individual calls
           if (detectedThemes.length > 0) {
+            const themeStart = Date.now();
             await GameMemoryService.addTacticalThemes(gameId, detectedThemes);
+            console.log(`[Move] addTacticalThemes (${detectedThemes.length} themes): ${Date.now() - themeStart}ms`);
           }
 
+          console.log(`[Move] Background save total: ${Date.now() - bgStart}ms`);
         } catch (error) {
-          console.error('Error saving to game memory (background):', error);
+          console.error('[Move] Error saving to game memory (background):', error);
           // This is non-blocking, so we just log the error
         }
       })();

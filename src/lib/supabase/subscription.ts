@@ -120,6 +120,7 @@ export async function canUseAIMove(userId: string): Promise<{
   limit: number;
   unlimited: boolean;
 }> {
+  const start = Date.now();
   const supabase = await getServerClient();
 
   // Run both checks in parallel - RPC check and usage fetch are independent
@@ -127,6 +128,7 @@ export async function canUseAIMove(userId: string): Promise<{
     supabase.rpc('can_use_ai_move', { p_user_id: userId }),
     getUserUsage(userId),
   ]);
+  console.log(`[Subscription] canUseAIMove (parallel): ${Date.now() - start}ms`);
 
   if (rpcResult.error) {
     console.error('[Subscription] Error checking AI move usage:', rpcResult.error);
@@ -151,6 +153,7 @@ export async function canUseChat(userId: string): Promise<{
   limit: number;
   unlimited: boolean;
 }> {
+  const start = Date.now();
   const supabase = await getServerClient();
 
   // Run both checks in parallel - RPC check and usage fetch are independent
@@ -158,6 +161,7 @@ export async function canUseChat(userId: string): Promise<{
     supabase.rpc('can_use_chat', { p_user_id: userId }),
     getUserUsage(userId),
   ]);
+  console.log(`[Subscription] canUseChat (parallel): ${Date.now() - start}ms`);
 
   if (rpcResult.error) {
     console.error('[Subscription] Error checking chat usage:', rpcResult.error);

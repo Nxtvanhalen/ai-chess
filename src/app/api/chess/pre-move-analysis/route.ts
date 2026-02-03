@@ -50,13 +50,15 @@ export async function POST(request: NextRequest) {
 
     if (gameId) {
       try {
+        const contextStart = Date.now();
         // Run both fetches in parallel - saves ~100ms per request
         [fullGameContext, chesterPersonality] = await Promise.all([
           GameMemoryService.getGameContext(gameId),
           ChesterMemoryService.getPersonalityContext(userId),
         ]);
+        console.log(`[PreMove] Context fetch (parallel): ${Date.now() - contextStart}ms`);
       } catch (error) {
-        console.error('Error fetching game memory:', error);
+        console.error('[PreMove] Error fetching game memory:', error);
         // Continue without memory - graceful degradation
       }
     }

@@ -23,6 +23,7 @@ function getEngine(): EnhancedChessEngine {
 }
 
 export async function POST(request: NextRequest) {
+  const requestStart = Date.now();
   try {
     // Check rate limit (Redis-based, falls back to in-memory)
     const clientIP = getClientIPFromRequest(request);
@@ -105,11 +106,13 @@ export async function POST(request: NextRequest) {
     // Validate the position
     const chess = new Chess(fen);
     if (!chess.isGameOver() && chess.turn() === 'b') {
+      const engineStart = Date.now();
       const result = engine.getBestMove(
         fen,
         difficulty as 'easy' | 'medium' | 'hard',
         playerMoveHistory,
       );
+      console.log(`[AI-Move] Engine computation: ${Date.now() - engineStart}ms`);
 
       if (result) {
         // Apply the move to get the new position
@@ -133,6 +136,7 @@ export async function POST(request: NextRequest) {
           );
         }
 
+        console.log(`[AI-Move] Total request time: ${Date.now() - requestStart}ms`);
         return NextResponse.json(
           {
             move: result.move,
@@ -157,9 +161,10 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    console.log(`[AI-Move] No valid move, total time: ${Date.now() - requestStart}ms`);
     return NextResponse.json({ error: 'No valid move found' }, { status: 400 });
   } catch (error) {
-    console.error('AI move error:', error);
+    console.error('[AI-Move] Error:', error);
     return NextResponse.json({ error: 'Failed to generate AI move' }, { status: 500 });
   }
 }
