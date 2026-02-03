@@ -277,10 +277,10 @@ function analyzeRequest(request: NextRequest): ThreatAnalysis {
 }
 
 // -----------------------------------------------------------------------------
-// PROXY FUNCTION (Next.js 16+)
+// MIDDLEWARE FUNCTION (Next.js 16+)
 // -----------------------------------------------------------------------------
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname.toLowerCase();
 
   // Quick path-based blocking for common attack patterns (no logging needed - just noise)
@@ -388,7 +388,7 @@ export async function proxy(request: NextRequest) {
 }
 
 // -----------------------------------------------------------------------------
-// PROXY CONFIG - Apply to all routes except static files
+// MIDDLEWARE CONFIG - Apply to all routes except static files
 // -----------------------------------------------------------------------------
 
 export const config = {
