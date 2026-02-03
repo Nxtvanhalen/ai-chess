@@ -10,6 +10,35 @@ import { NextResponse } from 'next/server';
 // =============================================================================
 
 // -----------------------------------------------------------------------------
+// BLOCKED PATHS - Common attack/scan paths (WordPress, PHP, etc.)
+// -----------------------------------------------------------------------------
+const BLOCKED_PATHS: string[] = [
+  // WordPress
+  '/wp-admin',
+  '/wp-login',
+  '/wp-content',
+  '/wp-includes',
+  '/wordpress',
+  '/xmlrpc.php',
+  // PHP/CMS common targets
+  '/admin.php',
+  '/index.php',
+  '/config.php',
+  '/setup-config.php',
+  '/install.php',
+  '/phpmyadmin',
+  '/phpinfo.php',
+  // Common attack paths
+  '/.env',
+  '/.git',
+  '/.htaccess',
+  '/cgi-bin',
+  '/shell',
+  '/eval',
+  '/cmd',
+];
+
+// -----------------------------------------------------------------------------
 // BLOCKED IPs - Known malicious actors
 // -----------------------------------------------------------------------------
 const BLOCKED_IPS: Set<string> = new Set([
@@ -252,6 +281,18 @@ function analyzeRequest(request: NextRequest): ThreatAnalysis {
 // -----------------------------------------------------------------------------
 
 export async function proxy(request: NextRequest) {
+  const pathname = request.nextUrl.pathname.toLowerCase();
+
+  // Quick path-based blocking for common attack patterns (no logging needed - just noise)
+  const isBlockedPath = BLOCKED_PATHS.some(
+    (blocked) => pathname === blocked || pathname.startsWith(blocked + '/')
+  );
+
+  if (isBlockedPath) {
+    // Return 404 silently - don't give attackers any info
+    return new NextResponse(null, { status: 404 });
+  }
+
   const analysis = analyzeRequest(request);
 
   if (analysis.isBlocked) {
