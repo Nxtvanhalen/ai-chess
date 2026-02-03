@@ -71,13 +71,15 @@ export default function ChatInput({
         <input
           ref={textareaRef as any}
           type="text"
+          id="chat-message-input"
+          name="chat-message"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
           disabled={disabled}
           placeholder={placeholder}
           inputMode="text"
-          autoComplete="on"
+          autoComplete="off"
           autoCorrect="on"
           autoCapitalize="sentences"
           spellCheck="true"

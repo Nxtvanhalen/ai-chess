@@ -70,35 +70,6 @@
       "purpose": "maskable"
     }
   ],
-  "screenshots": [
-    {
-      "src": "/screenshots/desktop.png",
-      "sizes": "1920x1080",
-      "type": "image/png",
-      "form_factor": "wide"
-    },
-    {
-      "src": "/screenshots/mobile.png",
-      "sizes": "750x1334",
-      "type": "image/png",
-      "form_factor": "narrow"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "New Game",
-      "short_name": "New",
-      "description": "Start a new chess game",
-      "url": "/?new=true",
-      "icons": [
-        {
-          "src": "/icons/new-game-96x96.png",
-          "sizes": "96x96",
-          "type": "image/png"
-        }
-      ]
-    }
-  ],
   "prefer_related_applications": false,
   "related_applications": [],
   "scope": "/",
