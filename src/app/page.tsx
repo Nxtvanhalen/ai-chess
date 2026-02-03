@@ -140,7 +140,7 @@ export default function Home() {
 
         // Add welcome message with typing effect
         const welcomeText =
-          "Hey Chris! Ready for another game? I'll be here watching and giving you some tips. You're playing white against the engine. Good luck!";
+          "Hello! Ready for another game? I'll be here watching and giving you some tips. You're playing white against the engine. Good luck!";
         const welcomeId = await generateId();
         const welcomeMessage: ChatMessage = {
           id: welcomeId,
@@ -192,66 +192,6 @@ export default function Home() {
     return 'endgame';
   };
 
-  // Get AI suggestions when it's user's turn
-  const getAISuggestions = useCallback(
-    async (fen: string, gameId?: string) => {
-      if (!conversationId) return;
-
-      try {
-        // Create abort controller with 10 second timeout for slow API responses
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000);
-
-        const response = await fetch('/api/chess/pre-move-analysis', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            fen,
-            moveHistory: messagesRef.current
-              .filter((m) => m.metadata?.moveContext)
-              .map((m) => m.metadata?.moveContext),
-            gamePhase: detectGamePhase(fen),
-            gameId: gameId || currentGameId,
-            userId: user?.id || null,
-            gameContext: {
-              fen,
-              totalMoves: messagesRef.current.filter((m) => m.metadata?.moveContext).length,
-            },
-          }),
-          signal: controller.signal,
-        });
-
-        clearTimeout(timeoutId);
-
-        if (response.ok) {
-          const data = await response.json();
-          const commentText = data.comment || 'Your move!';
-          const suggestionMessageId = generateSimpleId();
-
-          // Add suggestion message with typing effect
-          const suggestionMessage: ChatMessage = {
-            id: suggestionMessageId,
-            role: 'assistant',
-            type: 'suggestion',
-            content: '',
-            timestamp: new Date(),
-            metadata: {
-              isThinking: true,
-              suggestions: data.suggestions, // Include suggestions from start so they render
-            },
-          };
-
-          setMessages((prev) => [...prev, suggestionMessage]);
-
-          // Type out the comment
-          typeText(commentText, suggestionMessageId);
-        }
-      } catch (error) {
-        console.error('Error getting AI suggestions:', error);
-      }
-    },
-    [conversationId, currentGameId, typeText, detectGamePhase, user?.id],
-  );
 
   const convertMoveToPlainEnglish = (san: string) => {
     // Convert algebraic notation to plain English
@@ -306,8 +246,8 @@ export default function Home() {
         role: 'assistant',
         content:
           winner === 'white'
-            ? "Checkmate! Well played, Chris. You've secured victory. Would you like to play again?"
-            : "Checkmate! I've managed to secure the win this time. Good game, Chris! Ready for another?",
+            ? "Checkmate! Well played. You've secured victory. Want another?"
+            : "Checkmate! I've managed to secure the win this time. Good game! Ready for another?",
         timestamp: new Date(),
       };
 
@@ -376,154 +316,7 @@ export default function Home() {
 
         setIsLoading(true);
 
-        // Get AI commentary on the move with retry logic
-        const makeApiCall = async (attempt: number = 1): Promise<Response> => {
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
-
-          try {
-            const response = await fetch('/api/chess/move', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              signal: controller.signal,
-              body: JSON.stringify({
-                move: move.san,
-                fen: move.after,
-                moveHistory: messages.filter((m) => m.metadata?.moveContext).slice(-15), // Only last 15 moves
-                gameContext: {
-                  fen: move.after,
-                  totalMoves: newMoveCount,
-                  fullMoveHistory: messages
-                    .filter((m) => m.metadata?.moveContext)
-                    .slice(-30)
-                    .map((m) => ({
-                      role: m.role,
-                      move: m.metadata?.moveContext,
-                      position: m.metadata?.position,
-                    })),
-                },
-                gameId: currentGameId,
-                userId: user?.id || null,
-                moveDetails: {
-                  san: move.san,
-                  from: move.from,
-                  to: move.to,
-                  piece: move.piece,
-                  captured: move.captured,
-                  player_type: 'human',
-                },
-              }),
-            });
-
-            clearTimeout(timeoutId);
-
-            // Retry on 500 errors
-            if (!response.ok && response.status === 500 && attempt < 3) {
-              console.warn(`Move API failed (attempt ${attempt}/3), retrying...`);
-              await new Promise((resolve) => setTimeout(resolve, 1000 * attempt)); // Exponential backoff
-              return makeApiCall(attempt + 1);
-            }
-
-            return response;
-          } catch (fetchError: any) {
-            clearTimeout(timeoutId);
-
-            // Retry on timeout or network errors
-            if (
-              attempt < 3 &&
-              (fetchError.name === 'AbortError' || fetchError.message?.includes('fetch'))
-            ) {
-              console.warn(`Move API timed out/failed (attempt ${attempt}/3), retrying...`);
-              await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
-              return makeApiCall(attempt + 1);
-            }
-
-            throw fetchError;
-          }
-        };
-
-        let response: Response;
-        try {
-          response = await makeApiCall();
-        } catch (apiError) {
-          console.error('Move API failed after retries:', apiError);
-          // Show fallback commentary
-          const fallbackMessage: ChatMessage = {
-            id: generateSimpleId(),
-            role: 'assistant',
-            content: "I'm having trouble analyzing that move right now. Let's continue!",
-            timestamp: new Date(),
-            metadata: { isThinking: false },
-          };
-          setMessages((prev) => [...prev, fallbackMessage]);
-          setIsLoading(false);
-          return; // Exit early but don't freeze the game
-        }
-
-        if (response.ok) {
-          const reader = response.body?.getReader();
-          const decoder = new TextDecoder();
-          const aiResponse: ChatMessage = {
-            id: generateSimpleId(),
-            role: 'assistant',
-            content: '',
-            timestamp: new Date(),
-            metadata: { isThinking: true },
-          };
-
-          setMessages((prev) => [...prev, aiResponse]);
-
-          if (reader) {
-            try {
-              // Read all content first
-              let fullContent = '';
-              while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
-                // Use stream: true to handle multi-byte UTF-8 characters properly
-                const chunk = decoder.decode(value, { stream: true });
-                fullContent += chunk;
-              }
-              // Final decode without stream flag to flush any remaining bytes
-              fullContent += decoder.decode();
-              aiResponse.content = fullContent;
-
-              // Use typing effect to display the content
-              typeText(fullContent, aiResponse.id);
-            } catch (streamError) {
-              console.error('Stream reading error:', streamError);
-              setMessages((prev) =>
-                prev.map((msg) =>
-                  msg.id === aiResponse.id
-                    ? {
-                        ...msg,
-                        content: 'I encountered an error. Please try again.',
-                        metadata: { isThinking: false },
-                      }
-                    : msg,
-                ),
-              );
-            }
-          }
-
-          // Save AI commentary to database
-          await saveMessage(conversationId, 'assistant', aiResponse.content);
-        } else {
-          // Response not ok after all retries
-          console.error('Move API returned non-ok status:', response.status);
-          const fallbackMessage: ChatMessage = {
-            id: generateSimpleId(),
-            role: 'assistant',
-            content: 'Having a bit of trouble analyzing that one. Keep playing!',
-            timestamp: new Date(),
-            metadata: { isThinking: false },
-          };
-          setMessages((prev) => [...prev, fallbackMessage]);
-        }
-
-        // After AI commentary, get AI's move (only if it's AI's turn to play)
+        // After user move, get engine's move (only if it's AI's turn to play)
         // Check if it's black's turn (AI plays black)
         const isAiTurn = move.after.includes(' b '); // FEN notation: 'b' means black to move
 
@@ -662,12 +455,13 @@ export default function Home() {
                     ),
                   );
 
-                  // Get Chester's analysis of the engine move
+                  // Get Chester's analysis of BOTH moves (user + engine)
                   const analysisResponse = await fetch('/api/chess/engine-move-analysis', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                      engineMove: aiMoveData,
+                      engineMove: aiMoveData.san, // Just pass the SAN string, not the whole object
+                      userMove: move.san, // Include user's move for combined commentary
                       fen: aiMoveData.fen,
                       engineEvaluation: aiMoveData.analysis?.evaluation || 0,
                     }),
@@ -695,16 +489,11 @@ export default function Home() {
                     });
                   }
 
-                  // If engine delivered checkmate, handle it and don't get suggestions
+                  // If engine delivered checkmate, handle it
                   if (isEngineCheckmate) {
                     console.log('Engine delivered checkmate:', aiMoveData.san);
                     // Engine plays black, so black wins
                     handleCheckmate('black');
-                  } else {
-                    // After engine move, get suggestions for user's next move
-                    setTimeout(() => {
-                      getAISuggestions(aiMoveData.fen);
-                    }, 1000);
                   }
                 } catch (moveError) {
                   console.error('Error processing AI move:', moveError);
@@ -730,9 +519,8 @@ export default function Home() {
       moveCount,
       currentGameId,
       conversationId,
-      getAISuggestions,
       typeText,
-      convertMoveToPlainEnglish, // Engine plays black, so black wins
+      convertMoveToPlainEnglish,
       handleCheckmate,
       messages.filter,
       user?.id,
@@ -881,7 +669,7 @@ export default function Home() {
 
       // Add new game message - full text to avoid closure issues
       const newGameText =
-        "New game! The board is reset and Chester's ready for another match. Your move, Chris!";
+        "New game! The board is reset and Chester's ready for another match. Your move!";
       const newGameMessage: ChatMessage = {
         id: await generateId(),
         role: 'assistant',

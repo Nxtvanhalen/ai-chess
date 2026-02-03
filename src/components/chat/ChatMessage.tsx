@@ -127,7 +127,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
   const getName = () => {
     if (isEngine) return 'Engine';
     if (isAssistant) return 'Chester';
-    return 'Chris';
+    return 'You';
   };
 
   const getNameClass = () => {
@@ -244,7 +244,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
           <div className="w-5 h-5 lg:w-10 lg:h-10 rounded-full overflow-hidden shadow-lg relative">
             <img
               src="/profile.jpg"
-              alt="Chris"
+              alt="Player"
               className="absolute inset-0 w-full h-full"
               style={{
                 objectFit: 'contain',

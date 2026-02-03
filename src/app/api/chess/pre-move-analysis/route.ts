@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
     const analysis = analyzer.analyzePosition();
 
     // Create urgency-based system prompt
-    let systemPrompt = `You are Chester, Chris's chess buddy watching him play. `;
+    let systemPrompt = `You are Chester, a chess buddy watching the game. `;
 
     // Add personality and relationship context
     if (chesterPersonality) {
@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
       if (fullGameContext.fullMoveHistory.length > 0) {
         const moveSequence = fullGameContext.fullMoveHistory
           .slice(-20) // Last 20 moves
-          .map((m) => `${m.move_number}. ${m.player_type === 'human' ? 'Chris' : 'AI'}: ${m.san}`)
+          .map((m) => `${m.move_number}. ${m.player_type === 'human' ? 'Player' : 'AI'}: ${m.san}`)
           .join(', ');
         systemPrompt += `\n\nRecent moves: ${moveSequence}`;
       }
@@ -219,7 +219,7 @@ export async function POST(request: NextRequest) {
         { role: 'system', content: systemPrompt },
         {
           role: 'user',
-          content: `${context}\n\nGame phase: ${gamePhase || 'opening'}\nRecent moves: ${moveHistory?.slice(-3).join(', ') || 'None yet'}\n\nWhat moves would you casually suggest to Chris?`,
+          content: `${context}\n\nGame phase: ${gamePhase || 'opening'}\nRecent moves: ${moveHistory?.slice(-3).join(', ') || 'None yet'}\n\nWhat moves would you casually suggest?`,
         },
       ],
       max_completion_tokens: 300,

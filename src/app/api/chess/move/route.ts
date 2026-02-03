@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
         .map((m: any) => {
           // Ensure move is a string, not an object
           const moveStr = typeof m.move === 'string' ? m.move : m.move?.san || String(m.move);
-          return `${m.role === 'user' ? 'Chris' : 'AI'}: ${moveStr}`;
+          return `${m.role === 'user' ? 'Player' : 'AI'}: ${moveStr}`;
         })
         .join(', ');
 
@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
         role: 'system',
         content: `Complete game move history: ${moveSequence}
         
-        Use this full context to provide accurate strategic analysis of Chris's move considering:
+        Use this full context to provide accurate strategic analysis of the player's move considering:
         - The opening progression and development patterns
         - Previous tactical sequences and their outcomes
         - The overall strategic direction of the game
@@ -145,7 +145,7 @@ export async function POST(request: NextRequest) {
 
     // Add Chester's personality context
     if (chesterPersonality) {
-      instructions += `\n\nYour relationship with Chris:
+      instructions += `\n\nYour relationship with the player:
 - Rapport Level: ${chesterPersonality.rapportLevel}/10
 - Games Together: ${chesterPersonality.gamesPlayed}
 - Recent Performance: ${chesterPersonality.recentPerformance}`;
@@ -159,7 +159,7 @@ export async function POST(request: NextRequest) {
       const moveSequence = recentMoves
         .map(
           (m: any) =>
-            `${m.move_number}. ${m.player_type === 'human' ? 'Chris' : 'AI'}: ${m.san}${m.captured ? ` (x${m.captured})` : ''}`,
+            `${m.move_number}. ${m.player_type === 'human' ? 'Player' : 'AI'}: ${m.san}${m.captured ? ` (x${m.captured})` : ''}`,
         )
         .join(', ');
 
@@ -193,14 +193,14 @@ export async function POST(request: NextRequest) {
         .map((m: any) => {
           // Ensure move is a string, not an object
           const moveStr = typeof m.move === 'string' ? m.move : m.move?.san || String(m.move);
-          return `${m.role === 'user' ? 'Chris' : 'AI'}: ${moveStr}`;
+          return `${m.role === 'user' ? 'Player' : 'AI'}: ${moveStr}`;
         })
         .join(', ');
 
       const isFullHistory = gameContext.fullMoveHistory.length <= MAX_MOVES_IN_CONTEXT;
       instructions += `\n\n${isFullHistory ? 'Complete' : 'Recent'} game move history (${recentMoves.length} moves): ${moveSequence}
 
-      Use this context to provide accurate strategic analysis of Chris's move considering:
+      Use this context to provide accurate strategic analysis of the player's move considering:
       - The opening progression and development patterns
       - Previous tactical sequences and their outcomes
       - The overall strategic direction of the game

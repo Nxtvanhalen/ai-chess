@@ -65,9 +65,10 @@ export default function ChatInterface({
     isAnimatingRef.current = true;
 
     // Use Framer Motion's animate for smooth, GPU-accelerated animation
+    // Faster duration for typing effect responsiveness
     scrollAnimationRef.current = animate(startScroll, targetScroll, {
-      duration: 1.5,
-      ease: [0.16, 1, 0.3, 1], // More dramatic easeOutExpo - very smooth deceleration
+      duration: 0.3, // Reduced from 1.5s for better typing responsiveness
+      ease: [0.25, 0.1, 0.25, 1], // easeInOut for quick but smooth scroll
       onUpdate: (value) => {
         container.scrollTop = value;
       },
@@ -114,14 +115,8 @@ export default function ChatInterface({
     const observer = new MutationObserver(() => {
       // Only auto-scroll if user hasn't intentionally scrolled up
       if (!userScrolledUpRef.current || isNearBottom()) {
-        // Debounce scroll calls - longer delay to let animation complete
-        if (scrollTimeoutRef.current) {
-          clearTimeout(scrollTimeoutRef.current);
-        }
-
-        scrollTimeoutRef.current = setTimeout(() => {
-          scrollToBottom(true);
-        }, 100); // 100ms debounce - let content settle
+        // Instant scroll during typing (no animation) for line-by-line visibility
+        scrollToBottom(false);
       }
     });
 
@@ -145,7 +140,7 @@ export default function ChatInterface({
       // Small delay to let new message render
       setTimeout(() => scrollToBottom(true), 50);
     }
-  }, [scrollToBottom]);
+  }, [messages.length, scrollToBottom]);
 
   const handleScrollToBottomClick = useCallback(() => {
     userScrolledUpRef.current = false;

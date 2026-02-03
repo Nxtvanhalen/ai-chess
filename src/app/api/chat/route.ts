@@ -194,7 +194,7 @@ export async function POST(request: NextRequest) {
         instructions += `\n\nGame Progress: ${gameContext.totalMoves} moves have been played.`;
       }
     } else {
-      instructions += `\n\nNote: No current board state available. Ask Chris to make a move if you need to see the position.`;
+      instructions += `\n\nNote: No current board state available. Ask them to make a move if you need to see the position.`;
     }
 
     // Add past game context if user is asking about it
@@ -219,7 +219,7 @@ export async function POST(request: NextRequest) {
       if (pastGameContext.moveHistory.length > 0) {
         const moveSequence = pastGameContext.moveHistory
           .map(
-            (m: any) => `${m.move_number}. ${m.player_type === 'human' ? 'Chris' : 'AI'}: ${m.san}`,
+            (m: any) => `${m.move_number}. ${m.player_type === 'human' ? 'Player' : 'AI'}: ${m.san}`,
           )
           .join(', ');
         instructions += `\n- Key Moves: ${moveSequence}`;
@@ -232,10 +232,10 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      instructions += `\n\nUse this data to answer Chris's question about the past game.`;
+      instructions += `\n\nUse this data to answer their question about the past game.`;
     } else if (isAskingAboutPastGame) {
       // User asked about past game but we don't have data
-      instructions += `\n\nNote: Chris is asking about a past game, but no completed game history was found in the database. Let them know you don't have records of previous games yet, but you'll remember future games.`;
+      instructions += `\n\nNote: They're asking about a past game, but no completed game history was found in the database. Let them know you don't have records of previous games yet, but you'll remember future games.`;
     }
 
     // Add comprehensive game memory context
@@ -265,13 +265,13 @@ export async function POST(request: NextRequest) {
         const moveSequence = recentMoves
           .map(
             (m) =>
-              `${m.move_number}. ${m.player_type === 'human' ? 'Chris' : 'AI'}: ${m.san}${m.captured ? ` (captured ${m.captured})` : ''}`,
+              `${m.move_number}. ${m.player_type === 'human' ? 'Player' : 'AI'}: ${m.san}${m.captured ? ` (captured ${m.captured})` : ''}`,
           )
           .join(', ');
 
         instructions += `\n\nRecent move history for style analysis (last ${recentMoves.length} moves): ${moveSequence}.
 
-        As Chester, analyze Chris's playing style based on these moves, looking for patterns in:
+        As Chester, analyze the player's style based on these moves, looking for patterns in:
         - Opening preferences and development
         - Tactical vs positional approach
         - Risk-taking vs cautious play
@@ -285,13 +285,13 @@ export async function POST(request: NextRequest) {
       const recentMoves = moveHistory.slice(-50);
       const moveSequence = recentMoves
         .filter((m: any) => m.metadata?.moveContext)
-        .map((m: any) => `${m.role === 'user' ? 'Chris' : 'AI'}: ${m.metadata.moveContext}`)
+        .map((m: any) => `${m.role === 'user' ? 'Player' : 'AI'}: ${m.metadata.moveContext}`)
         .join(', ');
 
       if (moveSequence) {
         instructions += `\n\nRecent move history for style analysis (last ${recentMoves.length} moves): ${moveSequence}.
 
-        As Chester, analyze Chris's playing style based on these moves, looking for patterns in:
+        As Chester, analyze the player's style based on these moves, looking for patterns in:
         - Opening preferences and development
         - Tactical vs positional approach
         - Risk-taking vs cautious play

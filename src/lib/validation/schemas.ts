@@ -135,6 +135,7 @@ export const engineMoveAnalysisSchema = z.object({
       to: z.string().optional(),
     }),
   ]),
+  userMove: z.string().min(2).max(10).optional(), // User's move that preceded the engine move
   fen: fenSchema,
   engineEvaluation: z.number().optional(),
   alternatives: z.array(z.any()).optional(),
