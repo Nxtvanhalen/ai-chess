@@ -15,7 +15,7 @@ export default function CompactEngineMove({ move, analysis }: CompactEngineMoveP
       <motion.div
         className="flex items-center gap-2 px-3 py-2 mx-4 my-1
                    bg-slate-800/40 border border-slate-600/30 rounded-lg
-                   backdrop-blur-sm max-w-fit ml-auto"
+                   max-w-fit ml-auto"
         initial={{ opacity: 0, x: 20, scale: 0.95 }}
         animate={{ opacity: 1, x: 0, scale: 1 }}
         transition={{

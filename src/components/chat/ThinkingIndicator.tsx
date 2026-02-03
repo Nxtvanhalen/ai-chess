@@ -35,7 +35,7 @@ export default function ThinkingIndicator({ name = 'Chester', message }: Thinkin
     <motion.div
       className="flex items-center gap-2 px-3 py-1.5 ml-12 mr-8 
                  bg-purple-500/10 border border-purple-400/20 rounded-full
-                 backdrop-blur-sm max-w-fit"
+                 max-w-fit"
       initial={{ opacity: 0, scale: 0.8, y: 10 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.8, y: -5 }}

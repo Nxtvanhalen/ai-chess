@@ -140,10 +140,10 @@ export default function ChatMessage({ message }: ChatMessageProps) {
 
   const getBubbleClass = () => {
     if (isEngine)
-      return 'bg-red-900/15 px-1 py-0.5 lg:p-4 rounded-md lg:rounded-2xl border border-red-400/30 shadow-lg backdrop-blur-sm';
+      return 'bg-red-900/15 px-1 py-0.5 lg:p-4 rounded-md lg:rounded-2xl border border-red-400/30 shadow-lg ';
     if (isAssistant)
-      return 'bg-purple-900/15 px-1 py-0.5 lg:p-4 rounded-md lg:rounded-2xl border border-purple-400/30 shadow-lg backdrop-blur-sm';
-    return 'bg-slate-800/25 px-1 py-0.5 lg:p-4 rounded-md lg:rounded-2xl border border-slate-400/30 shadow-lg backdrop-blur-sm';
+      return 'bg-purple-900/15 px-1 py-0.5 lg:p-4 rounded-md lg:rounded-2xl border border-purple-400/30 shadow-lg ';
+    return 'bg-slate-800/25 px-1 py-0.5 lg:p-4 rounded-md lg:rounded-2xl border border-slate-400/30 shadow-lg ';
   };
 
   // Engine thinking indicator
@@ -174,7 +174,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
               Engine
             </span>
           </div>
-          <div className="bg-red-900/15 px-1 py-0.5 lg:p-4 rounded-md lg:rounded-2xl border border-red-400/30 shadow-lg backdrop-blur-sm">
+          <div className="bg-red-900/15 px-1 py-0.5 lg:p-4 rounded-md lg:rounded-2xl border border-red-400/30 shadow-lg ">
             <div className="flex items-center gap-2">
               <span className="text-orange-300 text-sm italic">
                 {message.metadata?.analysis || 'Thinking...'}

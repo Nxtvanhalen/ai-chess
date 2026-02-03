@@ -19,7 +19,7 @@ export default function LoadingIndicator() {
           </span>
         </div>
 
-        <div className="bg-purple-900/15 p-4 rounded-2xl border border-purple-400/30 shadow-lg backdrop-blur-sm">
+        <div className="bg-purple-900/15 p-4 rounded-2xl border border-purple-400/30 shadow-lg">
           <div className="flex gap-1.5">
             <span className="loading-dot inline-block w-2 h-2 bg-purple-400 rounded-full"></span>
             <span className="loading-dot inline-block w-2 h-2 bg-purple-400 rounded-full"></span>
