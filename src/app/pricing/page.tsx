@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { PLAN_FEATURES, PRICING } from '@/lib/stripe/config';
+import Link from 'next/link';
 
 type BillingInterval = 'monthly' | 'yearly';
 
@@ -10,6 +11,7 @@ export default function PricingPage() {
   const { user } = useAuth();
   const [interval, setInterval] = useState<BillingInterval>('monthly');
   const [loading, setLoading] = useState<string | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleCheckout = async (plan: 'pro' | 'premium') => {
     if (!user) {
@@ -47,6 +49,63 @@ export default function PricingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 py-12 px-4 overflow-auto fixed inset-0">
+      {/* Hamburger Menu */}
+      <div className="absolute top-4 right-4 z-50">
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          className="p-2 rounded-lg bg-gray-800/50 backdrop-blur-sm border border-gray-700 hover:bg-gray-700/50 transition-colors"
+          aria-label="Menu"
+        >
+          <svg
+            className="w-6 h-6 text-gray-300"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            {menuOpen ? (
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            ) : (
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            )}
+          </svg>
+        </button>
+
+        {menuOpen && (
+          <div className="absolute right-0 mt-2 w-48 bg-gray-800/95 backdrop-blur-sm border border-gray-700 rounded-xl shadow-xl overflow-hidden">
+            <Link
+              href="/"
+              className="block px-4 py-3 text-gray-300 hover:bg-gray-700/50 hover:text-white transition-colors"
+              onClick={() => setMenuOpen(false)}
+            >
+              Back to Game
+            </Link>
+            <div className="border-t border-gray-700" />
+            <Link
+              href="/legal/privacy"
+              className="block px-4 py-3 text-gray-300 hover:bg-gray-700/50 hover:text-white transition-colors"
+              onClick={() => setMenuOpen(false)}
+            >
+              Privacy Policy
+            </Link>
+            <Link
+              href="/legal/terms"
+              className="block px-4 py-3 text-gray-300 hover:bg-gray-700/50 hover:text-white transition-colors"
+              onClick={() => setMenuOpen(false)}
+            >
+              Terms of Service
+            </Link>
+            <div className="border-t border-gray-700" />
+            <a
+              href="mailto:Chrisleebergstrom@gmail.com"
+              className="block px-4 py-3 text-gray-300 hover:bg-gray-700/50 hover:text-white transition-colors"
+              onClick={() => setMenuOpen(false)}
+            >
+              Contact
+            </a>
+          </div>
+        )}
+      </div>
+
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
@@ -205,11 +264,17 @@ export default function PricingPage() {
           </div>
         </div>
 
-        {/* Back Link */}
-        <div className="text-center mt-12">
-          <a href="/" className="text-gray-400 hover:text-white transition-colors">
+        {/* Footer Links */}
+        <div className="text-center mt-12 space-x-6">
+          <Link href="/" className="text-gray-400 hover:text-white transition-colors">
             Back to Game
-          </a>
+          </Link>
+          <Link href="/legal/privacy" className="text-gray-400 hover:text-white transition-colors text-sm">
+            Privacy
+          </Link>
+          <Link href="/legal/terms" className="text-gray-400 hover:text-white transition-colors text-sm">
+            Terms
+          </Link>
         </div>
       </div>
     </div>

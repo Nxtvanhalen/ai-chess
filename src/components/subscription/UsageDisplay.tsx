@@ -62,7 +62,7 @@ export default function UsageDisplay() {
   const isEmpty = !usage.ai_moves.unlimited && usage.ai_moves.remaining === 0;
 
   return (
-    <div className="flex items-center gap-3 px-3 py-1 rounded-lg text-sm">
+    <div className="flex items-center gap-3 px-3 py-1 rounded-lg text-sm relative z-[100]" style={{ pointerEvents: 'auto' }}>
       <div className="flex items-center gap-2">
         <span className="text-gray-400">Moves:</span>
         {usage.ai_moves.unlimited ? (
@@ -91,7 +91,8 @@ export default function UsageDisplay() {
       {usage.plan !== 'premium' && (
         <a
           href="/pricing"
-          className="text-purple-400 hover:text-purple-300 transition-colors text-xs"
+          className="text-purple-400 hover:text-purple-300 transition-colors text-xs relative z-[100] cursor-pointer"
+          style={{ pointerEvents: 'auto' }}
         >
           Upgrade
         </a>
