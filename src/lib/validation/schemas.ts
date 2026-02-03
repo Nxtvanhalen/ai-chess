@@ -66,7 +66,7 @@ export const gameContextSchema = z.object({
 
 // Move history item for chat context
 const chatMoveHistoryItemSchema = z.object({
-  role: z.enum(['user', 'assistant']).optional(),
+  role: z.enum(['user', 'assistant', 'engine']).optional(),
   content: z.string().optional(),
   metadata: z.record(z.any()).optional(),
 });
