@@ -521,7 +521,7 @@ export default function ChessBoard({
         <div
           className="absolute inset-0 z-50 bg-slate-900 flex items-center justify-center rounded-2xl"
         >
-          <div className="bg-gradient-to-br from-purple-900/40 via-blue-900/40 to-indigo-900/40 rounded-2xl flex items-center justify-center w-full h-full">
+          <div className="bg-black rounded-2xl flex items-center justify-center w-full h-full">
             <div className="text-center space-y-4">
               <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 animate-pulse shadow-[0_0_30px_rgba(168,85,247,0.5)]" />
               <p className="text-slate-400 text-sm font-medium tracking-widest uppercase animate-pulse">Initializing Board</p>
