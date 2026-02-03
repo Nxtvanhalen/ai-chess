@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface UsageData {
@@ -19,10 +19,39 @@ interface UsageData {
   plan: string;
 }
 
+// Cache usage data to avoid excessive API calls
+let cachedUsage: UsageData | null = null;
+let lastFetchTime = 0;
+const CACHE_DURATION = 60000; // 60 seconds cache
+
 export default function UsageDisplay() {
   const { user } = useAuth();
-  const [usage, setUsage] = useState<UsageData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [usage, setUsage] = useState<UsageData | null>(cachedUsage);
+  const [loading, setLoading] = useState(!cachedUsage);
+
+  const fetchUsage = useCallback(async (force = false) => {
+    // Skip if cached data is fresh (unless forced)
+    const now = Date.now();
+    if (!force && cachedUsage && now - lastFetchTime < CACHE_DURATION) {
+      setUsage(cachedUsage);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/subscription/usage');
+      if (response.ok) {
+        const data = await response.json();
+        cachedUsage = data;
+        lastFetchTime = now;
+        setUsage(data);
+      }
+    } catch (error) {
+      console.error('Error fetching usage:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     if (!user) {
@@ -30,26 +59,21 @@ export default function UsageDisplay() {
       return;
     }
 
-    const fetchUsage = async () => {
-      try {
-        const response = await fetch('/api/subscription/usage');
-        if (response.ok) {
-          const data = await response.json();
-          setUsage(data);
-        }
-      } catch (error) {
-        console.error('Error fetching usage:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
+    // Initial fetch (uses cache if available)
     fetchUsage();
 
-    // Refresh every 30 seconds
-    const interval = setInterval(fetchUsage, 30000);
-    return () => clearInterval(interval);
-  }, [user]);
+    // Refresh every 2 minutes (reduced from 30 seconds)
+    const interval = setInterval(() => fetchUsage(true), 120000);
+
+    // Also refresh when window regains focus (user returns to tab)
+    const handleFocus = () => fetchUsage();
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [user, fetchUsage]);
 
   if (!user || loading) return null;
   if (!usage) return null;

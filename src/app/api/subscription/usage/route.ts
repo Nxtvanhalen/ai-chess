@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 import { getUserTier, getUserUsage } from '@/lib/supabase/subscription';
 
 export async function GET() {
+  const start = Date.now();
   try {
     const cookieStore = await cookies();
     const supabase = createServerClient(
@@ -35,13 +36,26 @@ export async function GET() {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
-    const usage = await getUserUsage(user.id);
-    const plan = await getUserTier(user.id);
+    // Fetch usage and tier in parallel (both query subscription table)
+    const [usage, plan] = await Promise.all([
+      getUserUsage(user.id),
+      getUserTier(user.id),
+    ]);
 
-    return NextResponse.json({
-      ...usage,
-      plan,
-    });
+    console.log(`[Usage API] Fetched in ${Date.now() - start}ms`);
+
+    return NextResponse.json(
+      {
+        ...usage,
+        plan,
+      },
+      {
+        headers: {
+          // Allow browser to cache for 30 seconds
+          'Cache-Control': 'private, max-age=30',
+        },
+      },
+    );
   } catch (error) {
     console.error('[Usage API] Error:', error);
     return NextResponse.json({ error: 'Failed to fetch usage data' }, { status: 500 });
