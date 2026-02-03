@@ -28,6 +28,8 @@ const BLOCKED_PATHS: string[] = [
   '/install.php',
   '/phpmyadmin',
   '/phpinfo.php',
+  // Admin paths
+  '/admin',
   // Common attack paths
   '/.env',
   '/.git',
