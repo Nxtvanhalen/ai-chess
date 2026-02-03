@@ -15,7 +15,16 @@ export function useDeviceDetection() {
     if (typeof window === 'undefined') return;
 
     const isMobileDevice = window.innerWidth <= 1023;
-    const isLandscapeMode = window.innerWidth > window.innerHeight;
+
+    // Use screen.orientation API for stable orientation detection
+    // This doesn't change when keyboard opens (unlike viewport dimensions)
+    let isLandscapeMode: boolean;
+    if (window.screen?.orientation?.type) {
+      isLandscapeMode = window.screen.orientation.type.includes('landscape');
+    } else {
+      // Fallback: use screen dimensions (also stable, unlike viewport)
+      isLandscapeMode = window.screen.width > window.screen.height;
+    }
 
     setIsMobile(isMobileDevice);
     setIsLandscape(isLandscapeMode);

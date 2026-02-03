@@ -148,19 +148,30 @@ export default function ChatInterface({
   }, [scrollToBottom]);
 
   // Simplified orientation detection for CSS classes only
+  // Uses screen.orientation API for stability (doesn't change when keyboard opens)
   useEffect(() => {
     const updateOrientation = () => {
       if (typeof window === 'undefined') return;
       const mobile = window.innerWidth < 1024;
-      const landscape = window.innerWidth > window.innerHeight;
+
+      // Use screen.orientation API - stable when keyboard opens
+      let landscape: boolean;
+      if (window.screen?.orientation?.type) {
+        landscape = window.screen.orientation.type.includes('landscape');
+      } else {
+        landscape = window.screen.width > window.screen.height;
+      }
+
       setIsLandscape(mobile && landscape);
     };
 
     updateOrientation();
     window.addEventListener('resize', updateOrientation);
+    window.addEventListener('orientationchange', updateOrientation);
 
     return () => {
       window.removeEventListener('resize', updateOrientation);
+      window.removeEventListener('orientationchange', updateOrientation);
     };
   }, []);
 
