@@ -47,6 +47,8 @@ const createPieceRenderer = (PieceComponent: any, isWhite: boolean, pieceType: s
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          overflow: 'hidden',
+          position: 'relative',
         }}
         className="piece-pulse"
       >

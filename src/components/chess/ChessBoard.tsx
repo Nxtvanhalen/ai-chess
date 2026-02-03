@@ -26,7 +26,20 @@ export default function ChessBoard({
   theme = defaultTheme,
 }: ChessBoardProps) {
   const [game, setGame] = useState(new Chess());
-  const [boardWidth, setBoardWidth] = useState(400);
+  // Calculate initial size synchronously to prevent flash
+  const [boardWidth, setBoardWidth] = useState(() => {
+    if (typeof window === 'undefined') return 400;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const mobile = vw < 1024;
+    const landscape = vw > vh;
+    if (mobile && !landscape) {
+      return Math.floor(Math.min(vw - 16, vh * 0.55));
+    } else if (mobile && landscape) {
+      return Math.floor(Math.min(vh - 20, vw * 0.48 - 20));
+    }
+    return Math.floor(Math.min(vw * 0.55 - 48, vh - 120));
+  });
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
   const boardContainerRef = useRef<HTMLDivElement>(null);
   const [possibleMoves, setPossibleMoves] = useState<Square[]>([]);
@@ -56,25 +69,21 @@ export default function ChessBoard({
       setIsMobile(mobile);
       setIsLandscape(landscape);
 
-      // On mobile portrait, we let CSS (flex + aspect-ratio) handle the sizing
-      // so we don't need to calculate a specific pixel width here.
-      if (mobile && !landscape) {
-        setBoardWidth(0); // value 0 acts as a flag to disable inline styles
-        return;
-      }
-
       let maxSize;
 
-      if (mobile && landscape) {
-        // Mobile landscape: use available height minus some padding
-        // Wrapper is 50%, so we must ensure board is smaller (0.48) to fit
+      if (mobile && !landscape) {
+        // Mobile portrait: use smaller of width or 55% of height
+        const maxHeight = viewportHeight * 0.55;
+        maxSize = Math.min(viewportWidth - 16, maxHeight);
+      } else if (mobile && landscape) {
+        // Mobile landscape: use available height
         maxSize = Math.min(viewportHeight - 20, viewportWidth * 0.48 - 20);
       } else {
         // Desktop: responsive to container width
         maxSize = Math.min(viewportWidth * 0.55 - 48, viewportHeight - 120);
       }
 
-      setBoardWidth(Math.floor(Math.max(maxSize, 300))); // Minimum size of 300px
+      setBoardWidth(Math.floor(Math.max(maxSize, 280)));
     };
 
     updateBoardSize(); // Initial call
@@ -446,15 +455,15 @@ export default function ChessBoard({
         ? 'p-2 h-full'
         : 'p-1 lg:p-6 pt-2 lg:pt-6'
         }`}
-      style={boardWidth > 0 ? {
-        width: `${boardWidth}px`,
-        height: `${boardWidth + 8}px`,
-        minHeight: 'auto'
-      } : undefined}>
-      <div ref={boardContainerRef} style={boardWidth > 0 ? { width: boardWidth, height: boardWidth } : { width: '100%', height: '100%' }} className="relative">
+      style={{
+        width: boardWidth,
+        height: boardWidth,
+      }}>
+      <div ref={boardContainerRef} style={{ width: boardWidth, height: boardWidth }} className="relative">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-2xl pointer-events-none" />
         <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl opacity-10 blur-sm pointer-events-none" />
         <Chessboard
+          boardWidth={boardWidth}
           position={game.fen()}
           onPieceDrop={handleDrop}
           onSquareClick={handleSquareClick}
@@ -507,9 +516,10 @@ export default function ChessBoard({
           {renderPieceNames()}
         </div>
 
-        {/* Smooth Loading Overlay - Masks the initial SVG hydration */}
+        {/* Loading Overlay - hides until board is ready */}
+        {!isLoaded && (
         <div
-          className={`absolute inset-0 z-50 bg-slate-900 flex items-center justify-center rounded-2xl transition-opacity duration-700 ease-in-out ${isLoaded ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+          className="absolute inset-0 z-50 bg-slate-900 flex items-center justify-center rounded-2xl"
         >
           <div className="bg-gradient-to-br from-purple-900/40 via-blue-900/40 to-indigo-900/40 rounded-2xl flex items-center justify-center w-full h-full">
             <div className="text-center space-y-4">
@@ -518,6 +528,7 @@ export default function ChessBoard({
             </div>
           </div>
         </div>
+        )}
       </div>
     </div>
   );
