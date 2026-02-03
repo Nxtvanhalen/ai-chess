@@ -251,16 +251,27 @@ export class GameMemoryService {
   }
 
   /**
-   * Add tactical theme detected during game
+   * Add tactical theme detected during game (single theme - legacy)
    */
   static async addTacticalTheme(gameId: string, theme: string): Promise<void> {
+    return GameMemoryService.addTacticalThemes(gameId, [theme]);
+  }
+
+  /**
+   * Add multiple tactical themes in a single batch operation
+   * Much more efficient than calling addTacticalTheme multiple times
+   */
+  static async addTacticalThemes(gameId: string, themes: string[]): Promise<void> {
+    if (themes.length === 0) return;
+
     const memory = await GameMemoryService.getGameMemory(gameId);
     if (!memory) return;
 
-    // Avoid duplicates
-    if (memory.tactical_themes.includes(theme)) return;
+    // Filter out duplicates (themes already in the array)
+    const newThemes = themes.filter((theme) => !memory.tactical_themes.includes(theme));
+    if (newThemes.length === 0) return;
 
-    const updatedThemes = [...memory.tactical_themes, theme];
+    const updatedThemes = [...memory.tactical_themes, ...newThemes];
 
     const supabase = getSupabase();
     if (!supabase) return;
@@ -273,17 +284,17 @@ export class GameMemoryService {
       .eq('game_id', gameId);
 
     if (error) {
-      console.error('Error adding tactical theme:', error);
+      console.error('Error adding tactical themes:', error);
       throw error;
     }
 
-    // Create snapshot for tactical pattern
+    // Create single snapshot for all detected tactical patterns
     await GameMemoryService.createSnapshot(
       memory.id,
       memory.total_moves,
       'tactical_pattern_detected',
       {
-        theme,
+        themes: newThemes,
         move_number: memory.total_moves,
       },
     );

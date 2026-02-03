@@ -122,20 +122,20 @@ export async function canUseAIMove(userId: string): Promise<{
 }> {
   const supabase = await getServerClient();
 
-  // Use the database function for atomic check
-  const { data, error } = await supabase.rpc('can_use_ai_move', { p_user_id: userId });
+  // Run both checks in parallel - RPC check and usage fetch are independent
+  const [rpcResult, usage] = await Promise.all([
+    supabase.rpc('can_use_ai_move', { p_user_id: userId }),
+    getUserUsage(userId),
+  ]);
 
-  if (error) {
-    console.error('[Subscription] Error checking AI move usage:', error);
+  if (rpcResult.error) {
+    console.error('[Subscription] Error checking AI move usage:', rpcResult.error);
     // Default to allowing in case of error (fail open for UX)
     return { allowed: true, remaining: 0, limit: 0, unlimited: false };
   }
 
-  // Get current usage for detailed response
-  const usage = await getUserUsage(userId);
-
   return {
-    allowed: data as boolean,
+    allowed: rpcResult.data as boolean,
     remaining: usage?.ai_moves.remaining ?? 0,
     limit: usage?.ai_moves.limit ?? 0,
     unlimited: usage?.ai_moves.unlimited ?? false,
@@ -153,17 +153,19 @@ export async function canUseChat(userId: string): Promise<{
 }> {
   const supabase = await getServerClient();
 
-  const { data, error } = await supabase.rpc('can_use_chat', { p_user_id: userId });
+  // Run both checks in parallel - RPC check and usage fetch are independent
+  const [rpcResult, usage] = await Promise.all([
+    supabase.rpc('can_use_chat', { p_user_id: userId }),
+    getUserUsage(userId),
+  ]);
 
-  if (error) {
-    console.error('[Subscription] Error checking chat usage:', error);
+  if (rpcResult.error) {
+    console.error('[Subscription] Error checking chat usage:', rpcResult.error);
     return { allowed: true, remaining: 0, limit: 0, unlimited: false };
   }
 
-  const usage = await getUserUsage(userId);
-
   return {
-    allowed: data as boolean,
+    allowed: rpcResult.data as boolean,
     remaining: usage?.chat_messages.remaining ?? 0,
     limit: usage?.chat_messages.limit ?? 0,
     unlimited: usage?.chat_messages.unlimited ?? false,

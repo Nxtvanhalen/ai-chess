@@ -272,8 +272,8 @@ export async function POST(request: NextRequest) {
             metadata: {},
           });
 
-          // Detect and save tactical themes from commentary
-          const tacticalKeywords = {
+          // Detect and save tactical themes from commentary (batched for performance)
+          const tacticalKeywords: Record<string, string> = {
             fork: 'fork',
             pin: 'pin',
             skewer: 'skewer',
@@ -287,10 +287,13 @@ export async function POST(request: NextRequest) {
           };
 
           const lowercaseContent = content.toLowerCase();
-          for (const [keyword, theme] of Object.entries(tacticalKeywords)) {
-            if (lowercaseContent.includes(keyword)) {
-              await GameMemoryService.addTacticalTheme(gameId, theme);
-            }
+          const detectedThemes = Object.entries(tacticalKeywords)
+            .filter(([keyword]) => lowercaseContent.includes(keyword))
+            .map(([, theme]) => theme);
+
+          // Single batched DB operation instead of up to 10 individual calls
+          if (detectedThemes.length > 0) {
+            await GameMemoryService.addTacticalThemes(gameId, detectedThemes);
           }
 
         } catch (error) {
