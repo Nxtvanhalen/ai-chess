@@ -19,9 +19,6 @@ interface GameContext {
   totalMoves?: number;
 }
 
-// Helper to add delay
-const _sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
 export function useChesterStream() {
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamedText, setStreamedText] = useState('');
@@ -29,6 +26,7 @@ export function useChesterStream() {
   const textBufferRef = useRef<string>('');
   const displayedTextRef = useRef<string>('');
   const typingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const checkCompleteIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const streamChat = useCallback(
     async (
@@ -130,9 +128,12 @@ export function useChesterStream() {
 
         // Wait for typing effect to finish displaying all buffered text
         await new Promise<void>((resolve) => {
-          const checkComplete = setInterval(() => {
+          checkCompleteIntervalRef.current = setInterval(() => {
             if (displayedTextRef.current.length >= textBufferRef.current.length) {
-              clearInterval(checkComplete);
+              if (checkCompleteIntervalRef.current) {
+                clearInterval(checkCompleteIntervalRef.current);
+                checkCompleteIntervalRef.current = null;
+              }
               resolve();
             }
           }, 50);
@@ -153,6 +154,10 @@ export function useChesterStream() {
         if (typingIntervalRef.current) {
           clearInterval(typingIntervalRef.current);
           typingIntervalRef.current = null;
+        }
+        if (checkCompleteIntervalRef.current) {
+          clearInterval(checkCompleteIntervalRef.current);
+          checkCompleteIntervalRef.current = null;
         }
         setIsStreaming(false);
         abortControllerRef.current = null;

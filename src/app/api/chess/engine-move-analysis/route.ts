@@ -106,7 +106,6 @@ export async function POST(request: NextRequest) {
         : '\n\nSTRATEGIC POSITION: Focus on piece activity, king safety, or pawn structure';
 
     const deepseek = getDeepSeekClient();
-    console.log('[Engine Move Analysis] Using DeepSeek v3 model');
     const completion = await deepseek.chat.completions.create({
       model: 'deepseek-chat',
       messages: [

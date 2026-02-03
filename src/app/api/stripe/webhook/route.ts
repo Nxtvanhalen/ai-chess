@@ -90,7 +90,6 @@ export async function POST(request: NextRequest) {
       }
 
       default:
-        console.log(`[Stripe Webhook] Unhandled event type: ${event.type}`);
     }
 
     return NextResponse.json({ received: true });
@@ -150,7 +149,6 @@ async function handleCheckoutCompleted(
   // Update user profile subscription tier
   await supabase.from('user_profiles').update({ subscription_tier: plan }).eq('id', userId);
 
-  console.log(`[Stripe Webhook] Checkout completed for user ${userId}: ${plan} plan`);
 }
 
 async function handleSubscriptionUpdate(
@@ -219,7 +217,6 @@ async function handleSubscriptionUpdate(
     await supabase.from('user_profiles').update({ subscription_tier: plan }).eq('id', sub.user_id);
   }
 
-  console.log(`[Stripe Webhook] Subscription updated: ${subscription.id} -> ${plan}`);
 }
 
 async function handleSubscriptionCanceled(
@@ -258,7 +255,6 @@ async function handleSubscriptionCanceled(
       .eq('id', sub.user_id);
   }
 
-  console.log(`[Stripe Webhook] Subscription canceled: ${subscription.id}`);
 }
 
 async function handlePaymentSucceeded(supabase: ServiceRoleClient, invoice: Stripe.Invoice) {
@@ -279,7 +275,6 @@ async function handlePaymentSucceeded(supabase: ServiceRoleClient, invoice: Stri
     console.error('[Stripe Webhook] Failed to record payment:', error);
   }
 
-  console.log(`[Stripe Webhook] Payment succeeded for subscription: ${subscriptionId}`);
 }
 
 async function handlePaymentFailed(supabase: ServiceRoleClient, invoice: Stripe.Invoice) {
@@ -297,7 +292,6 @@ async function handlePaymentFailed(supabase: ServiceRoleClient, invoice: Stripe.
     console.error('[Stripe Webhook] Failed to update payment failure:', error);
   }
 
-  console.log(`[Stripe Webhook] Payment failed for subscription: ${subscriptionId}`);
 }
 
 /**

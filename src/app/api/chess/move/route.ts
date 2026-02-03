@@ -56,7 +56,6 @@ export async function POST(request: NextRequest) {
     const authUser = await getAuthenticatedUser();
     const userId = authUser?.id || null;
 
-    console.log('Move API - Processing move:', {
       move,
       hasGameId: !!gameId,
       hasMoveDetails: !!moveDetails,
@@ -82,7 +81,6 @@ export async function POST(request: NextRequest) {
         fullGameContext = (await Promise.race([contextPromise, dbTimeout])) as any;
         chesterPersonality = (await Promise.race([personalityPromise, dbTimeout])) as any;
 
-        console.log('Move API - Memory context loaded:', {
           totalMovesInMemory: fullGameContext?.totalMoves || 0,
           tacticalThemes: fullGameContext?.tacticalThemes || [],
           loadTime: Date.now() - startTime,
@@ -222,7 +220,6 @@ export async function POST(request: NextRequest) {
     // Call OpenAI with error handling
     let content = '';
     try {
-      console.log('Move API - Calling OpenAI Responses API...');
       const aiStartTime = Date.now();
 
       const completion = await createResponsesCompletion({
@@ -238,7 +235,6 @@ export async function POST(request: NextRequest) {
       });
 
       const aiDuration = Date.now() - aiStartTime;
-      console.log(`Move API - OpenAI responded in ${aiDuration}ms`);
 
       // Parse Responses API format
       const messageOutput = completion.output.find((item: any) => item.type === 'message');
@@ -309,7 +305,6 @@ export async function POST(request: NextRequest) {
             }
           }
 
-          console.log('Move and commentary saved to game memory');
         } catch (error) {
           console.error('Error saving to game memory (background):', error);
           // This is non-blocking, so we just log the error
@@ -318,7 +313,6 @@ export async function POST(request: NextRequest) {
     }
 
     const totalDuration = Date.now() - startTime;
-    console.log(`Move API - Total request duration: ${totalDuration}ms`);
 
     return new Response(content, {
       headers: {

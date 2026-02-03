@@ -1,14 +1,7 @@
 import { z } from 'zod';
 
-// FEN validation regex - validates basic FEN structure
-const _fenRegex =
-  /^([rnbqkpRNBQKP1-8]+\/){7}[rnbqkpRNBQKP1-8]+ [wb] (-|K?Q?k?q?) (-|[a-h][36]) \d+ \d+$/;
-
 // Chess square validation
 const squareRegex = /^[a-h][1-8]$/;
-
-// SAN move validation (loose - allows most algebraic notation)
-const _sanRegex = /^[KQRBN]?[a-h]?[1-8]?x?[a-h][1-8](=[QRBN])?[+#]?$|^O-O(-O)?[+#]?$/;
 
 // Difficulty levels
 const difficultySchema = z.enum(['easy', 'medium', 'hard']).default('medium');

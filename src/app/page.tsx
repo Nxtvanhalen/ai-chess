@@ -99,7 +99,6 @@ export default function Home() {
     // Log performance report every 30 seconds in development
     const reportInterval = setInterval(() => {
       if (process.env.NODE_ENV === 'development') {
-        console.log('Performance Report:', performanceMonitor.current?.getReport());
       }
     }, 30000);
 
@@ -129,7 +128,6 @@ export default function Home() {
         // Initialize game memory
         try {
           await GameMemoryService.createGameMemory(newGame.id, user?.id);
-          console.log('Game memory initialized for game:', newGame.id);
         } catch (error) {
           console.error('Error initializing game memory:', error);
         }
@@ -234,7 +232,6 @@ export default function Home() {
           const durationSeconds = Math.floor((Date.now() - gameStartTimeRef.current) / 1000);
           const result = winner === 'white' ? 'white_wins' : 'black_wins';
           await GameMemoryService.finalizeGame(currentGameId, result, durationSeconds);
-          console.log('Game finalized:', { result, durationSeconds, gameId: currentGameId });
         } catch (error) {
           console.error('Error finalizing game:', error);
         }
@@ -319,7 +316,6 @@ export default function Home() {
         // Check if user delivered checkmate (SAN notation ends with #)
         const isUserCheckmate = move.san?.includes('#');
         if (isUserCheckmate) {
-          console.log('User delivered checkmate:', move.san);
           handleCheckmate('white');
           setIsLoading(false);
           return;
@@ -466,7 +462,6 @@ export default function Home() {
 
                   // If engine delivered checkmate, handle it immediately and skip analysis
                   if (isEngineCheckmate) {
-                    console.log('Engine delivered checkmate:', aiMoveData.san);
                     // Engine plays black, so black wins
                     handleCheckmate('black');
                   } else {
@@ -535,20 +530,6 @@ export default function Home() {
       user?.id,
     ],
   );
-
-  const _getRandomMoveComment = () => {
-    const comments = [
-      'Your turn!',
-      'What you got?',
-      'Over to you.',
-      "Let's see what you do.",
-      'Your move, buddy.',
-      "Ball's in your court.",
-      'Show me what you got.',
-      'Interesting position now.',
-    ];
-    return comments[Math.floor(Math.random() * comments.length)];
-  };
 
   const handleSendMessage = useCallback(
     async (content: string) => {
@@ -667,7 +648,6 @@ export default function Home() {
       // Initialize game memory
       try {
         await GameMemoryService.createGameMemory(newGame.id, user?.id);
-        console.log('Game memory initialized for restarted game:', newGame.id);
       } catch (error) {
         console.error('Error initializing game memory:', error);
       }

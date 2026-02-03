@@ -66,7 +66,6 @@ export async function POST(request: NextRequest) {
     }
 
     // Debug: Log game context to help troubleshoot Chester's board visibility
-    console.log('Chester Chat API - Game Context:', {
       hasGameContext: !!gameContext,
       fen: gameContext?.fen,
       lastMove: gameContext?.lastMove,
@@ -84,7 +83,6 @@ export async function POST(request: NextRequest) {
         fullGameContext = await GameMemoryService.getGameContext(gameId);
         chesterPersonality = await ChesterMemoryService.getPersonalityContext(userId);
 
-        console.log('Chester Memory Context:', {
           hasFullContext: !!fullGameContext,
           totalMovesInMemory: fullGameContext?.totalMoves || 0,
           commentaryCount: fullGameContext?.chesterCommentary?.length || 0,
@@ -154,13 +152,11 @@ export async function POST(request: NextRequest) {
             moveHistory: lastGame.full_move_history?.slice(-25) || [], // Last 25 moves
             commentary: lastGame.chester_commentary?.slice(-10) || [], // Last 10 comments
           };
-          console.log('Past game context loaded:', {
             result: pastGameContext.result,
             moves: pastGameContext.totalMoves,
             moveHistoryLength: pastGameContext.moveHistory.length,
           });
         } else {
-          console.log('No past game found for user:', userId);
         }
       } catch (error) {
         console.error('Error fetching past game:', error);
@@ -331,7 +327,6 @@ export async function POST(request: NextRequest) {
 
         if (!validation.isValid) {
           // Log the error for debugging
-          console.log(`Chester move validation error: ${suggestion} - ${validation.error}`);
 
           // If Chester made an error, append a correction note
           if (validation.correctedMove) {
@@ -364,7 +359,6 @@ export async function POST(request: NextRequest) {
           },
         });
 
-        console.log('Chat interaction saved to game memory');
       } catch (error) {
         console.error('Error saving chat to game memory:', error);
         // Don't fail the request if memory save fails

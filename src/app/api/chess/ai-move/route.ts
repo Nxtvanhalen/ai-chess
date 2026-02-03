@@ -18,7 +18,6 @@ let engineInstance: EnhancedChessEngine | null = null;
 function getEngine(): EnhancedChessEngine {
   if (!engineInstance) {
     engineInstance = new EnhancedChessEngine();
-    console.log(
       '[AI Move API] Enhanced engine initialized with opening book + transposition table',
     );
   }
@@ -103,7 +102,6 @@ export async function POST(request: NextRequest) {
     // Clear transposition table for new games
     if (newGame) {
       engine.clearTranspositionTable();
-      console.log('[AI Move API] Transposition table cleared for new game');
     }
 
     // Validate the position
@@ -120,7 +118,6 @@ export async function POST(request: NextRequest) {
         const move = chess.move(result.move);
 
         // Log enhanced stats
-        console.log('[AI Move API] Engine result:', {
           move: result.move,
           depth: result.depth,
           fromBook: result.fromBook,

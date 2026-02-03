@@ -139,7 +139,6 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    console.log('[Chester Stream] Starting streaming response...');
 
     // Create streaming response
     const stream = await createResponsesCompletionStream({
@@ -191,7 +190,6 @@ export async function POST(request: NextRequest) {
                 metadata: {},
               });
 
-              console.log('[Chester Stream] Chat saved to game memory');
             } catch (error) {
               console.error('[Chester Stream] Error saving to memory:', error);
             }

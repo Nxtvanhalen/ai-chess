@@ -22,7 +22,6 @@ export default function ChatInterface({
   const messagesContentRef = useRef<HTMLDivElement>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [isLandscape, setIsLandscape] = useState(false);
-  const _lastScrollHeightRef = useRef(0);
   const userScrolledUpRef = useRef(false);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const scrollAnimationRef = useRef<{ stop: () => void } | null>(null);

@@ -43,7 +43,6 @@ export async function POST(request: NextRequest) {
     const authUser = await getAuthenticatedUser();
     const userId = authUser?.id || null;
 
-    console.log('Pre-move analysis - Starting:', {
       hasGameId: !!gameId,
       currentPhase: gamePhase,
       totalMoves: gameContext?.totalMoves,
@@ -58,7 +57,6 @@ export async function POST(request: NextRequest) {
         fullGameContext = await GameMemoryService.getGameContext(gameId);
         chesterPersonality = await ChesterMemoryService.getPersonalityContext(userId);
 
-        console.log('Pre-move analysis - Memory loaded:', {
           totalMovesInMemory: fullGameContext?.totalMoves || 0,
           previousSuggestions: fullGameContext?.suggestionsGiven?.length || 0,
           tacticalThemes: fullGameContext?.tacticalThemes || [],
@@ -228,7 +226,6 @@ export async function POST(request: NextRequest) {
 
     const response = JSON.parse(completion.choices[0].message.content || '{}');
 
-    console.log('Pre-move analysis raw response:', JSON.stringify(response, null, 2));
 
     const suggestions: MoveSuggestion[] =
       response.suggestions?.map((s: any) => ({
@@ -237,14 +234,12 @@ export async function POST(request: NextRequest) {
         casual: true,
       })) || [];
 
-    console.log('Pre-move analysis formatted suggestions:', JSON.stringify(suggestions, null, 2));
 
     const result = {
       suggestions: suggestions.slice(0, 2), // Ensure max 2 suggestions
       comment: response.casualComment || 'Your turn!',
     };
 
-    console.log('Pre-move analysis final result:', JSON.stringify(result, null, 2));
 
     // Save suggestions to game memory
     if (gameId && result.suggestions.length > 0) {
@@ -269,7 +264,6 @@ export async function POST(request: NextRequest) {
           },
         });
 
-        console.log('Suggestions saved to game memory');
       } catch (error) {
         console.error('Error saving suggestions to game memory:', error);
         // Don't fail the request if memory save fails
