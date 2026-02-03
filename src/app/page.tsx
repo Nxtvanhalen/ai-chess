@@ -316,6 +316,15 @@ export default function Home() {
 
         setIsLoading(true);
 
+        // Check if user delivered checkmate (SAN notation ends with #)
+        const isUserCheckmate = move.san?.includes('#');
+        if (isUserCheckmate) {
+          console.log('User delivered checkmate:', move.san);
+          handleCheckmate('white');
+          setIsLoading(false);
+          return;
+        }
+
         // After user move, get engine's move (only if it's AI's turn to play)
         // Check if it's black's turn (AI plays black)
         const isAiTurn = move.after.includes(' b '); // FEN notation: 'b' means black to move
@@ -455,45 +464,45 @@ export default function Home() {
                     ),
                   );
 
-                  // Get Chester's analysis of BOTH moves (user + engine)
-                  const analysisResponse = await fetch('/api/chess/engine-move-analysis', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                      engineMove: aiMoveData.san, // Just pass the SAN string, not the whole object
-                      userMove: move.san, // Include user's move for combined commentary
-                      fen: aiMoveData.fen,
-                      engineEvaluation: aiMoveData.analysis?.evaluation || 0,
-                    }),
-                  });
-
-                  if (analysisResponse.ok) {
-                    const analysisData = await analysisResponse.json();
-
-                    // Add Chester's commentary on engine move with typing effect
-                    const analysisMessageId = generateSimpleId();
-                    const analysisMessage: ChatMessage = {
-                      id: analysisMessageId,
-                      role: 'assistant',
-                      type: 'analysis',
-                      content: '',
-                      timestamp: new Date(),
-                      metadata: { isThinking: true },
-                    };
-
-                    setMessages((prev) => [...prev, analysisMessage]);
-
-                    // Type out the analysis
-                    typeText(analysisData.commentary, analysisMessageId, async () => {
-                      await saveMessage(conversationId!, 'assistant', analysisData.commentary);
-                    });
-                  }
-
-                  // If engine delivered checkmate, handle it
+                  // If engine delivered checkmate, handle it immediately and skip analysis
                   if (isEngineCheckmate) {
                     console.log('Engine delivered checkmate:', aiMoveData.san);
                     // Engine plays black, so black wins
                     handleCheckmate('black');
+                  } else {
+                    // Get Chester's analysis of BOTH moves (user + engine) - skip on checkmate
+                    const analysisResponse = await fetch('/api/chess/engine-move-analysis', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        engineMove: aiMoveData.san,
+                        userMove: move.san,
+                        fen: aiMoveData.fen,
+                        engineEvaluation: aiMoveData.analysis?.evaluation || 0,
+                      }),
+                    });
+
+                    if (analysisResponse.ok) {
+                      const analysisData = await analysisResponse.json();
+
+                      // Add Chester's commentary on engine move with typing effect
+                      const analysisMessageId = generateSimpleId();
+                      const analysisMessage: ChatMessage = {
+                        id: analysisMessageId,
+                        role: 'assistant',
+                        type: 'analysis',
+                        content: '',
+                        timestamp: new Date(),
+                        metadata: { isThinking: true },
+                      };
+
+                      setMessages((prev) => [...prev, analysisMessage]);
+
+                      // Type out the analysis
+                      typeText(analysisData.commentary, analysisMessageId, async () => {
+                        await saveMessage(conversationId!, 'assistant', analysisData.commentary);
+                      });
+                    }
                   }
                 } catch (moveError) {
                   console.error('Error processing AI move:', moveError);
