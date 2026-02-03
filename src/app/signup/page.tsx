@@ -102,7 +102,9 @@ export default function SignupPage() {
               </label>
               <input
                 id="email"
+                name="email"
                 type="email"
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -117,7 +119,9 @@ export default function SignupPage() {
               </label>
               <input
                 id="password"
+                name="password"
                 type="password"
+                autoComplete="new-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -136,7 +140,9 @@ export default function SignupPage() {
               </label>
               <input
                 id="confirmPassword"
+                name="confirmPassword"
                 type="password"
+                autoComplete="new-password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
