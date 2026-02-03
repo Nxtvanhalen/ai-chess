@@ -65,14 +65,6 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Debug: Log game context to help troubleshoot Chester's board visibility
-      hasGameContext: !!gameContext,
-      fen: gameContext?.fen,
-      lastMove: gameContext?.lastMove,
-      totalMoves: gameContext?.totalMoves,
-      messageLength: message.length,
-      hasGameId: !!gameId,
-    });
 
     // Fetch comprehensive game memory context
     let fullGameContext = null;
@@ -82,14 +74,6 @@ export async function POST(request: NextRequest) {
       try {
         fullGameContext = await GameMemoryService.getGameContext(gameId);
         chesterPersonality = await ChesterMemoryService.getPersonalityContext(userId);
-
-          hasFullContext: !!fullGameContext,
-          totalMovesInMemory: fullGameContext?.totalMoves || 0,
-          commentaryCount: fullGameContext?.chesterCommentary?.length || 0,
-          tacticalThemes: fullGameContext?.tacticalThemes || [],
-          rapportLevel: chesterPersonality?.rapportLevel || 1,
-          gamesPlayed: chesterPersonality?.gamesPlayed || 0,
-        });
       } catch (error) {
         console.error('Error fetching game memory context:', error);
         // Continue without memory context - graceful degradation
@@ -152,11 +136,6 @@ export async function POST(request: NextRequest) {
             moveHistory: lastGame.full_move_history?.slice(-25) || [], // Last 25 moves
             commentary: lastGame.chester_commentary?.slice(-10) || [], // Last 10 comments
           };
-            result: pastGameContext.result,
-            moves: pastGameContext.totalMoves,
-            moveHistoryLength: pastGameContext.moveHistory.length,
-          });
-        } else {
         }
       } catch (error) {
         console.error('Error fetching past game:', error);

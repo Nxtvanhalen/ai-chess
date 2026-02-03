@@ -43,10 +43,6 @@ export async function POST(request: NextRequest) {
     const authUser = await getAuthenticatedUser();
     const userId = authUser?.id || null;
 
-      hasGameId: !!gameId,
-      currentPhase: gamePhase,
-      totalMoves: gameContext?.totalMoves,
-    });
 
     // Fetch comprehensive game memory context
     let fullGameContext = null;
@@ -56,11 +52,6 @@ export async function POST(request: NextRequest) {
       try {
         fullGameContext = await GameMemoryService.getGameContext(gameId);
         chesterPersonality = await ChesterMemoryService.getPersonalityContext(userId);
-
-          totalMovesInMemory: fullGameContext?.totalMoves || 0,
-          previousSuggestions: fullGameContext?.suggestionsGiven?.length || 0,
-          tacticalThemes: fullGameContext?.tacticalThemes || [],
-        });
       } catch (error) {
         console.error('Error fetching game memory:', error);
         // Continue without memory - graceful degradation

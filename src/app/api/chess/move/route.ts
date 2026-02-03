@@ -56,13 +56,6 @@ export async function POST(request: NextRequest) {
     const authUser = await getAuthenticatedUser();
     const userId = authUser?.id || null;
 
-      move,
-      hasGameId: !!gameId,
-      hasMoveDetails: !!moveDetails,
-      totalMoves: gameContext?.totalMoves,
-      moveHistoryLength: moveHistory?.length || 0,
-      fullMoveHistoryLength: gameContext?.fullMoveHistory?.length || 0,
-    });
 
     // Fetch comprehensive game memory context with timeout
     let fullGameContext = null;
@@ -80,11 +73,6 @@ export async function POST(request: NextRequest) {
 
         fullGameContext = (await Promise.race([contextPromise, dbTimeout])) as any;
         chesterPersonality = (await Promise.race([personalityPromise, dbTimeout])) as any;
-
-          totalMovesInMemory: fullGameContext?.totalMoves || 0,
-          tacticalThemes: fullGameContext?.tacticalThemes || [],
-          loadTime: Date.now() - startTime,
-        });
       } catch (error) {
         console.error('Error fetching game memory (continuing with degraded context):', error);
         // Continue without memory - graceful degradation

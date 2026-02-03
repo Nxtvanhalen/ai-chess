@@ -18,8 +18,6 @@ let engineInstance: EnhancedChessEngine | null = null;
 function getEngine(): EnhancedChessEngine {
   if (!engineInstance) {
     engineInstance = new EnhancedChessEngine();
-      '[AI Move API] Enhanced engine initialized with opening book + transposition table',
-    );
   }
   return engineInstance;
 }
@@ -116,15 +114,6 @@ export async function POST(request: NextRequest) {
       if (result) {
         // Apply the move to get the new position
         const move = chess.move(result.move);
-
-        // Log enhanced stats
-          move: result.move,
-          depth: result.depth,
-          fromBook: result.fromBook,
-          nodesSearched: result.nodesSearched,
-          ttHitRate: `${(result.ttHitRate * 100).toFixed(1)}%`,
-          thinkingTime: `${result.thinkingTime}ms`,
-        });
 
         // Increment usage counter for authenticated users
         if (user) {
