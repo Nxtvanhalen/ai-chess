@@ -1,6 +1,10 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { getAuthenticatedUser } from '@/lib/auth/getUser';
-import { extractMoveSuggestions, validateMoveSuggestion } from '@/lib/chess/board-validator';
+import {
+  extractMoveSuggestions,
+  generateSafetyNotice,
+  validateMoveSuggestion,
+} from '@/lib/chess/board-validator';
 import { CHESS_BUTLER_SYSTEM_PROMPT, formatMoveContext } from '@/lib/openai/chess-butler-prompt';
 import { createResponsesCompletion } from '@/lib/openai/client';
 import { checkRateLimitRedis, getClientIPFromRequest, getRateLimitHeadersRedis } from '@/lib/redis';
@@ -13,6 +17,45 @@ import {
   incrementChatUsage,
 } from '@/lib/supabase/subscription';
 import { chatSchema, validateRequest } from '@/lib/validation/schemas';
+
+function listToPromptText(items: unknown[]): string {
+  return items
+    .map((item) => {
+      if (typeof item === 'string' || typeof item === 'number' || typeof item === 'boolean') {
+        return String(item);
+      }
+      if (item && typeof item === 'object') {
+        const record = item as Record<string, unknown>;
+        const prioritizedKeys = ['name', 'move', 'theme', 'label', 'content', 'type'];
+        for (const key of prioritizedKeys) {
+          if (typeof record[key] === 'string' && record[key]) return record[key] as string;
+        }
+        const firstStringValue = Object.values(record).find((v) => typeof v === 'string' && v);
+        if (typeof firstStringValue === 'string') return firstStringValue;
+      }
+      return '';
+    })
+    .filter(Boolean)
+    .join(', ');
+}
+
+function promptValue(value: unknown, fallback: string = ''): string {
+  if (value === null || value === undefined) return fallback;
+  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+    return String(value);
+  }
+  if (Array.isArray(value)) return listToPromptText(value);
+  if (typeof value === 'object') {
+    const record = value as Record<string, unknown>;
+    const prioritizedKeys = ['content', 'text', 'name', 'move', 'theme', 'label', 'type'];
+    for (const key of prioritizedKeys) {
+      if (typeof record[key] === 'string' && record[key]) return record[key] as string;
+    }
+    const firstStringValue = Object.values(record).find((v) => typeof v === 'string' && v);
+    if (typeof firstStringValue === 'string') return firstStringValue;
+  }
+  return fallback;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -155,15 +198,15 @@ export async function POST(request: NextRequest) {
       instructions += `\n\nYOUR RELATIONSHIP WITH CHRIS:
 - Rapport Level: ${chesterPersonality.rapportLevel}/10
 - Games Played Together: ${chesterPersonality.gamesPlayed}
-- Current Performance: ${chesterPersonality.recentPerformance}
+- Current Performance: ${promptValue(chesterPersonality.recentPerformance, 'neutral')}
 - Current Streak: ${chesterPersonality.currentStreak > 0 ? `${chesterPersonality.currentStreak} wins` : 'none'}`;
 
       if (chesterPersonality.commonMistakes.length > 0) {
-        instructions += `\n- Common Patterns to Watch: ${chesterPersonality.commonMistakes.join(', ')}`;
+        instructions += `\n- Common Patterns to Watch: ${listToPromptText(chesterPersonality.commonMistakes)}`;
       }
 
       if (chesterPersonality.strongAreas.length > 0) {
-        instructions += `\n- Strong Areas: ${chesterPersonality.strongAreas.join(', ')}`;
+        instructions += `\n- Strong Areas: ${listToPromptText(chesterPersonality.strongAreas)}`;
       }
     }
 
@@ -189,11 +232,11 @@ export async function POST(request: NextRequest) {
       }
 
       if (pastGameContext.tacticalThemes.length > 0) {
-        instructions += `\n- Tactical Themes: ${pastGameContext.tacticalThemes.join(', ')}`;
+        instructions += `\n- Tactical Themes: ${listToPromptText(pastGameContext.tacticalThemes)}`;
       }
 
       if (pastGameContext.narrative) {
-        instructions += `\n- Game Summary: ${pastGameContext.narrative}`;
+        instructions += `\n- Game Summary: ${promptValue(pastGameContext.narrative)}`;
       }
 
       if (pastGameContext.moveHistory.length > 0) {
@@ -208,7 +251,7 @@ export async function POST(request: NextRequest) {
       if (pastGameContext.commentary.length > 0) {
         instructions += `\n- Your Commentary from that game:`;
         pastGameContext.commentary.forEach((c: any) => {
-          instructions += `\n  * ${c.content}`;
+          instructions += `\n  * ${promptValue(c.content)}`;
         });
       }
 
@@ -222,12 +265,12 @@ export async function POST(request: NextRequest) {
     if (fullGameContext) {
       // Add tactical themes detected
       if (fullGameContext.tacticalThemes.length > 0) {
-        instructions += `\n\nTactical Themes in This Game: ${fullGameContext.tacticalThemes.join(', ')}`;
+        instructions += `\n\nTactical Themes in This Game: ${listToPromptText(fullGameContext.tacticalThemes)}`;
       }
 
       // Add game narrative if available
       if (fullGameContext.gameNarrative) {
-        instructions += `\n\nGame Story So Far: ${fullGameContext.gameNarrative}`;
+        instructions += `\n\nGame Story So Far: ${promptValue(fullGameContext.gameNarrative)}`;
       }
 
       // Add recent commentary for context continuity
@@ -235,7 +278,7 @@ export async function POST(request: NextRequest) {
       if (recentCommentary.length > 0) {
         instructions += `\n\nYour Recent Commentary:`;
         recentCommentary.forEach((comment) => {
-          instructions += `\n- Move ${comment.move_number}: ${comment.content}`;
+          instructions += `\n- Move ${comment.move_number}: ${promptValue(comment.content)}`;
         });
       }
 
@@ -317,6 +360,11 @@ export async function POST(request: NextRequest) {
             content += `\n\n[Note: ${validation.correctedMove}]`;
           }
         }
+      }
+
+      const safetyNotice = generateSafetyNotice(gameContext.fen, content);
+      if (safetyNotice) {
+        content += `\n\n[${safetyNotice}]`;
       }
     }
 

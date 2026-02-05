@@ -18,7 +18,7 @@ const HighlightedText = ({ children }: { children: string }) => {
   return (
     <>
       {parts.map((part, index) => {
-        if (movePattern.test(part)) {
+        if (part.match(movePattern)) {
           return (
             <span
               key={index}
@@ -121,9 +121,7 @@ export default function DynamicMarkdown({ children, className }: DynamicMarkdown
               );
             },
             p: ({ children }: any) => (
-              <p className="mb-3 last:mb-0 leading-relaxed">
-                <HighlightedText>{String(children)}</HighlightedText>
-              </p>
+              <p className="mb-3 last:mb-0 leading-relaxed">{children}</p>
             ),
             text: ({ children }: any) => {
               if (typeof children === 'string') {

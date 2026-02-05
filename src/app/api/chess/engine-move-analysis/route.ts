@@ -19,6 +19,17 @@ interface CachedAnalysis {
 const analysisCache = new Map<string, CachedAnalysis>();
 const ANALYSIS_CACHE_TTL_MS = 45_000;
 const LLM_TIMEOUT_MS = Number(process.env.ENGINE_ANALYSIS_TIMEOUT_MS || 4_500);
+const CENTRAL_FILES = new Set(['c', 'd', 'e', 'f']);
+const FLANK_FILES = new Set(['a', 'h']);
+
+type EngineLegalMove = {
+  from: string;
+  to: string;
+  piece: string;
+  captured?: string;
+  san: string;
+  flags: string;
+};
 
 function getCacheKey(
   fen: string,
@@ -182,6 +193,20 @@ function sanitizeCommentaryClaims(
   return normalized;
 }
 
+function normalizeMovePhraseCasing(text: string) {
+  return text
+    .replace(
+      /\b(king|queen|rook|bishop|knight|pawn)\s+to\s+([a-h][1-8])\b/gi,
+      (_, piece: string, square: string) =>
+        `${piece.charAt(0).toUpperCase()}${piece.slice(1).toLowerCase()} to ${square.toUpperCase()}`,
+    )
+    .replace(
+      /\b(king|queen|rook|bishop|knight|pawn)\s+takes(?:\s+on)?\s+([a-h][1-8])\b/gi,
+      (_, piece: string, square: string) =>
+        `${piece.charAt(0).toUpperCase()}${piece.slice(1).toLowerCase()} takes on ${square.toUpperCase()}`,
+    );
+}
+
 function alignCommentaryWithSuggestion(
   commentary: string,
   suggestionMove: string,
@@ -218,7 +243,7 @@ function formatMoveText(move: { piece: string; to: string; captured?: string }):
 }
 
 function pickDefaultLegalMove(
-  legalMoves: Array<{ san: string; piece: string; to: string; captured?: string; from: string }>,
+  legalMoves: EngineLegalMove[],
 ) {
   const checkMove = legalMoves.find((m) => m.san.includes('+'));
   if (checkMove) return checkMove;
@@ -236,7 +261,7 @@ function pickDefaultLegalMove(
 
 function resolveSuggestedMove(
   suggestionText: string | undefined,
-  legalMoves: Array<{ san: string; piece: string; to: string; from: string; captured?: string; flags: string }>,
+  legalMoves: EngineLegalMove[],
 ) {
   if (!suggestionText) return null;
 
@@ -292,7 +317,7 @@ function getAttackers(chess: Chess, square: string, attackerColor: 'w' | 'b') {
 
 function isMoveTacticallySafe(
   positionFen: string,
-  move: { from: string; to: string; piece: string; captured?: string; san: string },
+  move: EngineLegalMove,
 ) {
   const chess = new Chess(positionFen);
   chess.move(move.san);
@@ -320,20 +345,98 @@ function isMoveTacticallySafe(
   return true;
 }
 
-function pickSafeMove(
-  fen: string,
-  preferredMove: { from: string; to: string; piece: string; captured?: string; san: string } | null,
-  legalMoves: Array<{ from: string; to: string; piece: string; captured?: string; san: string }>,
-  fallbackMove: { from: string; to: string; piece: string; captured?: string; san: string } | null,
-) {
-  if (preferredMove && isMoveTacticallySafe(fen, preferredMove)) return preferredMove;
-  if (fallbackMove && isMoveTacticallySafe(fen, fallbackMove)) return fallbackMove;
+function isFlankPawnPush(move: EngineLegalMove): boolean {
+  return move.piece === 'p' && FLANK_FILES.has(move.to[0]) && !move.captured;
+}
 
-  for (const move of legalMoves) {
-    if (isMoveTacticallySafe(fen, move)) return move;
+function scoreMoveRelevance(
+  fen: string,
+  move: EngineLegalMove,
+  analysis: ReturnType<PositionAnalyzer['analyzePosition']>,
+) {
+  const chess = new Chess(fen);
+  const currentColor = chess.turn();
+  const myThreats = analysis.threats.filter((t) => t.piece.startsWith(currentColor));
+  const threatenedSquares = new Set(
+    myThreats
+      .filter((t) => t.value >= 3 || t.isHanging)
+      .map((t) => t.square.toLowerCase()),
+  );
+
+  let score = 0;
+
+  if (move.captured) score += 10 + (PIECE_VALUE[move.captured] || 1) * 3;
+  if (move.san.includes('+')) score += 10;
+  if (threatenedSquares.has(move.from.toLowerCase())) score += 12;
+  if (move.piece === 'k' && chess.inCheck()) score += 15;
+
+  const fromRank = move.from[1];
+  if ((move.piece === 'n' || move.piece === 'b') && (fromRank === '1' || fromRank === '8')) score += 5;
+  if (move.piece === 'p' && CENTRAL_FILES.has(move.to[0])) score += 4;
+  if (CENTRAL_FILES.has(move.to[0])) score += 2;
+
+  if (analysis.urgencyLevel === 'emergency') {
+    if (isFlankPawnPush(move)) score -= 14;
+    if (move.piece === 'p' && !move.captured && !CENTRAL_FILES.has(move.to[0])) score -= 6;
+  } else if (analysis.urgencyLevel === 'tactical') {
+    if (isFlankPawnPush(move)) score -= 8;
+  } else if (isFlankPawnPush(move)) {
+    score -= 3;
   }
 
-  return fallbackMove || legalMoves[0] || null;
+  return score;
+}
+
+function reasoningForMove(
+  move: EngineLegalMove,
+  analysis: ReturnType<PositionAnalyzer['analyzePosition']>,
+) {
+  if (move.captured) return `Wins ${pieceName(move.captured).toLowerCase()}`;
+  if (move.piece === 'k' && analysis.urgencyLevel === 'emergency') return 'King safety first';
+  if (move.san.includes('+')) return 'Creates immediate pressure';
+  if ((move.piece === 'n' || move.piece === 'b') && (move.from[1] === '1' || move.from[1] === '8')) {
+    return 'Develops active piece';
+  }
+  if (move.piece === 'p' && CENTRAL_FILES.has(move.to[0])) return 'Controls center squares';
+  return 'Improves piece activity';
+}
+
+function pickSafeMove(
+  fen: string,
+  preferredMove: EngineLegalMove | null,
+  legalMoves: EngineLegalMove[],
+  fallbackMove: EngineLegalMove | null,
+  analysis: ReturnType<PositionAnalyzer['analyzePosition']>,
+) {
+  const safeMoves = legalMoves.filter((move) => isMoveTacticallySafe(fen, move));
+  const candidates = safeMoves.length > 0 ? safeMoves : legalMoves;
+  if (candidates.length === 0) return null;
+
+  const scored = candidates
+    .map((move) => ({ move, score: scoreMoveRelevance(fen, move, analysis) }))
+    .sort((a, b) => b.score - a.score);
+
+  const best = scored[0]?.move || null;
+  if (!best) return fallbackMove || legalMoves[0] || null;
+
+  if (preferredMove && candidates.some((m) => m.san === preferredMove.san)) {
+    const preferredScore = scoreMoveRelevance(fen, preferredMove, analysis);
+    const bestScore = scored[0].score;
+    // Keep LLM preference only if it's reasonably close to best relevance.
+    if (bestScore - preferredScore <= 3) {
+      return preferredMove;
+    }
+  }
+
+  if (fallbackMove && candidates.some((m) => m.san === fallbackMove.san)) {
+    const fallbackScore = scoreMoveRelevance(fen, fallbackMove, analysis);
+    const bestScore = scored[0].score;
+    if (bestScore - fallbackScore <= 1) {
+      return fallbackMove;
+    }
+  }
+
+  return best;
 }
 
 export async function POST(request: NextRequest) {
@@ -369,7 +472,7 @@ export async function POST(request: NextRequest) {
 
     // Handle engineMove being either a string or an object with san property
     const moveStr = typeof engineMove === 'string' ? engineMove : engineMove.san || '';
-    const legalMoves = new Chess(fen).moves({ verbose: true });
+    const legalMoves = new Chess(fen).moves({ verbose: true }) as EngineLegalMove[];
     const defaultMove = pickDefaultLegalMove(legalMoves);
     const defaultMoveText = defaultMove ? formatMoveText(defaultMove) : 'No legal moves';
     const engineMoveText = sanToPlainEnglish(moveStr);
@@ -451,10 +554,16 @@ Mandatory:
 
       const response = JSON.parse(completion.choices[0].message.content || '{}');
       payload = {
-        commentary: sanitizeCommentaryClaims(
-          normalizeCommentaryStyle(response.commentary || 'Interesting move by the engine.', userMove, moveStr),
-          userMove,
-          moveStr,
+        commentary: normalizeMovePhraseCasing(
+          sanitizeCommentaryClaims(
+            normalizeCommentaryStyle(
+              response.commentary || 'Interesting move by the engine.',
+              userMove,
+              moveStr,
+            ),
+            userMove,
+            moveStr,
+          ),
         ),
         suggestion: response.suggestion || { move: 'Develop a piece', reasoning: 'Good play' },
       };
@@ -465,13 +574,10 @@ Mandatory:
 
     // Enforce legal move suggestions to prevent impossible recommendations.
     const resolvedMove = resolveSuggestedMove(payload.suggestion?.move, legalMoves);
-    const selectedMove = pickSafeMove(fen, resolvedMove, legalMoves, defaultMove);
+    const selectedMove = pickSafeMove(fen, resolvedMove, legalMoves, defaultMove, analysis);
     const finalMove = selectedMove || defaultMove;
     if (finalMove) {
-      const reasoning = (payload.suggestion?.reasoning || 'Practical move')
-        .split(' ')
-        .slice(0, 5)
-        .join(' ');
+      const reasoning = reasoningForMove(finalMove, analysis);
 
       payload.suggestion = {
         move: formatMoveText(finalMove),

@@ -221,19 +221,23 @@ export default function Home() {
     if (san === 'O-O') return 'castles kingside';
     if (san === 'O-O-O') return 'castles queenside';
 
+    // Strip SAN suffix decorations so we can parse move intent.
+    const cleaned = san.replace(/[+#?!]+$/g, '');
+    const destinationMatch = cleaned.match(/[a-h][1-8]/);
+    const destination = destinationMatch ? destinationMatch[0].toUpperCase() : '';
+    const isCapture = cleaned.includes('x');
+    const isCheckmate = san.includes('#');
+    const isCheck = !isCheckmate && san.includes('+');
+
     // Handle regular moves
-    const piece = san[0];
-    if (pieceMap[piece]) {
-      // Extract destination square
-      const match = san.match(/[a-h][1-8]/);
-      const destination = match ? match[0].toUpperCase() : '';
-      return `${pieceMap[piece]} to ${destination}`;
-    } else {
-      // Pawn move
-      const match = san.match(/[a-h][1-8]/);
-      const destination = match ? match[0].toUpperCase() : '';
-      return `Pawn to ${destination}`;
-    }
+    const piece = cleaned[0];
+    const pieceName = pieceMap[piece] || 'Pawn';
+    let text = isCapture ? `${pieceName} takes on ${destination}` : `${pieceName} to ${destination}`;
+
+    if (isCheckmate) text += ' (checkmate)';
+    else if (isCheck) text += ' (check)';
+
+    return text;
   }, []);
 
   const handleCheckmate = useCallback(

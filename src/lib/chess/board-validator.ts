@@ -195,3 +195,119 @@ export function extractMoveSuggestions(response: string): string[] {
 
   return [...new Set(suggestions)]; // Remove duplicates
 }
+
+function parseMoveDescription(moveDescription: string): {
+  piece: string;
+  from?: string;
+  to: string;
+} | null {
+  const moveRegex = /(\w+)\s+(?:from\s+([A-H][1-8])\s+)?to\s+([A-H][1-8])/i;
+  const match = moveDescription.match(moveRegex);
+  if (!match) return null;
+
+  const [_, pieceName, fromSquare, toSquare] = match;
+  const pieceMap: Record<string, string> = {
+    king: 'k',
+    queen: 'q',
+    rook: 'r',
+    bishop: 'b',
+    knight: 'n',
+    pawn: 'p',
+  };
+
+  const piece = pieceMap[pieceName.toLowerCase()];
+  if (!piece) return null;
+
+  return {
+    piece,
+    from: fromSquare?.toLowerCase(),
+    to: toSquare.toLowerCase(),
+  };
+}
+
+function getAttackersOfSquare(chess: Chess, square: string, attackerColor: 'w' | 'b') {
+  const fenParts = chess.fen().split(' ');
+  fenParts[1] = attackerColor;
+  const attackerView = new Chess(fenParts.join(' '));
+  return attackerView.moves({ verbose: true }).filter((m) => m.to === square);
+}
+
+export function assessMoveSuggestionSafety(
+  fen: string,
+  moveDescription: string,
+): {
+  isSafe: boolean;
+  reason?: string;
+} {
+  try {
+    const chess = new Chess(fen);
+    const parsed = parseMoveDescription(moveDescription);
+    if (!parsed) return { isSafe: true };
+
+    const legalMoves = chess.moves({ verbose: true });
+    const candidate = legalMoves.find(
+      (m) => m.piece === parsed.piece && m.to === parsed.to && (!parsed.from || m.from === parsed.from),
+    );
+    if (!candidate) {
+      return { isSafe: false, reason: `${moveDescription} is not legal here.` };
+    }
+
+    chess.move(candidate.san);
+    const opponentColor = chess.turn() as 'w' | 'b';
+    const myColor = opponentColor === 'w' ? 'b' : 'w';
+
+    const attackers = chess
+      .moves({ verbose: true })
+      .filter((m) => m.captured && m.to === candidate.to);
+
+    if (attackers.length === 0) return { isSafe: true };
+
+    const defenders = getAttackersOfSquare(chess, candidate.to, myColor);
+    const pieceValues: Record<string, number> = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 100 };
+    const movedValue = pieceValues[candidate.piece] || 1;
+    const cheapestAttacker = Math.min(...attackers.map((a) => pieceValues[a.piece] || 9));
+
+    if (movedValue >= 3 && defenders.length === 0) {
+      return { isSafe: false, reason: `${moveDescription} appears to hang material.` };
+    }
+
+    if (movedValue - cheapestAttacker >= 2 && attackers.length > defenders.length) {
+      return { isSafe: false, reason: `${moveDescription} can be traded unfavorably.` };
+    }
+
+    return { isSafe: true };
+  } catch {
+    return { isSafe: true };
+  }
+}
+
+function canOpponentCapturePieceNextTurn(fen: string, pieceName: 'queen' | 'rook' | 'bishop' | 'knight' | 'pawn') {
+  const chess = new Chess(fen);
+  const pieceMap: Record<string, string> = { queen: 'q', rook: 'r', bishop: 'b', knight: 'n', pawn: 'p' };
+  const targetPiece = pieceMap[pieceName];
+
+  const fenParts = chess.fen().split(' ');
+  fenParts[1] = fenParts[1] === 'w' ? 'b' : 'w';
+  const opponentView = new Chess(fenParts.join(' '));
+  const captures = opponentView.moves({ verbose: true }).filter((m) => m.captured === targetPiece);
+  return captures.length > 0;
+}
+
+export function generateSafetyNotice(fen: string, response: string): string | null {
+  const notices: string[] = [];
+  const suggestions = extractMoveSuggestions(response);
+
+  for (const suggestion of suggestions) {
+    const safety = assessMoveSuggestionSafety(fen, suggestion);
+    if (!safety.isSafe && safety.reason) {
+      notices.push(`Caution: ${safety.reason}`);
+    }
+  }
+
+  if (/can(?:not|'t)\s+take\s+your\s+queen/i.test(response) && canOpponentCapturePieceNextTurn(fen, 'queen')) {
+    notices.push('Caution: The queen may still be capturable on the next move.');
+  }
+
+  if (notices.length === 0) return null;
+  return notices.join(' ');
+}

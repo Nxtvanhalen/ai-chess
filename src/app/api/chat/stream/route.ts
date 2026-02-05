@@ -1,5 +1,6 @@
 import type { NextRequest } from 'next/server';
 import { getAuthenticatedUser } from '@/lib/auth/getUser';
+import { generateSafetyNotice } from '@/lib/chess/board-validator';
 import { CHESS_BUTLER_SYSTEM_PROMPT, formatMoveContext } from '@/lib/openai/chess-butler-prompt';
 import { createResponsesCompletionStream, parseResponsesStream } from '@/lib/openai/client';
 import { checkRateLimitRedis, getClientIPFromRequest, getRateLimitHeadersRedis } from '@/lib/redis';
@@ -12,6 +13,45 @@ import {
   incrementChatUsage,
 } from '@/lib/supabase/subscription';
 import { chatSchema, validateRequest } from '@/lib/validation/schemas';
+
+function listToPromptText(items: unknown[]): string {
+  return items
+    .map((item) => {
+      if (typeof item === 'string' || typeof item === 'number' || typeof item === 'boolean') {
+        return String(item);
+      }
+      if (item && typeof item === 'object') {
+        const record = item as Record<string, unknown>;
+        const prioritizedKeys = ['name', 'move', 'theme', 'label', 'content', 'type'];
+        for (const key of prioritizedKeys) {
+          if (typeof record[key] === 'string' && record[key]) return record[key] as string;
+        }
+        const firstStringValue = Object.values(record).find((v) => typeof v === 'string' && v);
+        if (typeof firstStringValue === 'string') return firstStringValue;
+      }
+      return '';
+    })
+    .filter(Boolean)
+    .join(', ');
+}
+
+function promptValue(value: unknown, fallback: string = ''): string {
+  if (value === null || value === undefined) return fallback;
+  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+    return String(value);
+  }
+  if (Array.isArray(value)) return listToPromptText(value);
+  if (typeof value === 'object') {
+    const record = value as Record<string, unknown>;
+    const prioritizedKeys = ['content', 'text', 'name', 'move', 'theme', 'label', 'type'];
+    for (const key of prioritizedKeys) {
+      if (typeof record[key] === 'string' && record[key]) return record[key] as string;
+    }
+    const firstStringValue = Object.values(record).find((v) => typeof v === 'string' && v);
+    if (typeof firstStringValue === 'string') return firstStringValue;
+  }
+  return fallback;
+}
 
 /**
  * Streaming Chat API for Chester
@@ -86,10 +126,10 @@ export async function POST(request: NextRequest) {
       instructions += `\n\nYOUR RELATIONSHIP WITH CHRIS:
 - Rapport Level: ${chesterPersonality.rapportLevel}/10
 - Games Played Together: ${chesterPersonality.gamesPlayed}
-- Current Performance: ${chesterPersonality.recentPerformance}`;
+- Current Performance: ${promptValue(chesterPersonality.recentPerformance, 'neutral')}`;
 
       if (chesterPersonality.commonMistakes.length > 0) {
-        instructions += `\n- Common Patterns to Watch: ${chesterPersonality.commonMistakes.join(', ')}`;
+        instructions += `\n- Common Patterns to Watch: ${listToPromptText(chesterPersonality.commonMistakes)}`;
       }
     }
 
@@ -104,14 +144,14 @@ export async function POST(request: NextRequest) {
     // Add game memory context
     if (fullGameContext) {
       if (fullGameContext.tacticalThemes.length > 0) {
-        instructions += `\n\nTactical Themes: ${fullGameContext.tacticalThemes.join(', ')}`;
+        instructions += `\n\nTactical Themes: ${listToPromptText(fullGameContext.tacticalThemes)}`;
       }
 
       const recentCommentary = fullGameContext.chesterCommentary.slice(-3);
       if (recentCommentary.length > 0) {
         instructions += `\n\nYour Recent Commentary:`;
         recentCommentary.forEach((comment) => {
-          instructions += `\n- Move ${comment.move_number}: ${comment.content}`;
+          instructions += `\n- Move ${comment.move_number}: ${promptValue(comment.content)}`;
         });
       }
     }
@@ -139,6 +179,18 @@ export async function POST(request: NextRequest) {
               // Send SSE formatted data
               const sseData = `data: ${JSON.stringify({ text: chunk })}\n\n`;
               controller.enqueue(encoder.encode(sseData));
+            }
+          }
+
+          // Add a deterministic tactical safety note when needed.
+          if (gameContext?.fen) {
+            const safetyNotice = generateSafetyNotice(gameContext.fen, fullContent);
+            if (safetyNotice) {
+              const safetyChunk = `\n\n[${safetyNotice}]`;
+              fullContent += safetyChunk;
+              controller.enqueue(
+                encoder.encode(`data: ${JSON.stringify({ text: safetyChunk })}\n\n`),
+              );
             }
           }
 

@@ -165,17 +165,30 @@ export async function* parseResponsesStream(
 
           try {
             const parsed = JSON.parse(data);
+            const extractText = (value: unknown): string => {
+              if (!value) return '';
+              if (typeof value === 'string') return value;
+              if (typeof value === 'object') {
+                const obj = value as Record<string, unknown>;
+                if (typeof obj.text === 'string') return obj.text;
+                if (typeof obj.delta === 'string') return obj.delta;
+              }
+              return '';
+            };
 
             // Extract text delta from response
             if (parsed.type === 'response.output_text.delta') {
-              yield parsed.delta || '';
+              const text = extractText(parsed.delta);
+              if (text) yield text;
             } else if (parsed.type === 'content_block_delta') {
-              yield parsed.delta?.text || '';
+              const text = extractText(parsed.delta);
+              if (text) yield text;
             } else if (parsed.delta?.content) {
               // Handle various delta formats
               for (const content of parsed.delta.content) {
-                if (content.type === 'output_text' && content.text) {
-                  yield content.text;
+                if (content.type === 'output_text') {
+                  const text = extractText(content.text);
+                  if (text) yield text;
                 }
               }
             }
