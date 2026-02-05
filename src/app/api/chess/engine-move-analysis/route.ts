@@ -154,12 +154,48 @@ function normalizeCommentaryStyle(
   normalized = normalized.replaceAll(engineMoveSan, sanToPlainEnglish(engineMoveSan));
 
   // Best-effort conversion of SAN tokens that may still appear in the text.
+  // Intentionally excludes bare pawn pushes like "e4" to avoid corrupting
+  // already-plain-English phrases such as "Bishop to G2".
   normalized = normalized.replace(
-    /\b(?:O-O-O|O-O|[KQRBN]?[a-h]?[1-8]?x?[a-h][1-8](?:=[QRBN])?[+#]?)\b/g,
+    /\b(?:O-O-O|O-O|[KQRBN][a-h]?[1-8]?x?[a-h][1-8](?:=[QRBN])?[+#]?|[a-h]x[a-h][1-8](?:=[QRBN])?[+#]?|[a-h][18]=[QRBN][+#]?)\b/g,
     (token) => sanToPlainEnglish(token),
   );
 
   return normalized;
+}
+
+function sanitizeCommentaryClaims(
+  commentary: string,
+  userMoveSan: string | undefined,
+  engineMoveSan: string,
+) {
+  let normalized = commentary;
+  const hasActualCheck =
+    Boolean(userMoveSan && /[+#]/.test(userMoveSan)) || /[+#]/.test(engineMoveSan);
+
+  // If neither move is check/checkmate, avoid claiming check happened.
+  if (!hasActualCheck) {
+    normalized = normalized.replace(/\bcheckmate\b/gi, 'winning pressure');
+    normalized = normalized.replace(/\bcheck\b/gi, 'pressure');
+  }
+
+  return normalized;
+}
+
+function alignCommentaryWithSuggestion(
+  commentary: string,
+  suggestionMove: string,
+  suggestionReasoning: string,
+) {
+  const cleaned = commentary
+    // Remove any model-provided "Try ..." instruction so we can inject the validated move.
+    .replace(/\bTry\s+[^.?!]*(?:[.?!]|$)/gi, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  const base = cleaned.length > 0 ? cleaned : 'Solid position.';
+  const punctuation = /[.?!]$/.test(base) ? '' : '.';
+  return `${base}${punctuation} Try ${suggestionMove} for ${suggestionReasoning}.`;
 }
 
 function pieceName(piece: string): string {
@@ -236,6 +272,68 @@ function resolveSuggestedMove(
   );
 
   return candidates[0] || null;
+}
+
+const PIECE_VALUE: Record<string, number> = {
+  p: 1,
+  n: 3,
+  b: 3,
+  r: 5,
+  q: 9,
+  k: 100,
+};
+
+function getAttackers(chess: Chess, square: string, attackerColor: 'w' | 'b') {
+  const fenParts = chess.fen().split(' ');
+  fenParts[1] = attackerColor;
+  const attackerView = new Chess(fenParts.join(' '));
+  return attackerView.moves({ verbose: true }).filter((m) => m.to === square);
+}
+
+function isMoveTacticallySafe(
+  positionFen: string,
+  move: { from: string; to: string; piece: string; captured?: string; san: string },
+) {
+  const chess = new Chess(positionFen);
+  chess.move(move.san);
+
+  const opponentColor = chess.turn();
+  const myColor = opponentColor === 'w' ? 'b' : 'w';
+  const attackers = getAttackers(chess, move.to, opponentColor as 'w' | 'b');
+  const defenders = getAttackers(chess, move.to, myColor as 'w' | 'b');
+
+  if (attackers.length === 0) return true;
+
+  const movedPieceValue = PIECE_VALUE[move.piece] || 1;
+
+  // Hard reject obvious hangs of minor pieces or better.
+  if (movedPieceValue >= 3 && defenders.length === 0) return false;
+
+  // Reject if a low-value attacker can win a high-value moved piece immediately.
+  const cheapestAttackerValue = Math.min(
+    ...attackers.map((a) => PIECE_VALUE[a.piece] || 9),
+  );
+  if (movedPieceValue - cheapestAttackerValue >= 2 && attackers.length > defenders.length) {
+    return false;
+  }
+
+  return true;
+}
+
+function pickSafeMove(
+  fen: string,
+  preferredMove: { from: string; to: string; piece: string; captured?: string; san: string } | null,
+  legalMoves: Array<{ from: string; to: string; piece: string; captured?: string; san: string }>,
+  fallbackMove: { from: string; to: string; piece: string; captured?: string; san: string } | null,
+) {
+  if (preferredMove && isMoveTacticallySafe(fen, preferredMove)) return preferredMove;
+  if (fallbackMove && isMoveTacticallySafe(fen, fallbackMove)) return fallbackMove;
+
+  for (const move of legalMoves) {
+    if (isMoveTacticallySafe(fen, move)) return move;
+  }
+
+  return fallbackMove || legalMoves[0] || null;
 }
 
 export async function POST(request: NextRequest) {
@@ -353,8 +451,8 @@ Mandatory:
 
       const response = JSON.parse(completion.choices[0].message.content || '{}');
       payload = {
-        commentary: normalizeCommentaryStyle(
-          response.commentary || 'Interesting move by the engine.',
+        commentary: sanitizeCommentaryClaims(
+          normalizeCommentaryStyle(response.commentary || 'Interesting move by the engine.', userMove, moveStr),
           userMove,
           moveStr,
         ),
@@ -366,15 +464,24 @@ Mandatory:
     }
 
     // Enforce legal move suggestions to prevent impossible recommendations.
-    const resolvedMove = resolveSuggestedMove(payload.suggestion?.move, legalMoves) || defaultMove;
-    if (resolvedMove) {
+    const resolvedMove = resolveSuggestedMove(payload.suggestion?.move, legalMoves);
+    const selectedMove = pickSafeMove(fen, resolvedMove, legalMoves, defaultMove);
+    const finalMove = selectedMove || defaultMove;
+    if (finalMove) {
+      const reasoning = (payload.suggestion?.reasoning || 'Practical move')
+        .split(' ')
+        .slice(0, 5)
+        .join(' ');
+
       payload.suggestion = {
-        move: formatMoveText(resolvedMove),
-        reasoning: (payload.suggestion?.reasoning || 'Practical move').split(' ').slice(0, 5).join(' '),
+        move: formatMoveText(finalMove),
+        reasoning,
       };
-      if (!payload.commentary?.toLowerCase().includes('try ')) {
-        payload.commentary = `${payload.commentary?.trim() || 'Interesting sequence.'} Try ${payload.suggestion.move}.`;
-      }
+      payload.commentary = alignCommentaryWithSuggestion(
+        payload.commentary?.trim() || 'Interesting sequence.',
+        payload.suggestion.move,
+        reasoning,
+      );
     } else {
       payload.suggestion = {
         move: 'No legal moves',
