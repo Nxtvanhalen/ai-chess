@@ -17,7 +17,7 @@ interface CachedAnalysis {
 
 const analysisCache = new Map<string, CachedAnalysis>();
 const ANALYSIS_CACHE_TTL_MS = 45_000;
-const LLM_TIMEOUT_MS = 2_800;
+const LLM_TIMEOUT_MS = Number(process.env.ENGINE_ANALYSIS_TIMEOUT_MS || 4_500);
 
 function getCacheKey(
   fen: string,
