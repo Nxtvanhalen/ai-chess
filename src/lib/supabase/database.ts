@@ -1,10 +1,14 @@
 import { supabase } from './client';
 
 // Game management
-export async function createGame(playerColor: 'white' | 'black' = 'white') {
+export async function createGame(userId: string, playerColor: 'white' | 'black' = 'white') {
+  if (!userId) {
+    throw new Error('createGame requires an authenticated userId.');
+  }
   const { data, error } = await supabase
     .from('games')
     .insert({
+      user_id: userId,
       status: 'active',
       player_color: playerColor,
       fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', // Starting position
@@ -77,10 +81,14 @@ export async function saveMove(
 }
 
 // Conversation management
-export async function createConversation(gameId: string) {
+export async function createConversation(gameId: string, userId: string) {
+  if (!userId) {
+    throw new Error('createConversation requires an authenticated userId.');
+  }
   const { data, error } = await supabase
     .from('conversations')
     .insert({
+      user_id: userId,
       game_id: gameId,
       message_count: 0,
     })
@@ -147,13 +155,18 @@ export async function getConversationMessages(conversationId: string) {
 
 // Memory management for Chess Butler
 export async function saveMemory(
+  userId: string,
   category: 'game_pattern' | 'conversation' | 'preference' | 'coaching' | 'player_style',
   content: string,
   context: any = {},
 ) {
+  if (!userId) {
+    throw new Error('saveMemory requires an authenticated userId.');
+  }
   const { data, error } = await supabase
     .from('memory')
     .insert({
+      user_id: userId,
       category,
       content,
       context,

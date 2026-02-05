@@ -146,7 +146,7 @@ export const PLAN_LIMITS: Record<
 
 export interface Game {
   id: string;
-  user_id: string | null;
+  user_id: string;
   created_at: string;
   updated_at: string;
   status: GameStatus;
@@ -158,7 +158,7 @@ export interface Game {
 }
 
 export interface GameInsert {
-  user_id?: string;
+  user_id: string;
   status?: GameStatus;
   pgn?: string;
   fen?: string;
@@ -206,7 +206,7 @@ export interface MoveInsert {
 
 export interface Conversation {
   id: string;
-  user_id: string | null;
+  user_id: string;
   game_id: string | null;
   created_at: string;
   updated_at: string;
@@ -215,7 +215,7 @@ export interface Conversation {
 }
 
 export interface ConversationInsert {
-  user_id?: string;
+  user_id: string;
   game_id?: string;
   summary?: string;
 }
@@ -247,7 +247,7 @@ export interface MessageInsert {
 export interface GameMemory {
   id: string;
   game_id: string;
-  user_id: string | null;
+  user_id: string;
   created_at: string;
   updated_at: string;
   full_move_history: Array<{
@@ -393,7 +393,7 @@ export interface Database {
       };
       game_memory: {
         Row: GameMemory;
-        Insert: Partial<GameMemory> & { game_id: string };
+        Insert: Partial<GameMemory> & { game_id: string; user_id: string };
         Update: Partial<GameMemory>;
       };
       chester_long_term_memory: {
