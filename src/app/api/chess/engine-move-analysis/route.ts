@@ -1,3 +1,4 @@
+import { Chess } from 'chess.js';
 import { type NextRequest, NextResponse } from 'next/server';
 import { PositionAnalyzer } from '@/lib/chess/positionAnalyzer';
 import { getDeepSeekClient } from '@/lib/openai/client';
@@ -91,27 +92,150 @@ function buildLiteContext(
 }
 
 function buildFallbackResponse(
-  moveStr: string,
-  userMove: string | undefined,
+  engineMoveText: string,
+  userMoveText: string | undefined,
   analysis: ReturnType<PositionAnalyzer['analyzePosition']>,
+  legalMoveText: string,
 ) {
   const fallbackCommentary =
     analysis.urgencyLevel === 'emergency'
-      ? `${userMove ? `You played ${userMove}. ` : ''}${moveStr} forces accuracy now. Keep it simple and protect loose pieces.`
+      ? `${userMoveText ? `You played ${userMoveText}. ` : ''}${engineMoveText} forces accuracy now. Keep it simple and protect loose pieces.`
       : analysis.urgencyLevel === 'tactical'
-        ? `${userMove ? `After ${userMove}, ` : ''}${moveStr} keeps things sharp. Look for active moves with immediate threats.`
-        : `${userMove ? `After ${userMove}, ` : ''}${moveStr} is solid. Improve your least active piece and keep pressure central.`;
-
-  const fallbackSuggestion =
-    analysis.recommendations[0]?.split(' - ')[0] || 'Develop a piece to an active square';
+        ? `${userMoveText ? `After ${userMoveText}, ` : ''}${engineMoveText} keeps things sharp. Look for active moves with immediate threats.`
+        : `${userMoveText ? `After ${userMoveText}, ` : ''}${engineMoveText} is solid. Improve your least active piece and keep pressure central.`;
 
   return {
-    commentary: fallbackCommentary,
+    commentary: `${fallbackCommentary} Try ${legalMoveText}.`,
     suggestion: {
-      move: fallbackSuggestion,
+      move: legalMoveText,
       reasoning: analysis.urgencyLevel === 'emergency' ? 'Stabilize position' : 'Improve activity',
     },
   };
+}
+
+function sanToPlainEnglish(san: string): string {
+  const trimmed = san.trim();
+  if (!trimmed) return san;
+
+  if (trimmed === 'O-O') return 'castles kingside';
+  if (trimmed === 'O-O-O') return 'castles queenside';
+
+  const cleaned = trimmed.replace(/[+#?!]+$/g, '');
+  const pieceMap: Record<string, string> = {
+    K: 'King',
+    Q: 'Queen',
+    R: 'Rook',
+    B: 'Bishop',
+    N: 'Knight',
+  };
+
+  const pieceLetter = cleaned[0];
+  const isPieceMove = Boolean(pieceMap[pieceLetter]);
+  const piece = isPieceMove ? pieceMap[pieceLetter] : 'Pawn';
+  const isCapture = cleaned.includes('x');
+  const destinationMatch = cleaned.match(/([a-h][1-8])/);
+  const destination = destinationMatch ? destinationMatch[1].toUpperCase() : '';
+
+  if (!destination) return trimmed;
+  if (isCapture) return `${piece} takes on ${destination}`;
+  return `${piece} to ${destination}`;
+}
+
+function normalizeCommentaryStyle(
+  commentary: string,
+  userMoveSan: string | undefined,
+  engineMoveSan: string,
+) {
+  let normalized = commentary || '';
+
+  if (userMoveSan) {
+    normalized = normalized.replaceAll(userMoveSan, sanToPlainEnglish(userMoveSan));
+  }
+  normalized = normalized.replaceAll(engineMoveSan, sanToPlainEnglish(engineMoveSan));
+
+  // Best-effort conversion of SAN tokens that may still appear in the text.
+  normalized = normalized.replace(
+    /\b(?:O-O-O|O-O|[KQRBN]?[a-h]?[1-8]?x?[a-h][1-8](?:=[QRBN])?[+#]?)\b/g,
+    (token) => sanToPlainEnglish(token),
+  );
+
+  return normalized;
+}
+
+function pieceName(piece: string): string {
+  const map: Record<string, string> = {
+    p: 'Pawn',
+    n: 'Knight',
+    b: 'Bishop',
+    r: 'Rook',
+    q: 'Queen',
+    k: 'King',
+  };
+  return map[piece] || 'Piece';
+}
+
+function formatMoveText(move: { piece: string; to: string; captured?: string }): string {
+  const destination = move.to.toUpperCase();
+  if (move.piece === 'p') return `Pawn to ${destination}`;
+  const piece = pieceName(move.piece);
+  return move.captured ? `${piece} to ${destination} takes ${pieceName(move.captured)}` : `${piece} to ${destination}`;
+}
+
+function pickDefaultLegalMove(
+  legalMoves: Array<{ san: string; piece: string; to: string; captured?: string; from: string }>,
+) {
+  const checkMove = legalMoves.find((m) => m.san.includes('+'));
+  if (checkMove) return checkMove;
+
+  const captureMove = legalMoves.find((m) => m.captured);
+  if (captureMove) return captureMove;
+
+  const developmentMove = legalMoves.find(
+    (m) => (m.piece === 'n' || m.piece === 'b') && (m.from[1] === '1' || m.from[1] === '8'),
+  );
+  if (developmentMove) return developmentMove;
+
+  return legalMoves[0] || null;
+}
+
+function resolveSuggestedMove(
+  suggestionText: string | undefined,
+  legalMoves: Array<{ san: string; piece: string; to: string; from: string; captured?: string; flags: string }>,
+) {
+  if (!suggestionText) return null;
+
+  const text = suggestionText.toLowerCase().trim();
+
+  if (text.includes('castle kingside') || text.includes('o-o')) {
+    return legalMoves.find((m) => m.flags.includes('k')) || null;
+  }
+  if (text.includes('castle queenside') || text.includes('o-o-o')) {
+    return legalMoves.find((m) => m.flags.includes('q')) || null;
+  }
+
+  const match = suggestionText.match(/(king|queen|rook|bishop|knight|pawn)\s+(?:from\s+([a-h][1-8])\s+)?to\s+([a-h][1-8])/i);
+  if (!match) return null;
+
+  const [, pieceWord, fromSquare, toSquare] = match;
+  const pieceMap: Record<string, string> = {
+    king: 'k',
+    queen: 'q',
+    rook: 'r',
+    bishop: 'b',
+    knight: 'n',
+    pawn: 'p',
+  };
+  const piece = pieceMap[pieceWord.toLowerCase()];
+  if (!piece) return null;
+
+  const to = toSquare.toLowerCase();
+  const from = fromSquare?.toLowerCase();
+
+  const candidates = legalMoves.filter(
+    (m) => m.piece === piece && m.to === to && (!from || m.from === from),
+  );
+
+  return candidates[0] || null;
 }
 
 export async function POST(request: NextRequest) {
@@ -147,6 +271,11 @@ export async function POST(request: NextRequest) {
 
     // Handle engineMove being either a string or an object with san property
     const moveStr = typeof engineMove === 'string' ? engineMove : engineMove.san || '';
+    const legalMoves = new Chess(fen).moves({ verbose: true });
+    const defaultMove = pickDefaultLegalMove(legalMoves);
+    const defaultMoveText = defaultMove ? formatMoveText(defaultMove) : 'No legal moves';
+    const engineMoveText = sanToPlainEnglish(moveStr);
+    const userMoveText = userMove ? sanToPlainEnglish(userMove) : undefined;
     const analyzer = new PositionAnalyzer(fen);
     const analysis = analyzer.analyzePosition();
     const context = buildLiteContext(fen, moveStr, userMove, engineEvaluation, analysis);
@@ -174,6 +303,7 @@ Rules:
 - Describe what happened; do not speculate.
 - Keep tone dry, witty, concise.
 - Tactical safety first: do not suggest a move that drops material immediately.
+- Never use SAN notation (e.g., Nf3, Qxd5+, O-O). Use plain English move names.
 
 Return valid JSON in EXACTLY this format:
     {
@@ -223,12 +353,33 @@ Mandatory:
 
       const response = JSON.parse(completion.choices[0].message.content || '{}');
       payload = {
-        commentary: response.commentary || 'Interesting move by the engine.',
+        commentary: normalizeCommentaryStyle(
+          response.commentary || 'Interesting move by the engine.',
+          userMove,
+          moveStr,
+        ),
         suggestion: response.suggestion || { move: 'Develop a piece', reasoning: 'Good play' },
       };
     } catch (llmError) {
       console.warn('[EngineAnalysis] Falling back to local commentary:', llmError);
-      payload = buildFallbackResponse(moveStr, userMove, analysis);
+      payload = buildFallbackResponse(engineMoveText, userMoveText, analysis, defaultMoveText);
+    }
+
+    // Enforce legal move suggestions to prevent impossible recommendations.
+    const resolvedMove = resolveSuggestedMove(payload.suggestion?.move, legalMoves) || defaultMove;
+    if (resolvedMove) {
+      payload.suggestion = {
+        move: formatMoveText(resolvedMove),
+        reasoning: (payload.suggestion?.reasoning || 'Practical move').split(' ').slice(0, 5).join(' '),
+      };
+      if (!payload.commentary?.toLowerCase().includes('try ')) {
+        payload.commentary = `${payload.commentary?.trim() || 'Interesting sequence.'} Try ${payload.suggestion.move}.`;
+      }
+    } else {
+      payload.suggestion = {
+        move: 'No legal moves',
+        reasoning: 'Position is game over',
+      };
     }
 
     setCachedAnalysis(cacheKey, payload);
