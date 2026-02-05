@@ -22,7 +22,9 @@ interface UsageData {
 // Cache usage data to avoid excessive API calls
 let cachedUsage: UsageData | null = null;
 let lastFetchTime = 0;
+let inFlightUsageRequest: Promise<UsageData | null> | null = null;
 const CACHE_DURATION = 60000; // 60 seconds cache
+const FOCUS_REFRESH_COOLDOWN = 30000; // 30 seconds
 
 export default function UsageDisplay() {
   const { user } = useAuth();
@@ -39,11 +41,22 @@ export default function UsageDisplay() {
     }
 
     try {
-      const response = await fetch('/api/subscription/usage');
-      if (response.ok) {
-        const data = await response.json();
-        cachedUsage = data;
-        lastFetchTime = now;
+      if (!inFlightUsageRequest) {
+        inFlightUsageRequest = (async () => {
+          const response = await fetch('/api/subscription/usage');
+          if (!response.ok) return null;
+
+          const data = (await response.json()) as UsageData;
+          cachedUsage = data;
+          lastFetchTime = Date.now();
+          return data;
+        })().finally(() => {
+          inFlightUsageRequest = null;
+        });
+      }
+
+      const data = await inFlightUsageRequest;
+      if (data) {
         setUsage(data);
       }
     } catch (error) {
@@ -54,7 +67,7 @@ export default function UsageDisplay() {
   }, []);
 
   useEffect(() => {
-    if (!user) {
+    if (!user?.id) {
       setLoading(false);
       return;
     }
@@ -63,17 +76,37 @@ export default function UsageDisplay() {
     fetchUsage();
 
     // Refresh every 2 minutes (reduced from 30 seconds)
-    const interval = setInterval(() => fetchUsage(true), 120000);
+    const interval = setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        fetchUsage(true);
+      }
+    }, 120000);
 
-    // Also refresh when window regains focus (user returns to tab)
-    const handleFocus = () => fetchUsage();
-    window.addEventListener('focus', handleFocus);
+    // Refresh when tab regains focus/visibility, but throttle it.
+    let lastFocusRefresh = 0;
+    const refreshOnFocus = () => {
+      const now = Date.now();
+      if (document.visibilityState !== 'visible') return;
+      if (now - lastFocusRefresh < FOCUS_REFRESH_COOLDOWN) return;
+      lastFocusRefresh = now;
+      fetchUsage();
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        refreshOnFocus();
+      }
+    };
+
+    window.addEventListener('focus', refreshOnFocus);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
       clearInterval(interval);
-      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('focus', refreshOnFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [user, fetchUsage]);
+  }, [user?.id, fetchUsage]);
 
   if (!user || loading) return null;
   if (!usage) return null;

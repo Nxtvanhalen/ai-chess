@@ -66,13 +66,30 @@ export default function Home() {
       displayedLength = Math.min(displayedLength + charsPerTick, text.length);
       const displayedText = text.slice(0, displayedLength);
 
-      setMessages((prev) =>
-        prev.map((msg) =>
-          msg.id === messageId
-            ? { ...msg, content: displayedText, metadata: { isThinking: false } }
-            : msg,
-        ),
-      );
+      setMessages((prev) => {
+        let found = false;
+        let changed = false;
+
+        const next = prev.map((msg) => {
+          if (msg.id !== messageId) return msg;
+          found = true;
+
+          if (msg.content === displayedText && msg.metadata?.isThinking === false) {
+            return msg;
+          }
+
+          changed = true;
+          return { ...msg, content: displayedText, metadata: { isThinking: false } };
+        });
+
+        // If message disappeared (e.g. reset/new game), stop updating.
+        if (!found) {
+          clearInterval(interval);
+          return prev;
+        }
+
+        return changed ? next : prev;
+      });
 
       if (displayedLength >= text.length) {
         clearInterval(interval);
@@ -188,7 +205,7 @@ export default function Home() {
   };
 
 
-  const convertMoveToPlainEnglish = (san: string) => {
+  const convertMoveToPlainEnglish = useCallback((san: string) => {
     // Convert algebraic notation to plain English
     const pieceMap: Record<string, string> = {
       K: 'King',
@@ -217,7 +234,7 @@ export default function Home() {
       const destination = match ? match[0].toUpperCase() : '';
       return `Pawn to ${destination}`;
     }
-  };
+  }, []);
 
   const handleCheckmate = useCallback(
     async (winner: 'white' | 'black') => {
@@ -330,7 +347,7 @@ export default function Home() {
 
         if (isAiTurn) {
           // Get player move history for engine adaptation
-          const playerMoveHistory = messages
+          const playerMoveHistory = messagesRef.current
             .filter((m) => m.role === 'user' && m.metadata?.moveContext)
             .map((m) => m.metadata?.moveContext || '')
             .slice(-10);
@@ -541,8 +558,6 @@ export default function Home() {
       typeText,
       convertMoveToPlainEnglish,
       handleCheckmate,
-      messages.filter,
-      user?.id,
     ],
   );
 

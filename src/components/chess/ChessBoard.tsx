@@ -57,6 +57,7 @@ export default function ChessBoard({
   const [focusedSquare, setFocusedSquare] = useState<Square>('e2');
   const [statusAnnouncement, setStatusAnnouncement] = useState<string>('');
   const [isBoardFocused, setIsBoardFocused] = useState(false);
+  const [isKeyboardNavigationActive, setIsKeyboardNavigationActive] = useState(false);
 
   // Smooth fade-in effect to mask SVG hydration
   useEffect(() => {
@@ -133,7 +134,7 @@ export default function ChessBoard({
   }, [position, game.fen]);
 
   // Find the path between two squares for sliding pieces
-  const getPathBetweenSquares = (from: Square, to: Square): Square[] => {
+  const getPathBetweenSquares = useCallback((from: Square, to: Square): Square[] => {
     const path: Square[] = [];
     const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
     const fromFile = files.indexOf(from[0]);
@@ -154,22 +155,24 @@ export default function ChessBoard({
     }
 
     return path;
-  };
+  }, []);
 
   // Check for check and checkmate state after every move
   useEffect(() => {
     // Check for checkmate
     if (game.isCheckmate()) {
       const winner = game.turn() === 'w' ? 'black' : 'white';
-      setStatusAnnouncement(`Checkmate! ${winner === 'white' ? 'White' : 'Black'} wins!`);
+      const message = `Checkmate! ${winner === 'white' ? 'White' : 'Black'} wins!`;
+      setStatusAnnouncement((prev) => (prev === message ? prev : message));
       if (onCheckmate) {
         onCheckmate(winner);
       }
     } else if (game.isDraw()) {
-      setStatusAnnouncement('Game is a draw!');
+      setStatusAnnouncement((prev) => (prev === 'Game is a draw!' ? prev : 'Game is a draw!'));
     } else if (game.inCheck()) {
       const inCheckColor = game.turn() === 'w' ? 'White' : 'Black';
-      setStatusAnnouncement(`${inCheckColor} is in check!`);
+      const message = `${inCheckColor} is in check!`;
+      setStatusAnnouncement((prev) => (prev === message ? prev : message));
     }
 
     // Check for check
@@ -229,6 +232,7 @@ export default function ChessBoard({
   const handleSquareClick = useCallback(
     (square: string) => {
       if (!interactive) return;
+      setIsKeyboardNavigationActive(false);
 
       const piece = game.get(square as Square);
 
@@ -272,6 +276,7 @@ export default function ChessBoard({
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (!interactive) return;
+      setIsKeyboardNavigationActive(true);
 
       const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
       const ranks = ['1', '2', '3', '4', '5', '6', '7', '8'];
@@ -335,6 +340,7 @@ export default function ChessBoard({
   const handleDrop = useCallback(
     (sourceSquare: string, targetSquare: string) => {
       if (!interactive) return false;
+      setIsKeyboardNavigationActive(false);
 
       const gameCopy = new Chess(game.fen());
 
@@ -435,7 +441,7 @@ export default function ChessBoard({
   // Accessibility: Add keyboard focus indicator only when board has focus
   const squareStylesWithFocus = {
     ...customSquareStyles,
-    ...(isBoardFocused && focusedSquare && {
+    ...(isBoardFocused && isKeyboardNavigationActive && focusedSquare && {
       [focusedSquare]: {
         ...(customSquareStyles[focusedSquare] || {}),
         outline: '3px solid hsla(200, 100%, 60%, 0.9)',
@@ -578,6 +584,8 @@ export default function ChessBoard({
         onKeyDown={handleKeyDown}
         onFocus={() => !isMobile && setIsBoardFocused(true)}
         onBlur={() => setIsBoardFocused(false)}
+        onMouseDown={() => setIsKeyboardNavigationActive(false)}
+        onTouchStart={() => setIsKeyboardNavigationActive(false)}
       >
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-2xl pointer-events-none" />
         <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl opacity-10 blur-sm pointer-events-none" />

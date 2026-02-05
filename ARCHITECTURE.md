@@ -9,7 +9,7 @@ This document outlines the technical architecture, design decisions, and impleme
 1. **Production-First**: Every component is built to production standards from day one
 2. **Mobile-First**: UI/UX optimized for mobile devices, scaling up to desktop
 3. **Security-First**: Credentials and sensitive data handled with industry best practices
-4. **AI-Native**: OpenAI GPT-4o integration is core to the experience
+4. **AI-Native**: OpenAI Responses API (GPT-5 series) integration is core to the experience
 5. **Extensible**: Modular architecture ready for voice and future features
 
 ## System Architecture
@@ -47,8 +47,8 @@ This document outlines the technical architecture, design decisions, and impleme
 │  │   OpenAI        │         │    Supabase        │   │
 │  │   Service       │         │    Service         │   │
 │  │                 │         │                     │   │
-│  │  - GPT-4o       │         │  - Game storage    │   │
-│  │  - Realtime API │         │  - Chat history    │   │
+│  │  - GPT-5 via    │         │  - Game storage    │   │
+│  │    Responses API│         │  - Chat history    │   │
 │  │  - Streaming    │         │  - Memory system   │   │
 │  └─────────────────┘         └─────────────────────┘   │
 └─────────────────────────────────────────────────────────┘

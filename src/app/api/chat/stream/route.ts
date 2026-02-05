@@ -1,9 +1,8 @@
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
 import type { NextRequest } from 'next/server';
-import { checkRateLimit, getClientIP, getRateLimitHeaders } from '@/lib/middleware/rate-limit';
+import { getAuthenticatedUser } from '@/lib/auth/getUser';
 import { CHESS_BUTLER_SYSTEM_PROMPT, formatMoveContext } from '@/lib/openai/chess-butler-prompt';
 import { createResponsesCompletionStream, parseResponsesStream } from '@/lib/openai/client';
+import { checkRateLimitRedis, getClientIPFromRequest, getRateLimitHeadersRedis } from '@/lib/redis';
 import { ChesterMemoryService } from '@/lib/services/ChesterMemoryService';
 import { GameMemoryService } from '@/lib/services/GameMemoryService';
 import {
@@ -12,64 +11,49 @@ import {
   getUsageHeaders,
   incrementChatUsage,
 } from '@/lib/supabase/subscription';
+import { chatSchema, validateRequest } from '@/lib/validation/schemas';
 
 /**
  * Streaming Chat API for Chester
  * Returns Server-Sent Events for real-time character-by-character responses
  */
 export async function POST(request: NextRequest) {
-  // Check rate limit
-  const clientIP = getClientIP(request);
-  const rateLimitResult = checkRateLimit(clientIP);
-
-  if (!rateLimitResult.allowed) {
-    return new Response(
-      JSON.stringify({
-        error: 'Rate limit exceeded. Please wait before sending another message.',
-        retryAfter: Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000),
-      }),
-      {
-        status: 429,
-        headers: {
-          'Content-Type': 'application/json',
-          ...getRateLimitHeaders(rateLimitResult),
-        },
-      },
-    );
-  }
-
   try {
-    const { message, gameContext, gameId, userId } = await request.json();
+    // Check rate limit (Redis-based, falls back to in-memory)
+    const clientIP = getClientIPFromRequest(request);
+    const rateLimitResult = await checkRateLimitRedis(clientIP, 'chat');
 
-    // Check subscription usage limit for authenticated users
-    const cookieStore = await cookies();
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll();
-          },
-          setAll(cookiesToSet) {
-            try {
-              cookiesToSet.forEach(({ name, value, options }) => {
-                cookieStore.set(name, value, options);
-              });
-            } catch {
-              /* Server Component context */
-            }
+    if (!rateLimitResult.success) {
+      return new Response(
+        JSON.stringify({
+          error: 'Rate limit exceeded. Please wait before sending another message.',
+          retryAfter: Math.ceil((rateLimitResult.reset - Date.now()) / 1000),
+        }),
+        {
+          status: 429,
+          headers: {
+            'Content-Type': 'application/json',
+            ...getRateLimitHeadersRedis(rateLimitResult),
           },
         },
-      },
-    );
+      );
+    }
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const body = await request.json();
+    const validation = validateRequest(chatSchema, body);
+    if (!validation.success) {
+      return new Response(JSON.stringify({ error: validation.error }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
 
-    if (user) {
-      const usageCheck = await canUseChat(user.id);
+    const { message, gameContext, gameId } = validation.data;
+
+    const authUser = await getAuthenticatedUser();
+
+    if (authUser) {
+      const usageCheck = await canUseChat(authUser.id);
       if (!usageCheck.allowed) {
         return new Response(JSON.stringify(createUsageLimitError('chat', usageCheck)), {
           status: 429,
@@ -79,13 +63,6 @@ export async function POST(request: NextRequest) {
           },
         });
       }
-    }
-
-    if (!message) {
-      return new Response(JSON.stringify({ error: 'Message is required' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
     }
 
     // Build instructions (same logic as non-streaming route)
@@ -98,7 +75,7 @@ export async function POST(request: NextRequest) {
     if (gameId) {
       try {
         fullGameContext = await GameMemoryService.getGameContext(gameId);
-        chesterPersonality = await ChesterMemoryService.getPersonalityContext(userId);
+        chesterPersonality = await ChesterMemoryService.getPersonalityContext(authUser?.id || null);
       } catch (error) {
         console.error('Error fetching game memory context:', error);
       }
@@ -196,8 +173,8 @@ export async function POST(request: NextRequest) {
           }
 
           // Increment chat usage for authenticated users
-          if (user) {
-            await incrementChatUsage(user.id);
+          if (authUser) {
+            await incrementChatUsage(authUser.id);
           }
         } catch (error) {
           console.error('[Chester Stream] Stream error:', error);
@@ -214,7 +191,7 @@ export async function POST(request: NextRequest) {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
         Connection: 'keep-alive',
-        ...getRateLimitHeaders(rateLimitResult),
+        ...getRateLimitHeadersRedis(rateLimitResult),
       },
     });
   } catch (error) {

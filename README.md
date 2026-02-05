@@ -4,7 +4,7 @@ A sophisticated full-stack chess application with an intelligent AI companion na
 
 ![Production Status](https://img.shields.io/badge/status-production--ready-brightgreen)
 ![Grade](https://img.shields.io/badge/grade-A--blue)
-![Tests](https://img.shields.io/badge/tests-36%20passing-success)
+![Tests](https://img.shields.io/badge/tests-jest%20configured-blue)
 
 ## Live Demo
 
@@ -26,7 +26,7 @@ A sophisticated full-stack chess application with an intelligent AI companion na
 - **Database**: Supabase (PostgreSQL with Row Level Security)
 - **Auth**: Supabase Auth (Email/Password + Google OAuth)
 - **Payments**: Stripe (Subscriptions + Customer Portal)
-- **AI**: OpenAI GPT for Chester's commentary
+- **AI**: OpenAI Responses API (GPT-5 series) for Chester's commentary
 - **Chess**: chess.js + react-chessboard
 - **Monitoring**: Sentry (Error tracking + Session replay)
 - **Rate Limiting**: Upstash Redis
@@ -92,7 +92,9 @@ SENTRY_AUTH_TOKEN=
 npm run dev          # Development server
 npm run build        # Production build
 npm run start        # Start production server
-npm run lint         # ESLint check
+npm run lint         # Biome check
+npm run lint:fix     # Biome check + autofix
+npm run format       # Biome formatter
 npm test             # Run tests
 npm run test:watch   # Watch mode
 npm run test:coverage # Coverage report

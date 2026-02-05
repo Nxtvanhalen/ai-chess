@@ -1,11 +1,121 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { PositionAnalyzer } from '@/lib/chess/positionAnalyzer';
-import { formatMoveContext } from '@/lib/openai/chess-butler-prompt';
 import { getDeepSeekClient } from '@/lib/openai/client';
 import { checkRateLimitRedis, getClientIPFromRequest, getRateLimitHeadersRedis } from '@/lib/redis';
 import { engineMoveAnalysisSchema, validateRequest } from '@/lib/validation/schemas';
 
+interface CachedAnalysis {
+  expiresAt: number;
+  payload: {
+    commentary: string;
+    suggestion: {
+      move: string;
+      reasoning: string;
+    };
+  };
+}
+
+const analysisCache = new Map<string, CachedAnalysis>();
+const ANALYSIS_CACHE_TTL_MS = 45_000;
+const LLM_TIMEOUT_MS = 2_800;
+
+function getCacheKey(
+  fen: string,
+  move: string,
+  userMove?: string,
+  engineEvaluation?: number,
+): string {
+  const evalBucket =
+    engineEvaluation === undefined ? 'na' : Math.round(engineEvaluation * 10).toString();
+  return `${fen}|${move}|${userMove || 'none'}|${evalBucket}`;
+}
+
+function getCachedAnalysis(cacheKey: string) {
+  const entry = analysisCache.get(cacheKey);
+  if (!entry) return null;
+  if (entry.expiresAt < Date.now()) {
+    analysisCache.delete(cacheKey);
+    return null;
+  }
+  return entry.payload;
+}
+
+function setCachedAnalysis(cacheKey: string, payload: CachedAnalysis['payload']) {
+  analysisCache.set(cacheKey, {
+    expiresAt: Date.now() + ANALYSIS_CACHE_TTL_MS,
+    payload,
+  });
+}
+
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      reject(new Error(`Engine move analysis timed out after ${timeoutMs}ms`));
+    }, timeoutMs);
+
+    promise
+      .then((result) => {
+        clearTimeout(timeout);
+        resolve(result);
+      })
+      .catch((error) => {
+        clearTimeout(timeout);
+        reject(error);
+      });
+  });
+}
+
+function buildLiteContext(
+  fen: string,
+  moveStr: string,
+  userMove: string | undefined,
+  engineEvaluation: number | undefined,
+  analysis: ReturnType<PositionAnalyzer['analyzePosition']>,
+) {
+  const topThreats = analysis.threats
+    .slice(0, 2)
+    .map((t) => `${t.square.toUpperCase()} ${t.isHanging ? '(hanging)' : '(contested)'}`)
+    .join(', ');
+
+  return [
+    `FEN: ${fen}`,
+    `Engine move: ${moveStr}`,
+    userMove ? `Player move: ${userMove}` : null,
+    `Phase: ${analysis.gamePhase}`,
+    `Urgency: ${analysis.urgencyLevel}`,
+    engineEvaluation !== undefined ? `Eval: ${engineEvaluation.toFixed(2)}` : null,
+    topThreats ? `Top threats: ${topThreats}` : 'Top threats: none',
+  ]
+    .filter(Boolean)
+    .join('\n');
+}
+
+function buildFallbackResponse(
+  moveStr: string,
+  userMove: string | undefined,
+  analysis: ReturnType<PositionAnalyzer['analyzePosition']>,
+) {
+  const fallbackCommentary =
+    analysis.urgencyLevel === 'emergency'
+      ? `${userMove ? `You played ${userMove}. ` : ''}${moveStr} forces accuracy now. Keep it simple and protect loose pieces.`
+      : analysis.urgencyLevel === 'tactical'
+        ? `${userMove ? `After ${userMove}, ` : ''}${moveStr} keeps things sharp. Look for active moves with immediate threats.`
+        : `${userMove ? `After ${userMove}, ` : ''}${moveStr} is solid. Improve your least active piece and keep pressure central.`;
+
+  const fallbackSuggestion =
+    analysis.recommendations[0]?.split(' - ')[0] || 'Develop a piece to an active square';
+
+  return {
+    commentary: fallbackCommentary,
+    suggestion: {
+      move: fallbackSuggestion,
+      reasoning: analysis.urgencyLevel === 'emergency' ? 'Stabilize position' : 'Improve activity',
+    },
+  };
+}
+
 export async function POST(request: NextRequest) {
+  const startedAt = Date.now();
   try {
     // Check rate limit (Redis-based, falls back to in-memory)
     const clientIP = getClientIPFromRequest(request);
@@ -37,60 +147,47 @@ export async function POST(request: NextRequest) {
 
     // Handle engineMove being either a string or an object with san property
     const moveStr = typeof engineMove === 'string' ? engineMove : engineMove.san || '';
-    const context = formatMoveContext(fen, moveStr);
-
-    // Analyze position to inform suggestion
     const analyzer = new PositionAnalyzer(fen);
     const analysis = analyzer.analyzePosition();
+    const context = buildLiteContext(fen, moveStr, userMove, engineEvaluation, analysis);
 
-    const systemPrompt = `You are Chester, a chess buddy watching the player battle a chess engine.
+    const cacheKey = getCacheKey(fen, moveStr, userMove, engineEvaluation);
+    const cached = getCachedAnalysis(cacheKey);
+    if (cached) {
+      return NextResponse.json({
+        commentary: cached.commentary,
+        suggestion: cached.suggestion,
+        analysis: {
+          move: moveStr,
+          evaluation: engineEvaluation || 0,
+          depth: 10,
+          cached: true,
+        },
+      });
+    }
 
-    ${userMove ? 'React to BOTH moves in 1-2 short sentences, then suggest ONE next move.' : 'React to the engine move in ONE sentence, then suggest ONE next move.'} Be dry and witty.
+    const systemPrompt = `You are Chester, a strong chess buddy with dry wit.
 
-    CRITICAL: Describe what ACTUALLY HAPPENED, not what you think might happen next.
-    - If it retreated, say it retreated
-    - If it captured, say it captured
-    - If it developed a piece, note that
-    - DO NOT say "it wants your pawn" if it didn't take the pawn
-    - DO NOT predict what will happen next
+Return ${userMove ? '1-2 short sentences about BOTH moves' : '1 short sentence about the engine move'} and suggest ONE safe next move.
 
-    Good examples:
-    - "Retreating? Defensive play. Try Knight to F3 for development."
-    - "That bishop's running away. Castle kingside for safety."
-    - "Solid development. Push the E-pawn to gain space."
-    - "That's aggressive. Bishop to E7 develops while defending."
-    ${userMove ? '- "Solid pawn push. Engine responds with development. Try Knight to C6 for piece activity."' : ''}
-    ${userMove ? '- "You advanced aggressively. Engine retreats. Castle to consolidate your position."' : ''}
+Rules:
+- Describe what happened; do not speculate.
+- Keep tone dry, witty, concise.
+- Tactical safety first: do not suggest a move that drops material immediately.
 
-    Bad examples (DON'T DO THIS):
-    - "It eyeballed your pawn" (unless it actually took it)
-    - "It wants blood" (too vague/predictive)
-    - "Setting a trap" (unless obvious)
-
-    TACTICAL SAFETY - CRITICAL:
-    Before suggesting ANY move, you MUST mentally play it out:
-    1. If I suggest this move, what can the opponent do NEXT?
-    2. Will the piece I move be immediately captured?
-    3. Does this move leave another piece undefended?
-    4. NEVER suggest a move that loses material on the very next move
-    5. If capturing a piece, make sure your piece isn't immediately recaptured for free
-
-    RESPONSE FORMAT:
-    You MUST respond with valid JSON in EXACTLY this format:
+Return valid JSON in EXACTLY this format:
     {
-      "commentary": "1-2 sentences analyzing the moves. Try [move] for [reason].",
+      "commentary": "Brief analysis. Try [move] for [reason].",
       "suggestion": {
         "move": "Knight to F3",
         "reasoning": "Development"
       }
     }
 
-    MANDATORY RULES:
-    1. ALWAYS include "commentary" string with analysis + suggestion
-    2. ALWAYS include "suggestion" object with "move" and "reasoning"
-    3. Keep reasoning to 3-5 words
-    4. Use simple descriptions: "Knight to F3" not "Nf3"
-    5. The suggestion should be integrated naturally into the commentary text`;
+Mandatory:
+- Include both "commentary" and "suggestion".
+- Reasoning must be 3-5 words.
+- Use simple move text ("Knight to F3", not "Nf3").`;
 
     const evaluationContext =
       engineEvaluation !== undefined
@@ -105,28 +202,41 @@ export async function POST(request: NextRequest) {
         ? '\n\nTACTICAL OPPORTUNITY: Look for active play and threats'
         : '\n\nSTRATEGIC POSITION: Focus on piece activity, king safety, or pawn structure';
 
-    const deepseek = getDeepSeekClient();
-    const completion = await deepseek.chat.completions.create({
-      model: 'deepseek-chat',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        {
-          role: 'user',
-          content: `${context}${evaluationContext}${userMoveContext}${urgencyContext}\n\nThe engine just played: ${moveStr}\n\nWhat's your casual take on ${userMove ? 'these moves' : 'this move'}, and what should the player try next?`,
-        },
-      ],
-      max_completion_tokens: 200, // Increased for analysis + suggestion
-      response_format: { type: 'json_object' },
-    });
+    let payload: CachedAnalysis['payload'];
+    try {
+      const deepseek = getDeepSeekClient();
+      const completion = await withTimeout(
+        deepseek.chat.completions.create({
+          model: 'deepseek-chat',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            {
+              role: 'user',
+              content: `${context}${evaluationContext}${userMoveContext}${urgencyContext}\n\nThe engine just played: ${moveStr}\n\nWhat's your casual take on ${userMove ? 'these moves' : 'this move'}, and what should the player try next?`,
+            },
+          ],
+          max_completion_tokens: 160,
+          response_format: { type: 'json_object' },
+        }),
+        LLM_TIMEOUT_MS,
+      );
 
-    const response = JSON.parse(completion.choices[0].message.content || '{}');
+      const response = JSON.parse(completion.choices[0].message.content || '{}');
+      payload = {
+        commentary: response.commentary || 'Interesting move by the engine.',
+        suggestion: response.suggestion || { move: 'Develop a piece', reasoning: 'Good play' },
+      };
+    } catch (llmError) {
+      console.warn('[EngineAnalysis] Falling back to local commentary:', llmError);
+      payload = buildFallbackResponse(moveStr, userMove, analysis);
+    }
 
-    const commentary = response.commentary || 'Interesting move by the engine.';
-    const suggestion = response.suggestion || { move: 'Develop a piece', reasoning: 'Good play' };
+    setCachedAnalysis(cacheKey, payload);
 
+    console.log(`[EngineAnalysis] Total: ${Date.now() - startedAt}ms`);
     return NextResponse.json({
-      commentary,
-      suggestion,
+      commentary: payload.commentary,
+      suggestion: payload.suggestion,
       analysis: {
         move: moveStr,
         evaluation: engineEvaluation || 0,
