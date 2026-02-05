@@ -9,6 +9,10 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+      - key: BASELINE_BROWSER_MAPPING_IGNORE_OLD_DATA
+        value: "true"
+      - key: BROWSERSLIST_IGNORE_OLD_DATA
+        value: "true"
       - key: OPENAI_API_KEY
         sync: false
       - key: NEXT_PUBLIC_SUPABASE_URL
