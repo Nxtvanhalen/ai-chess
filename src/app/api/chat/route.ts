@@ -1,11 +1,18 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { getAuthenticatedUser } from '@/lib/auth/getUser';
 import {
+  buildBoardStateInstructions,
+  buildGameMemoryInstructions,
+  buildPersonalityInstructions,
+  listToPromptText,
+  promptValue,
+} from '@/lib/chat/prompt-utils';
+import {
   extractMoveSuggestions,
   generateSafetyNotice,
   validateMoveSuggestion,
 } from '@/lib/chess/board-validator';
-import { CHESS_BUTLER_SYSTEM_PROMPT, formatMoveContext } from '@/lib/openai/chess-butler-prompt';
+import { CHESS_BUTLER_SYSTEM_PROMPT } from '@/lib/openai/chess-butler-prompt';
 import { createResponsesCompletion } from '@/lib/openai/client';
 import { checkRateLimitRedis, getClientIPFromRequest, getRateLimitHeadersRedis } from '@/lib/redis';
 import { ChesterMemoryService } from '@/lib/services/ChesterMemoryService';
@@ -17,45 +24,6 @@ import {
   incrementChatUsage,
 } from '@/lib/supabase/subscription';
 import { chatSchema, validateRequest } from '@/lib/validation/schemas';
-
-function listToPromptText(items: unknown[]): string {
-  return items
-    .map((item) => {
-      if (typeof item === 'string' || typeof item === 'number' || typeof item === 'boolean') {
-        return String(item);
-      }
-      if (item && typeof item === 'object') {
-        const record = item as Record<string, unknown>;
-        const prioritizedKeys = ['name', 'move', 'theme', 'label', 'content', 'type'];
-        for (const key of prioritizedKeys) {
-          if (typeof record[key] === 'string' && record[key]) return record[key] as string;
-        }
-        const firstStringValue = Object.values(record).find((v) => typeof v === 'string' && v);
-        if (typeof firstStringValue === 'string') return firstStringValue;
-      }
-      return '';
-    })
-    .filter(Boolean)
-    .join(', ');
-}
-
-function promptValue(value: unknown, fallback: string = ''): string {
-  if (value === null || value === undefined) return fallback;
-  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-    return String(value);
-  }
-  if (Array.isArray(value)) return listToPromptText(value);
-  if (typeof value === 'object') {
-    const record = value as Record<string, unknown>;
-    const prioritizedKeys = ['content', 'text', 'name', 'move', 'theme', 'label', 'type'];
-    for (const key of prioritizedKeys) {
-      if (typeof record[key] === 'string' && record[key]) return record[key] as string;
-    }
-    const firstStringValue = Object.values(record).find((v) => typeof v === 'string' && v);
-    if (typeof firstStringValue === 'string') return firstStringValue;
-  }
-  return fallback;
-}
 
 export async function POST(request: NextRequest) {
   try {
@@ -194,31 +162,10 @@ export async function POST(request: NextRequest) {
     let instructions = CHESS_BUTLER_SYSTEM_PROMPT;
 
     // Add Chester's personality and relationship context
-    if (chesterPersonality) {
-      instructions += `\n\nYOUR RELATIONSHIP WITH CHRIS:
-- Rapport Level: ${chesterPersonality.rapportLevel}/10
-- Games Played Together: ${chesterPersonality.gamesPlayed}
-- Current Performance: ${promptValue(chesterPersonality.recentPerformance, 'neutral')}
-- Current Streak: ${chesterPersonality.currentStreak > 0 ? `${chesterPersonality.currentStreak} wins` : 'none'}`;
+    instructions += buildPersonalityInstructions(chesterPersonality);
 
-      if (chesterPersonality.commonMistakes.length > 0) {
-        instructions += `\n- Common Patterns to Watch: ${listToPromptText(chesterPersonality.commonMistakes)}`;
-      }
-
-      if (chesterPersonality.strongAreas.length > 0) {
-        instructions += `\n- Strong Areas: ${listToPromptText(chesterPersonality.strongAreas)}`;
-      }
-    }
-
-    if (gameContext?.fen) {
-      instructions += `\n\nCURRENT BOARD STATE - You CAN see the board clearly:\n${formatMoveContext(gameContext.fen, gameContext.lastMove)}`;
-
-      if (gameContext.totalMoves) {
-        instructions += `\n\nGame Progress: ${gameContext.totalMoves} moves have been played.`;
-      }
-    } else {
-      instructions += `\n\nNote: No current board state available. Ask them to make a move if you need to see the position.`;
-    }
+    // Add board state
+    instructions += buildBoardStateInstructions(gameContext);
 
     // Add past game context if user is asking about it
     if (pastGameContext) {
@@ -262,26 +209,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Add comprehensive game memory context
+    instructions += buildGameMemoryInstructions(fullGameContext);
+
     if (fullGameContext) {
-      // Add tactical themes detected
-      if (fullGameContext.tacticalThemes.length > 0) {
-        instructions += `\n\nTactical Themes in This Game: ${listToPromptText(fullGameContext.tacticalThemes)}`;
-      }
-
-      // Add game narrative if available
-      if (fullGameContext.gameNarrative) {
-        instructions += `\n\nGame Story So Far: ${promptValue(fullGameContext.gameNarrative)}`;
-      }
-
-      // Add recent commentary for context continuity
-      const recentCommentary = fullGameContext.chesterCommentary.slice(-5);
-      if (recentCommentary.length > 0) {
-        instructions += `\n\nYour Recent Commentary:`;
-        recentCommentary.forEach((comment) => {
-          instructions += `\n- Move ${comment.move_number}: ${promptValue(comment.content)}`;
-        });
-      }
-
       // Add move history for style analysis questions
       if (isStyleAnalysis && fullGameContext.fullMoveHistory.length > 0) {
         const recentMoves = fullGameContext.fullMoveHistory.slice(-50); // Last 50 moves
