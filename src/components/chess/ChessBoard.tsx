@@ -131,7 +131,7 @@ export default function ChessBoard({
       const newGame = new Chess(position);
       setGame(newGame);
     }
-  }, [position, game.fen()]);
+  }, [position, game]);
 
   // Find the path between two squares for sliding pieces
   const getPathBetweenSquares = useCallback((from: Square, to: Square): Square[] => {
