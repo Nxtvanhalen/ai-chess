@@ -4,8 +4,8 @@ services:
     env: node
     plan: starter
     region: oregon
-    buildCommand: npm ci && npm run build
-    startCommand: npm start
+    buildCommand: curl -fsSL https://bun.sh/install | bash && export PATH="$HOME/.bun/bin:$PATH" && bun install && bun run build
+    startCommand: bun run start
     envVars:
       - key: NODE_ENV
         value: production
