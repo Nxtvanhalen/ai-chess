@@ -132,8 +132,8 @@ export async function canUseAIMove(userId: string): Promise<{
 
   if (rpcResult.error) {
     console.error('[Subscription] Error checking AI move usage:', rpcResult.error);
-    // Default to allowing in case of error (fail open for UX)
-    return { allowed: true, remaining: 0, limit: 0, unlimited: false };
+    // Fail closed - deny access when we can't verify usage
+    return { allowed: false, remaining: 0, limit: 0, unlimited: false };
   }
 
   return {
@@ -165,7 +165,8 @@ export async function canUseChat(userId: string): Promise<{
 
   if (rpcResult.error) {
     console.error('[Subscription] Error checking chat usage:', rpcResult.error);
-    return { allowed: true, remaining: 0, limit: 0, unlimited: false };
+    // Fail closed - deny access when we can't verify usage
+    return { allowed: false, remaining: 0, limit: 0, unlimited: false };
   }
 
   return {

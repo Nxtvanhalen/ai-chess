@@ -118,23 +118,9 @@ export async function saveMessage(
 
   if (error) throw error;
 
-  // Update message count using direct database update
+  // Atomic message count increment
   try {
-    const { data: currentConv } = await supabase
-      .from('conversations')
-      .select('message_count')
-      .eq('id', conversationId)
-      .single();
-
-    if (currentConv) {
-      await supabase
-        .from('conversations')
-        .update({
-          message_count: (currentConv.message_count || 0) + 1,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', conversationId);
-    }
+    await supabase.rpc('increment_message_count', { p_conversation_id: conversationId });
   } catch (updateError) {
     console.warn('Message count update failed, continuing without it:', updateError);
   }
