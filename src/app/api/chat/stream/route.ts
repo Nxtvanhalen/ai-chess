@@ -1,12 +1,7 @@
 import type { NextRequest } from 'next/server';
 import { getAuthenticatedUser } from '@/lib/auth/getUser';
-import {
-  buildBoardStateInstructions,
-  buildGameMemoryInstructions,
-  buildPersonalityInstructions,
-} from '@/lib/chat/prompt-utils';
 import { generateSafetyNotice } from '@/lib/chess/board-validator';
-import { CHESS_BUTLER_SYSTEM_PROMPT } from '@/lib/openai/chess-butler-prompt';
+import { CHESS_BUTLER_SYSTEM_PROMPT, formatMoveContext } from '@/lib/openai/chess-butler-prompt';
 import { createResponsesCompletionStream, parseResponsesStream } from '@/lib/openai/client';
 import { checkRateLimitRedis, getClientIPFromRequest, getRateLimitHeadersRedis } from '@/lib/redis';
 import { ChesterMemoryService } from '@/lib/services/ChesterMemoryService';
@@ -18,6 +13,45 @@ import {
   incrementChatUsage,
 } from '@/lib/supabase/subscription';
 import { chatSchema, validateRequest } from '@/lib/validation/schemas';
+
+function listToPromptText(items: unknown[]): string {
+  return items
+    .map((item) => {
+      if (typeof item === 'string' || typeof item === 'number' || typeof item === 'boolean') {
+        return String(item);
+      }
+      if (item && typeof item === 'object') {
+        const record = item as Record<string, unknown>;
+        const prioritizedKeys = ['name', 'move', 'theme', 'label', 'content', 'type'];
+        for (const key of prioritizedKeys) {
+          if (typeof record[key] === 'string' && record[key]) return record[key] as string;
+        }
+        const firstStringValue = Object.values(record).find((v) => typeof v === 'string' && v);
+        if (typeof firstStringValue === 'string') return firstStringValue;
+      }
+      return '';
+    })
+    .filter(Boolean)
+    .join(', ');
+}
+
+function promptValue(value: unknown, fallback: string = ''): string {
+  if (value === null || value === undefined) return fallback;
+  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+    return String(value);
+  }
+  if (Array.isArray(value)) return listToPromptText(value);
+  if (typeof value === 'object') {
+    const record = value as Record<string, unknown>;
+    const prioritizedKeys = ['content', 'text', 'name', 'move', 'theme', 'label', 'type'];
+    for (const key of prioritizedKeys) {
+      if (typeof record[key] === 'string' && record[key]) return record[key] as string;
+    }
+    const firstStringValue = Object.values(record).find((v) => typeof v === 'string' && v);
+    if (typeof firstStringValue === 'string') return firstStringValue;
+  }
+  return fallback;
+}
 
 /**
  * Streaming Chat API for Chester
@@ -74,25 +108,53 @@ export async function POST(request: NextRequest) {
     // Build instructions (same logic as non-streaming route)
     let instructions = CHESS_BUTLER_SYSTEM_PROMPT;
 
-    // Fetch memory context (parallelized for performance)
+    // Fetch memory context
     let fullGameContext = null;
     let chesterPersonality = null;
 
     if (gameId) {
       try {
-        [fullGameContext, chesterPersonality] = await Promise.all([
-          GameMemoryService.getGameContext(gameId),
-          ChesterMemoryService.getPersonalityContext(authUser?.id || null),
-        ]);
+        fullGameContext = await GameMemoryService.getGameContext(gameId);
+        chesterPersonality = await ChesterMemoryService.getPersonalityContext(authUser?.id || null);
       } catch (error) {
         console.error('Error fetching game memory context:', error);
       }
     }
 
-    // Add Chester's personality, board state, and game memory context
-    instructions += buildPersonalityInstructions(chesterPersonality);
-    instructions += buildBoardStateInstructions(gameContext);
-    instructions += buildGameMemoryInstructions(fullGameContext);
+    // Add Chester's personality context
+    if (chesterPersonality) {
+      instructions += `\n\nYOUR RELATIONSHIP WITH CHRIS:
+- Rapport Level: ${chesterPersonality.rapportLevel}/10
+- Games Played Together: ${chesterPersonality.gamesPlayed}
+- Current Performance: ${promptValue(chesterPersonality.recentPerformance, 'neutral')}`;
+
+      if (chesterPersonality.commonMistakes.length > 0) {
+        instructions += `\n- Common Patterns to Watch: ${listToPromptText(chesterPersonality.commonMistakes)}`;
+      }
+    }
+
+    // Add board state
+    if (gameContext?.fen) {
+      instructions += `\n\nCURRENT BOARD STATE:\n${formatMoveContext(gameContext.fen, gameContext.lastMove)}`;
+      if (gameContext.totalMoves) {
+        instructions += `\n\nGame Progress: ${gameContext.totalMoves} moves played.`;
+      }
+    }
+
+    // Add game memory context
+    if (fullGameContext) {
+      if (fullGameContext.tacticalThemes.length > 0) {
+        instructions += `\n\nTactical Themes: ${listToPromptText(fullGameContext.tacticalThemes)}`;
+      }
+
+      const recentCommentary = fullGameContext.chesterCommentary.slice(-3);
+      if (recentCommentary.length > 0) {
+        instructions += `\n\nYour Recent Commentary:`;
+        recentCommentary.forEach((comment) => {
+          instructions += `\n- Move ${comment.move_number}: ${promptValue(comment.content)}`;
+        });
+      }
+    }
 
 
     // Create streaming response
@@ -136,27 +198,27 @@ export async function POST(request: NextRequest) {
           controller.enqueue(
             encoder.encode(`data: ${JSON.stringify({ done: true, fullContent })}\n\n`),
           );
+          controller.close();
 
-          // Perform DB operations BEFORE closing the stream
-          // On serverless, the function may be killed after close()
+          // Save to game memory after stream completes
           if (gameId && gameContext?.totalMoves !== undefined) {
             try {
-              await Promise.all([
-                GameMemoryService.addCommentary(gameId, {
-                  move_number: gameContext.totalMoves,
-                  type: 'chat',
-                  content: `User: ${message}`,
-                  timestamp: new Date().toISOString(),
-                  metadata: {},
-                }),
-                GameMemoryService.addCommentary(gameId, {
-                  move_number: gameContext.totalMoves,
-                  type: 'chat',
-                  content: `Chester: ${fullContent}`,
-                  timestamp: new Date().toISOString(),
-                  metadata: {},
-                }),
-              ]);
+              await GameMemoryService.addCommentary(gameId, {
+                move_number: gameContext.totalMoves,
+                type: 'chat',
+                content: `User: ${message}`,
+                timestamp: new Date().toISOString(),
+                metadata: {},
+              });
+
+              await GameMemoryService.addCommentary(gameId, {
+                move_number: gameContext.totalMoves,
+                type: 'chat',
+                content: `Chester: ${fullContent}`,
+                timestamp: new Date().toISOString(),
+                metadata: {},
+              });
+
             } catch (error) {
               console.error('[Chester Stream] Error saving to memory:', error);
             }
@@ -166,8 +228,6 @@ export async function POST(request: NextRequest) {
           if (authUser) {
             await incrementChatUsage(authUser.id);
           }
-
-          controller.close();
         } catch (error) {
           console.error('[Chester Stream] Stream error:', error);
           controller.enqueue(

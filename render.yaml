@@ -4,15 +4,11 @@ services:
     env: node
     plan: starter
     region: oregon
-    buildCommand: curl -fsSL https://bun.sh/install | bash && export PATH="$HOME/.bun/bin:$PATH" && bun install --production && bun run build
-    startCommand: bun run start
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
-      - key: BASELINE_BROWSER_MAPPING_IGNORE_OLD_DATA
-        value: "true"
-      - key: BROWSERSLIST_IGNORE_OLD_DATA
-        value: "true"
       - key: OPENAI_API_KEY
         sync: false
       - key: NEXT_PUBLIC_SUPABASE_URL

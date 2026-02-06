@@ -38,7 +38,7 @@ export class GameMemoryService {
    */
   static async createGameMemory(
     gameId: string,
-    userId: string,
+    userId?: string | null,
   ): Promise<GameMemory | null> {
     const supabase = getSupabase();
     if (!supabase) {
@@ -46,13 +46,9 @@ export class GameMemoryService {
       console.log('[GameMemory] Skipping createGameMemory - client-side');
       return null;
     }
-    if (!userId || !isValidUUID(userId)) {
-      throw new Error('[GameMemory] createGameMemory requires a valid userId.');
-    }
 
     const insertData: Record<string, unknown> = {
       game_id: gameId,
-      user_id: userId,
       full_move_history: [],
       chester_commentary: [],
       suggestions_given: [],
@@ -61,6 +57,13 @@ export class GameMemoryService {
       game_phase_transitions: [],
       total_moves: 0,
     };
+
+    // Only include user_id if it's a valid UUID
+    if (userId && isValidUUID(userId)) {
+      insertData.user_id = userId;
+    } else if (userId) {
+      console.log('[GameMemory] Ignoring invalid userId format:', userId);
+    }
 
     const { data, error } = await supabase.from('game_memory').insert(insertData).select().single();
 
@@ -110,9 +113,6 @@ export class GameMemoryService {
     const supabase = getSupabase();
     if (!supabase) {
       // Client-side: skip memory operations
-      return null;
-    }
-    if (!userId) {
       return null;
     }
 

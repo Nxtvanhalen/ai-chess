@@ -133,22 +133,21 @@ export default function Home() {
   // Initialize or restore game on mount
   useEffect(() => {
     const initializeGame = async () => {
-      if (!user) return;
       try {
         // Create new game
-        const newGame = await createGame(user.id, 'white');
+        const newGame = await createGame('white');
         setCurrentGameId(newGame.id);
         setCurrentPosition(newGame.fen);
 
         // Initialize game memory
         try {
-          await GameMemoryService.createGameMemory(newGame.id, user.id);
+          await GameMemoryService.createGameMemory(newGame.id, user?.id);
         } catch (error) {
           console.error('Error initializing game memory:', error);
         }
 
         // Create conversation for this game
-        const conversation = await createConversation(newGame.id, user.id);
+        const conversation = await createConversation(newGame.id);
         setConversationId(conversation.id);
 
         // Add welcome message with typing effect
@@ -669,7 +668,6 @@ export default function Home() {
   );
 
   const handleRestart = useCallback(async () => {
-    if (!user) return;
     // Reset game state - set position FIRST to prevent ChessBoard from re-detecting checkmate
     const startingFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
     setCurrentPosition(startingFen);
@@ -682,19 +680,19 @@ export default function Home() {
 
     try {
       // Create new game
-      const newGame = await createGame(user.id, 'white');
+      const newGame = await createGame('white');
       setCurrentGameId(newGame.id);
       // Position already set to starting FEN above
 
       // Initialize game memory
       try {
-        await GameMemoryService.createGameMemory(newGame.id, user.id);
+        await GameMemoryService.createGameMemory(newGame.id, user?.id);
       } catch (error) {
         console.error('Error initializing game memory:', error);
       }
 
       // Create conversation for this game
-      const conversation = await createConversation(newGame.id, user.id);
+      const conversation = await createConversation(newGame.id);
       setConversationId(conversation.id);
 
       // Add new game message - full text to avoid closure issues

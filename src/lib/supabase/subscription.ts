@@ -132,7 +132,7 @@ export async function canUseAIMove(userId: string): Promise<{
 
   if (rpcResult.error) {
     console.error('[Subscription] Error checking AI move usage:', rpcResult.error);
-    // Fail open with logging - RPC functions need hardening before fail-closed
+    // Default to allowing in case of error (fail open for UX)
     return { allowed: true, remaining: 0, limit: 0, unlimited: false };
   }
 
@@ -165,7 +165,6 @@ export async function canUseChat(userId: string): Promise<{
 
   if (rpcResult.error) {
     console.error('[Subscription] Error checking chat usage:', rpcResult.error);
-    // Fail open with logging - RPC functions need hardening before fail-closed
     return { allowed: true, remaining: 0, limit: 0, unlimited: false };
   }
 
