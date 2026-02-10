@@ -1,43 +1,55 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Suspense, useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 
-function LoginForm() {
+export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const { signIn, signInWithGoogle } = useAuth();
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const redirectTo = searchParams.get('redirectTo') || '/';
+  const { resetPassword } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
 
-    const { error } = await signIn(email, password);
+    const { error } = await resetPassword(email);
 
     if (error) {
       setError(error.message);
       setLoading(false);
     } else {
-      router.push(redirectTo);
+      setSuccess(true);
+      setLoading(false);
     }
   };
 
-  const _handleGoogleSignIn = async () => {
-    setError(null);
-    const { error } = await signInWithGoogle();
-    if (error) {
-      setError(error.message);
-    }
-  };
+  if (success) {
+    return (
+      <div className="min-h-dvh h-dvh flex items-center justify-center bg-gradient-to-br from-[#0d0d1a] via-[#1a1a2e] to-[#16162a] px-4 py-8 overflow-y-auto">
+        <div className="w-full max-w-md">
+          <div className="bg-[#1e1e3f]/80 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-purple-500/20 text-center">
+            <div className="text-5xl mb-4">✉️</div>
+            <h2 className="text-2xl font-bold text-white mb-4">Check your email</h2>
+            <p className="text-gray-400 mb-6">
+              We&apos;ve sent a password reset link to{' '}
+              <span className="text-purple-400">{email}</span>. Click the link to set a new password.
+            </p>
+            <Link
+              href="/login"
+              className="inline-block bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200"
+            >
+              Back to Login
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-dvh h-dvh flex items-center justify-center bg-gradient-to-br from-[#0d0d1a] via-[#1a1a2e] to-[#16162a] px-4 py-8 overflow-y-auto">
@@ -45,11 +57,11 @@ function LoginForm() {
         {/* Logo/Title */}
         <div className="text-center mb-8">
           <div className="text-4xl mb-2">♟️</div>
-          <h1 className="text-3xl font-bold text-white mb-2">Chester AI Chess</h1>
-          <p className="text-gray-400">Sign in to continue your game</p>
+          <h1 className="text-3xl font-bold text-white mb-2">Reset Password</h1>
+          <p className="text-gray-400">Enter your email and we&apos;ll send you a reset link</p>
         </div>
 
-        {/* Login Card */}
+        {/* Reset Card */}
         <div className="bg-[#1e1e3f]/80 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-purple-500/20">
           {/* Error Message */}
           {error && (
@@ -58,7 +70,6 @@ function LoginForm() {
             </div>
           )}
 
-          {/* Email Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
@@ -74,31 +85,6 @@ function LoginForm() {
                 required
                 className="w-full px-4 py-3 bg-[#2a2a4a] border border-purple-500/30 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                 placeholder="you@example.com"
-              />
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label htmlFor="password" className="block text-sm font-medium text-gray-300">
-                  Password
-                </label>
-                <Link
-                  href="/forgot-password"
-                  className="text-xs text-purple-400 hover:text-purple-300 transition-colors"
-                >
-                  Forgot password?
-                </Link>
-              </div>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full px-4 py-3 bg-[#2a2a4a] border border-purple-500/30 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                placeholder="••••••••"
               />
             </div>
 
@@ -125,48 +111,25 @@ function LoginForm() {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     />
                   </svg>
-                  Signing in...
+                  Sending...
                 </span>
               ) : (
-                'Sign In'
+                'Send Reset Link'
               )}
             </button>
           </form>
 
-          {/* Sign Up Link */}
           <p className="mt-6 text-center text-gray-400">
-            Don&apos;t have an account?{' '}
+            Remember your password?{' '}
             <Link
-              href="/signup"
+              href="/login"
               className="text-purple-400 hover:text-purple-300 font-medium transition-colors"
             >
-              Sign up
+              Sign in
             </Link>
           </p>
         </div>
-
-        {/* Footer */}
-        <p className="mt-8 text-center text-gray-500 text-sm">
-          By signing in, you agree to play chess with Chester.
-        </p>
       </div>
     </div>
-  );
-}
-
-// Loading fallback for Suspense
-function LoginLoading() {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0d0d1a] via-[#1a1a2e] to-[#16162a]">
-      <div className="animate-pulse text-purple-400 text-xl">Loading...</div>
-    </div>
-  );
-}
-
-export default function LoginPage() {
-  return (
-    <Suspense fallback={<LoginLoading />}>
-      <LoginForm />
-    </Suspense>
   );
 }

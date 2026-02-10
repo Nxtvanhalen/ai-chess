@@ -398,7 +398,7 @@ export async function proxy(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   // Public routes that don't require authentication
-  const publicRoutes = ['/login', '/signup', '/auth'];
+  const publicRoutes = ['/login', '/signup', '/auth', '/forgot-password', '/reset-password'];
   const isPublicRoute = publicRoutes.some((route) => request.nextUrl.pathname.startsWith(route));
 
   // Static assets that should never require auth (PWA manifest, service worker, etc.)
