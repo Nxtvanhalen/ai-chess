@@ -70,7 +70,7 @@ export interface Memory {
   createdAt: Date;
   category: 'game_pattern' | 'conversation' | 'preference' | 'coaching';
   content: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 // ============================================================================
@@ -277,6 +277,6 @@ export interface GameMemorySnapshot {
     | 'suggestion_given'
     | 'tactical_pattern_detected'
     | 'phase_transition';
-  snapshot_data: Record<string, any>;
+  snapshot_data: Record<string, unknown>;
   created_at: string;
 }

@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import type { ChatMessage as ChatMessageType } from '@/types';
+import type { ChatMessage as ChatMessageType, MoveSuggestion } from '@/types';
 import { King } from '../chess/pieces/King';
 import DynamicMarkdown from './DynamicMarkdown';
 
@@ -91,7 +91,7 @@ const TypingDots = () => (
   </div>
 );
 
-const SuggestionContent = ({ suggestions, comment }: { suggestions: any[]; comment?: string }) => (
+const SuggestionContent = ({ suggestions, comment }: { suggestions: MoveSuggestion[]; comment?: string }) => (
   <div className="space-y-3">
     {/* Show Chester's typed comment first */}
     {comment && <div className="text-slate-200">{comment}</div>}

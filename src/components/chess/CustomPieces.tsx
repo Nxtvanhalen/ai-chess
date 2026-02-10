@@ -31,7 +31,7 @@ const _PIECE_COMPONENTS = {
   k: King,
 };
 
-const createPieceRenderer = (PieceComponent: any, isWhite: boolean, pieceType: string) => {
+const createPieceRenderer = (PieceComponent: React.ComponentType<Record<string, unknown>>, isWhite: boolean, pieceType: string) => {
   return ({ squareWidth, isDragging }: CustomPieceFnArgs) => {
     const palette = isWhite ? PALETTES.white : PALETTES.black;
     const size = pieceType === 'p' ? '200%' : '180%'; // Pawns slightly larger (200%) vs others (180%)

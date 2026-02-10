@@ -56,8 +56,10 @@ function SimpleMarkdown({ children, className }: DynamicMarkdownProps) {
 }
 
 export default function DynamicMarkdown({ children, className }: DynamicMarkdownProps) {
-  const [ReactMarkdown, setReactMarkdown] = useState<any>(null);
-  const [remarkGfm, setRemarkGfm] = useState<any>(null);
+  // Dynamic imports don't have static types available - using ComponentType for the renderer
+  // and unknown for the remark plugin since we only pass them through
+  const [ReactMarkdown, setReactMarkdown] = useState<React.ComponentType<Record<string, unknown>> | null>(null);
+  const [remarkGfm, setRemarkGfm] = useState<unknown>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -104,12 +106,12 @@ export default function DynamicMarkdown({ children, className }: DynamicMarkdown
         <ReactMarkdown
           remarkPlugins={remarkGfm ? [remarkGfm] : undefined}
           components={{
-            pre: ({ children }: any) => (
+            pre: ({ children }: { children?: React.ReactNode }) => (
               <pre className="bg-slate-900 p-3 rounded-lg overflow-x-auto my-3 border border-slate-700">
                 <code className="text-green-400 text-sm font-mono">{children}</code>
               </pre>
             ),
-            code: ({ children, className }: any) => {
+            code: ({ children, className }: { children?: React.ReactNode; className?: string }) => {
               const isInline = !className;
               return isInline ? (
                 <code className="bg-slate-700 px-1.5 py-0.5 rounded text-emerald-300 text-sm font-mono">
@@ -121,27 +123,27 @@ export default function DynamicMarkdown({ children, className }: DynamicMarkdown
                 </code>
               );
             },
-            p: ({ children }: any) => (
+            p: ({ children }: { children?: React.ReactNode }) => (
               <p className="mb-3 last:mb-0 leading-relaxed">{children}</p>
             ),
-            text: ({ children }: any) => {
+            text: ({ children }: { children?: React.ReactNode }) => {
               if (typeof children === 'string') {
                 return <HighlightedText>{children}</HighlightedText>;
               }
               return children;
             },
-            strong: ({ children }: any) => (
+            strong: ({ children }: { children?: React.ReactNode }) => (
               <strong className="font-bold text-white">{children}</strong>
             ),
-            em: ({ children }: any) => <em className="italic text-blue-200">{children}</em>,
-            ul: ({ children }: any) => (
+            em: ({ children }: { children?: React.ReactNode }) => <em className="italic text-blue-200">{children}</em>,
+            ul: ({ children }: { children?: React.ReactNode }) => (
               <ul className="list-disc list-inside mb-3 space-y-1 text-slate-200">{children}</ul>
             ),
-            ol: ({ children }: any) => (
+            ol: ({ children }: { children?: React.ReactNode }) => (
               <ol className="list-decimal list-inside mb-3 space-y-1 text-slate-200">{children}</ol>
             ),
-            li: ({ children }: any) => <li className="text-slate-200">{children}</li>,
-            blockquote: ({ children }: any) => (
+            li: ({ children }: { children?: React.ReactNode }) => <li className="text-slate-200">{children}</li>,
+            blockquote: ({ children }: { children?: React.ReactNode }) => (
               <blockquote className="border-l-4 border-blue-500 pl-4 italic my-3 text-blue-200">
                 {children}
               </blockquote>

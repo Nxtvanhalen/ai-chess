@@ -95,7 +95,7 @@ export async function saveMessage(
   conversationId: string,
   role: 'user' | 'assistant' | 'system',
   content: string,
-  metadata?: any,
+  metadata?: Record<string, unknown>,
 ) {
   const { data, error } = await supabase
     .from('messages')
@@ -149,7 +149,7 @@ export async function getConversationMessages(conversationId: string) {
 export async function saveMemory(
   category: 'game_pattern' | 'conversation' | 'preference' | 'coaching' | 'player_style',
   content: string,
-  context: any = {},
+  context: Record<string, unknown> = {},
 ) {
   const { data, error } = await supabase
     .from('memory')

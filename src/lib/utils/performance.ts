@@ -87,7 +87,7 @@ export class PerformanceMonitor {
   }
 
   // Monitor memory usage (if available)
-  getMemoryUsage(): any {
+  getMemoryUsage(): { used: number; total: number; limit: number } | null {
     // @ts-expect-error - performance.memory is not in TypeScript types
     if (typeof performance.memory !== 'undefined') {
       // @ts-expect-error

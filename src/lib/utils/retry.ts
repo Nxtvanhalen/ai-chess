@@ -4,26 +4,37 @@ export interface RetryOptions {
   maxRetries: number;
   baseDelayMs: number;
   maxDelayMs: number;
-  retryCondition?: (error: any) => boolean;
+  retryCondition?: (error: unknown) => boolean;
+}
+
+/** Safely extract a property from an unknown error object */
+function getErrorProp<T>(error: unknown, key: string): T | undefined {
+  if (error && typeof error === 'object' && key in error) {
+    return (error as Record<string, unknown>)[key] as T;
+  }
+  return undefined;
+}
+
+function isRetryableError(error: unknown): boolean {
+  const status = getErrorProp<number>(error, 'status');
+  if (status !== undefined) {
+    return status >= 500 || status === 429;
+  }
+
+  const code = getErrorProp<string>(error, 'code');
+  if (code === 'ECONNRESET' || code === 'ETIMEDOUT') return true;
+
+  const message = getErrorProp<string>(error, 'message');
+  if (message && (message.includes('network') || message.includes('timeout'))) return true;
+
+  return false;
 }
 
 const DEFAULT_RETRY_OPTIONS: RetryOptions = {
   maxRetries: 3,
   baseDelayMs: 1000,
   maxDelayMs: 10000,
-  retryCondition: (error) => {
-    // Retry on network errors, rate limits, and server errors
-    if (error?.status) {
-      return error.status >= 500 || error.status === 429;
-    }
-    // Retry on network/timeout errors
-    return (
-      error?.code === 'ECONNRESET' ||
-      error?.code === 'ETIMEDOUT' ||
-      error?.message?.includes('network') ||
-      error?.message?.includes('timeout')
-    );
-  },
+  retryCondition: isRetryableError,
 };
 
 export async function withRetry<T>(
@@ -31,7 +42,7 @@ export async function withRetry<T>(
   options: Partial<RetryOptions> = {},
 ): Promise<T> {
   const opts = { ...DEFAULT_RETRY_OPTIONS, ...options };
-  let lastError: any;
+  let lastError: unknown;
 
   for (let attempt = 0; attempt <= opts.maxRetries; attempt++) {
     try {
@@ -73,28 +84,19 @@ export async function withOpenAIRetry<T>(operation: () => Promise<T>): Promise<T
     maxRetries: 3,
     baseDelayMs: 1000,
     maxDelayMs: 8000,
-    retryCondition: (error) => {
-      // OpenAI specific retry conditions
-      if (error?.status) {
-        switch (error.status) {
-          case 429: // Rate limit
-          case 500: // Internal server error
-          case 502: // Bad gateway
-          case 503: // Service unavailable
-          case 504: // Gateway timeout
-            return true;
-          default:
-            return false;
-        }
+    retryCondition: (error: unknown) => {
+      const status = getErrorProp<number>(error, 'status');
+      if (status !== undefined) {
+        return [429, 500, 502, 503, 504].includes(status);
       }
 
-      // Network/timeout errors
-      return (
-        error?.code === 'ECONNRESET' ||
-        error?.code === 'ETIMEDOUT' ||
-        error?.message?.includes('network') ||
-        error?.message?.includes('timeout')
-      );
+      const code = getErrorProp<string>(error, 'code');
+      if (code === 'ECONNRESET' || code === 'ETIMEDOUT') return true;
+
+      const message = getErrorProp<string>(error, 'message');
+      if (message && (message.includes('network') || message.includes('timeout'))) return true;
+
+      return false;
     },
   });
 }
