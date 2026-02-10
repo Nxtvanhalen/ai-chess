@@ -23,6 +23,7 @@ export function useChesterStream() {
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamedText, setStreamedText] = useState('');
   const abortControllerRef = useRef<AbortController | null>(null);
+  const textChunksRef = useRef<string[]>([]);
   const textBufferRef = useRef<string>('');
   const displayedTextRef = useRef<string>('');
   const typingIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -46,6 +47,7 @@ export function useChesterStream() {
       abortControllerRef.current = new AbortController();
       setIsStreaming(true);
       setStreamedText('');
+      textChunksRef.current = [];
       textBufferRef.current = '';
       displayedTextRef.current = '';
 
@@ -112,11 +114,12 @@ export function useChesterStream() {
                 }
 
                 if (data.done) {
-                  // Stream complete - buffer has full content
+                  // Stream complete - join chunks into final string
                   fullText = data.fullContent || textBufferRef.current;
                 } else if (data.text) {
-                  // Add to buffer (typing effect will display it)
-                  textBufferRef.current += data.text;
+                  // Collect chunks in array, join once (avoids O(n²) string concat)
+                  textChunksRef.current.push(data.text);
+                  textBufferRef.current = textChunksRef.current.join('');
                   fullText = textBufferRef.current;
                 }
               } catch {

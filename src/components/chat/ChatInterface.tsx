@@ -120,9 +120,7 @@ export default function ChatInterface({
     });
 
     observer.observe(messagesContent, {
-      childList: true, // Watch for new messages
-      subtree: true, // Watch nested elements
-      characterData: true, // Watch text content changes (typing)
+      childList: true, // Watch for new messages (typing effect handled by React state)
     });
 
     return () => {
