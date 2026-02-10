@@ -116,7 +116,13 @@ export async function POST(request: NextRequest) {
 
       if (result) {
         // Apply the move to get the new position
-        const move = chess.move(result.move);
+        let move;
+        try {
+          move = chess.move(result.move);
+        } catch (moveError) {
+          console.error('[AI-Move] Engine returned invalid move:', result.move, moveError);
+          return NextResponse.json({ error: 'Engine produced an invalid move' }, { status: 500 });
+        }
 
         // Increment usage counter for authenticated users
         if (user) {

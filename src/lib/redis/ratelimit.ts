@@ -69,6 +69,7 @@ interface InMemoryEntry {
 }
 
 const inMemoryLimits = new Map<string, InMemoryEntry>();
+const IN_MEMORY_MAX_SIZE = 10_000;
 
 function checkInMemoryLimit(
   identifier: string,
@@ -81,8 +82,8 @@ function checkInMemoryLimit(
 
   let entry = inMemoryLimits.get(key);
 
-  // Cleanup old entries occasionally
-  if (Math.random() < 0.01) {
+  // Cleanup expired entries when map grows large or occasionally
+  if (inMemoryLimits.size >= IN_MEMORY_MAX_SIZE || Math.random() < 0.01) {
     for (const [k, v] of inMemoryLimits.entries()) {
       if (now > v.resetTime) inMemoryLimits.delete(k);
     }

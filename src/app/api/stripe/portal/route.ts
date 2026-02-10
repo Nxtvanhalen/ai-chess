@@ -58,7 +58,14 @@ export async function POST(request: NextRequest) {
     }
 
     const stripe = getStripeClient();
-    const origin = request.headers.get('origin') || 'http://localhost:3000';
+    const allowedOrigins = [
+      process.env.NEXT_PUBLIC_SITE_URL,
+      'https://chesswithai.com',
+      'https://www.chesswithai.com',
+      'http://localhost:3000',
+    ].filter(Boolean);
+    const rawOrigin = request.headers.get('origin') || '';
+    const origin = allowedOrigins.includes(rawOrigin) ? rawOrigin : (allowedOrigins[0] || 'http://localhost:3000');
 
     // Create portal session
     const portalSession = await stripe.billingPortal.sessions.create({

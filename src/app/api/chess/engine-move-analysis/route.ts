@@ -17,6 +17,7 @@ interface CachedAnalysis {
 }
 
 const analysisCache = new Map<string, CachedAnalysis>();
+const ANALYSIS_CACHE_MAX_SIZE = 500;
 const ANALYSIS_CACHE_TTL_MS = 45_000;
 const LLM_TIMEOUT_MS = Number(process.env.ENGINE_ANALYSIS_TIMEOUT_MS || 4_500);
 const CENTRAL_FILES = new Set(['c', 'd', 'e', 'f']);
@@ -53,6 +54,11 @@ function getCachedAnalysis(cacheKey: string) {
 }
 
 function setCachedAnalysis(cacheKey: string, payload: CachedAnalysis['payload']) {
+  // Evict oldest entries if cache is at capacity
+  if (analysisCache.size >= ANALYSIS_CACHE_MAX_SIZE) {
+    const firstKey = analysisCache.keys().next().value;
+    if (firstKey) analysisCache.delete(firstKey);
+  }
   analysisCache.set(cacheKey, {
     expiresAt: Date.now() + ANALYSIS_CACHE_TTL_MS,
     payload,

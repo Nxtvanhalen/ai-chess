@@ -1,5 +1,6 @@
 'use client';
 
+import DOMPurify from 'dompurify';
 import { useEffect, useState } from 'react';
 
 interface DynamicMarkdownProps {
@@ -51,7 +52,7 @@ function SimpleMarkdown({ children, className }: DynamicMarkdownProps) {
     return formatted;
   };
 
-  return <div className={className} dangerouslySetInnerHTML={{ __html: formatText(children) }} />;
+  return <div className={className} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(formatText(children)) }} />;
 }
 
 export default function DynamicMarkdown({ children, className }: DynamicMarkdownProps) {
