@@ -1,3 +1,12 @@
+// =============================================================================
+// DORMANT ENDPOINT - Pre-move analysis (Chester's move suggestions)
+// =============================================================================
+// Status: NOT CURRENTLY USED by the frontend
+// Last active: Prior to engine-move-analysis consolidation
+// Preserved for: Future re-enablement of standalone pre-move suggestions
+// Uses: OpenAI GPT-5.2 (will incur API costs if re-enabled)
+// =============================================================================
+
 import { type NextRequest, NextResponse } from 'next/server';
 import { getAuthenticatedUser } from '@/lib/auth/getUser';
 import { PositionAnalyzer } from '@/lib/chess/positionAnalyzer';
@@ -10,7 +19,15 @@ import { withOpenAIRetry } from '@/lib/utils/retry';
 import { preMoveAnalysisSchema, validateRequest } from '@/lib/validation/schemas';
 import type { MoveSuggestion } from '@/types';
 
+const DORMANT = true;
+
 export async function POST(request: NextRequest) {
+  if (DORMANT) {
+    return NextResponse.json(
+      { error: 'This endpoint is currently dormant. Not in active use.' },
+      { status: 503 },
+    );
+  }
   try {
     // Check rate limit (Redis-based, falls back to in-memory)
     const clientIP = getClientIPFromRequest(request);

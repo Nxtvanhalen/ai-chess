@@ -1,3 +1,12 @@
+// =============================================================================
+// DORMANT ENDPOINT - Per-move Chester commentary (replaced by engine-move-analysis)
+// =============================================================================
+// Status: NOT CURRENTLY USED by the frontend
+// Last active: Prior to engine-move-analysis consolidation
+// Preserved for: Future re-enablement of detailed per-move analysis
+// Uses: OpenAI GPT-5.2 Responses API (will incur API costs if re-enabled)
+// =============================================================================
+
 import { type NextRequest, NextResponse } from 'next/server';
 import { getAuthenticatedUser } from '@/lib/auth/getUser';
 import { CHESS_BUTLER_SYSTEM_PROMPT } from '@/lib/openai/chess-butler-prompt';

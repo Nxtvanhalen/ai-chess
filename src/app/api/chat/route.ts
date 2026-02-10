@@ -1,3 +1,12 @@
+// =============================================================================
+// DORMANT ENDPOINT - Non-streaming Chester chat (replaced by /api/chat/stream)
+// =============================================================================
+// Status: NOT CURRENTLY USED by the frontend (only called from /debug page)
+// Last active: Prior to streaming chat migration
+// Preserved for: Fallback if streaming has issues, or future non-streaming needs
+// Uses: OpenAI GPT-5.2 Responses API (will incur API costs if re-enabled)
+// =============================================================================
+
 import { type NextRequest, NextResponse } from 'next/server';
 import { getAuthenticatedUser } from '@/lib/auth/getUser';
 import {
