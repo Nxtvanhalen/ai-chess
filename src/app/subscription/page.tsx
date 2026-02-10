@@ -1,7 +1,40 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { Suspense } from 'react';
+import { Suspense, useState } from 'react';
+import { redirectToCustomerPortal } from '@/lib/stripe/client';
+
+function ManageSubscriptionButton() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleManage = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      await redirectToCustomerPortal();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to open portal';
+      setError(message);
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div>
+      <button
+        onClick={handleManage}
+        disabled={loading}
+        className="block w-full px-8 py-3 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-xl transition-colors"
+      >
+        {loading ? 'Opening Portal...' : 'Manage Subscription'}
+      </button>
+      {error && (
+        <p className="text-red-400 text-sm mt-2">{error}</p>
+      )}
+    </div>
+  );
+}
 
 function SubscriptionContent() {
   const searchParams = useSearchParams();
@@ -32,12 +65,15 @@ function SubscriptionContent() {
             Welcome to the Chester AI Chess family! Your subscription is now active and you have
             access to all your plan's features.
           </p>
-          <a
-            href="/"
-            className="inline-block px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-xl transition-colors"
-          >
-            Start Playing
-          </a>
+          <div className="space-y-3">
+            <a
+              href="/"
+              className="block px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-xl transition-colors"
+            >
+              Start Playing
+            </a>
+            <ManageSubscriptionButton />
+          </div>
         </div>
       </div>
     );
@@ -92,15 +128,16 @@ function SubscriptionContent() {
         <h1 className="text-2xl font-bold text-white mb-4">Subscription</h1>
         <p className="text-gray-400 mb-8">Manage your Chester AI Chess subscription.</p>
         <div className="space-y-3">
+          <ManageSubscriptionButton />
           <a
             href="/pricing"
-            className="block px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-xl transition-colors"
+            className="block px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-xl transition-colors text-center"
           >
             View Plans
           </a>
           <a
             href="/"
-            className="block px-8 py-3 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-xl transition-colors"
+            className="block px-8 py-3 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-xl transition-colors text-center"
           >
             Back to Game
           </a>
