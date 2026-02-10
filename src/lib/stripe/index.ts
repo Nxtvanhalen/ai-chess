@@ -12,10 +12,11 @@ export {
 } from './client';
 // Server-side
 export {
-  getLimitsFromPlan,
+  getBalanceAllocation,
   getPlanFromPriceId,
   getStripeClient,
   getStripeClientSafe,
+  isMovePack,
   PLAN_FEATURES,
   PRICING,
   STRIPE_PRICES,

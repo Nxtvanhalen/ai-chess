@@ -1,19 +1,15 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface UsageData {
   ai_moves: {
-    used: number;
-    limit: number;
-    remaining: number;
+    balance: number;
     unlimited: boolean;
   };
   chat_messages: {
-    used: number;
-    limit: number;
-    remaining: number;
+    balance: number;
     unlimited: boolean;
   };
   plan: string;
@@ -25,97 +21,88 @@ const PLAN_LABELS: Record<string, string> = {
   premium: 'Premium',
 };
 
-// Cache usage data to avoid excessive API calls
-let cachedUsage: UsageData | null = null;
-let lastFetchTime = 0;
-let inFlightUsageRequest: Promise<UsageData | null> | null = null;
-const CACHE_DURATION = 60000; // 60 seconds cache
-const FOCUS_REFRESH_COOLDOWN = 30000; // 30 seconds
+// Custom event name for cross-component cache invalidation
+const USAGE_INVALIDATE_EVENT = 'chester:usage-invalidate';
+
+/**
+ * Bust the usage cache from outside the component (e.g. after a purchase or move).
+ * Dispatches a DOM event that UsageDisplay listens for.
+ */
+export function invalidateUsageCache() {
+  window.dispatchEvent(new Event(USAGE_INVALIDATE_EVENT));
+}
 
 export default function UsageDisplay() {
   const { user, signOut } = useAuth();
-  const [usage, setUsage] = useState<UsageData | null>(cachedUsage);
-  const [loading, setLoading] = useState(!cachedUsage);
+  const [usage, setUsage] = useState<UsageData | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-
-  const fetchUsage = useCallback(async (force = false) => {
-    // Skip if cached data is fresh (unless forced)
-    const now = Date.now();
-    if (!force && cachedUsage && now - lastFetchTime < CACHE_DURATION) {
-      setUsage(cachedUsage);
-      setLoading(false);
-      return;
-    }
-
-    try {
-      if (!inFlightUsageRequest) {
-        inFlightUsageRequest = (async () => {
-          const response = await fetch('/api/subscription/usage');
-          if (!response.ok) return null;
-
-          const data = (await response.json()) as UsageData;
-          cachedUsage = data;
-          lastFetchTime = Date.now();
-          return data;
-        })().finally(() => {
-          inFlightUsageRequest = null;
-        });
-      }
-
-      const data = await inFlightUsageRequest;
-      if (data) {
-        setUsage(data);
-      }
-    } catch (error) {
-      console.error('Error fetching usage:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
+  // Single fetch function - no caching games, just fetch from server
   useEffect(() => {
     if (!user?.id) {
-      setLoading(false);
+      console.log('[UsageDisplay] No user, skipping fetch');
       return;
     }
 
-    // Initial fetch (uses cache if available)
+    console.log('[UsageDisplay] Effect running for user:', user.id);
+    let cancelled = false;
+
+    const fetchUsage = async () => {
+      try {
+        console.log('[UsageDisplay] Fetching usage data...');
+        const response = await fetch('/api/subscription/usage');
+        console.log('[UsageDisplay] Response status:', response.status);
+        if (!response.ok) {
+          const text = await response.text();
+          console.warn(`[UsageDisplay] Fetch failed: ${response.status}`, text);
+          return;
+        }
+        const data = (await response.json()) as UsageData;
+        console.log('[UsageDisplay] Got data:', JSON.stringify(data));
+        if (!cancelled) {
+          console.log('[UsageDisplay] Setting usage state');
+          setUsage(data);
+        } else {
+          console.log('[UsageDisplay] Cancelled, skipping state update');
+        }
+      } catch (error) {
+        console.error('[UsageDisplay] Error fetching usage:', error);
+      }
+    };
+
+    // Initial fetch
     fetchUsage();
 
-    // Refresh every 2 minutes (reduced from 30 seconds)
-    const interval = setInterval(() => {
-      if (document.visibilityState === 'visible') {
-        fetchUsage(true);
-      }
-    }, 120000);
-
-    // Refresh when tab regains focus/visibility, but throttle it.
-    let lastFocusRefresh = 0;
-    const refreshOnFocus = () => {
-      const now = Date.now();
-      if (document.visibilityState !== 'visible') return;
-      if (now - lastFocusRefresh < FOCUS_REFRESH_COOLDOWN) return;
-      lastFocusRefresh = now;
+    // Listen for invalidation events (from AI move, purchase, etc.)
+    const handleInvalidate = () => {
+      console.log('[UsageDisplay] Invalidated, re-fetching');
       fetchUsage();
     };
+    window.addEventListener(USAGE_INVALIDATE_EVENT, handleInvalidate);
 
-    const handleVisibilityChange = () => {
+    // Refresh every 60 seconds while visible
+    const interval = setInterval(() => {
       if (document.visibilityState === 'visible') {
-        refreshOnFocus();
+        fetchUsage();
+      }
+    }, 60000);
+
+    // Refresh on tab focus
+    const handleFocus = () => {
+      if (document.visibilityState === 'visible') {
+        fetchUsage();
       }
     };
-
-    window.addEventListener('focus', refreshOnFocus);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+    document.addEventListener('visibilitychange', handleFocus);
 
     return () => {
+      cancelled = true;
+      window.removeEventListener(USAGE_INVALIDATE_EVENT, handleInvalidate);
       clearInterval(interval);
-      window.removeEventListener('focus', refreshOnFocus);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      document.removeEventListener('visibilitychange', handleFocus);
     };
-  }, [user?.id, fetchUsage]);
+  }, [user?.id]);
 
   // Close menu on outside click
   useEffect(() => {
@@ -129,15 +116,43 @@ export default function UsageDisplay() {
     return () => document.removeEventListener('mousedown', handleClick);
   }, [menuOpen]);
 
-  if (!user || loading) return null;
-  if (!usage) return null;
+  // Don't render anything if not logged in
+  if (!user) return null;
 
+  // Show skeleton while loading
+  if (!usage) {
+    return (
+      <div className="flex items-center gap-3 px-3 py-1 rounded-lg text-sm relative z-[100]" style={{ pointerEvents: 'auto' }}>
+        <div className="flex items-center gap-2">
+          <span className="text-gray-400">Moves:</span>
+          <div className="w-20 h-2 bg-gray-700 rounded-full overflow-hidden animate-pulse" />
+          <span className="text-gray-500 font-medium">--</span>
+        </div>
+        {/* User menu button (always visible) */}
+        <div className="relative">
+          <button
+            className="w-7 h-7 rounded-full bg-gray-700 flex items-center justify-center border border-gray-600 opacity-50"
+            disabled
+          >
+            <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Plan allocation for progress bar reference (how many moves you get per month)
+  const planAllocation = usage.plan === 'premium' ? -1 : usage.plan === 'pro' ? 500 : 50;
   const movesPercentage = usage.ai_moves.unlimited
     ? 100
-    : Math.round((usage.ai_moves.remaining / usage.ai_moves.limit) * 100);
+    : planAllocation > 0
+      ? Math.min(100, Math.round((usage.ai_moves.balance / planAllocation) * 100))
+      : 0;
 
-  const isLow = !usage.ai_moves.unlimited && usage.ai_moves.remaining <= 10;
-  const isEmpty = !usage.ai_moves.unlimited && usage.ai_moves.remaining === 0;
+  const isLow = !usage.ai_moves.unlimited && usage.ai_moves.balance <= 10;
+  const isEmpty = !usage.ai_moves.unlimited && usage.ai_moves.balance === 0;
   const planLabel = PLAN_LABELS[usage.plan] || usage.plan;
   const isPaid = usage.plan === 'pro' || usage.plan === 'premium';
 
@@ -180,7 +195,7 @@ export default function UsageDisplay() {
       <div className="flex items-center gap-2">
         <span className="text-gray-400">Moves:</span>
         {usage.ai_moves.unlimited ? (
-          <span className="text-green-400 font-medium">Unlimited</span>
+          <span className="text-green-400 font-medium">&infin;</span>
         ) : (
           <>
             <div className="w-20 h-2 bg-gray-700 rounded-full overflow-hidden">
@@ -196,7 +211,7 @@ export default function UsageDisplay() {
                 isEmpty ? 'text-red-400' : isLow ? 'text-yellow-400' : 'text-gray-300'
               }`}
             >
-              {usage.ai_moves.remaining}/{usage.ai_moves.limit}
+              {usage.ai_moves.balance}
             </span>
           </>
         )}

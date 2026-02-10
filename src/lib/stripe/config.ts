@@ -61,6 +61,7 @@ export const STRIPE_PRICES = {
     monthly: process.env.STRIPE_PRICE_PREMIUM_MONTHLY || 'price_premium_monthly',
     yearly: process.env.STRIPE_PRICE_PREMIUM_YEARLY || 'price_premium_yearly',
   },
+  movePack: process.env.STRIPE_PRICE_MOVE_PACK || 'price_move_pack_50',
 } as const;
 
 // Pricing display (in cents for Stripe, displayed as dollars)
@@ -73,6 +74,10 @@ export const PRICING = {
     monthly: 1999, // $19.99/month
     yearly: 19999, // $199.99/year (save ~17%)
   },
+  movePack: {
+    amount: 100, // $1.00 one-time
+    moves: 50,
+  },
 } as const;
 
 // -----------------------------------------------------------------------------
@@ -84,19 +89,19 @@ export const PLAN_FEATURES = {
     name: 'Free',
     description: 'Perfect for casual players',
     features: [
-      '50 AI moves per day',
-      '20 chat messages per day',
+      '50 AI moves per month',
+      '20 chat messages per month',
       'Basic Chester AI personality',
       'Last 10 game history',
     ],
-    limitations: ['Limited daily usage', 'No game export', 'Standard response time'],
+    limitations: ['Limited monthly usage', 'No game export', 'Standard response time'],
   },
   pro: {
     name: 'Pro',
     description: 'For dedicated chess enthusiasts',
     features: [
-      '500 AI moves per day',
-      '200 chat messages per day',
+      '500 AI moves per month (unused moves carry over!)',
+      '200 chat messages per month',
       'Advanced Chester personality',
       'Unlimited game history',
       'Export games to PGN',
@@ -143,26 +148,22 @@ export function getPlanFromPriceId(priceId: string): 'free' | 'pro' | 'premium' 
   return 'free';
 }
 
-// Map plan types to usage limits
-export function getLimitsFromPlan(plan: 'free' | 'pro' | 'premium'): {
-  daily_ai_moves_limit: number;
-  daily_chat_messages_limit: number;
+// Get balance allocation for a plan (used for initial setup and renewals)
+export function getBalanceAllocation(plan: 'free' | 'pro' | 'premium'): {
+  ai_moves: number;
+  chat_messages: number;
 } {
   switch (plan) {
     case 'premium':
-      return {
-        daily_ai_moves_limit: -1, // unlimited
-        daily_chat_messages_limit: -1, // unlimited
-      };
+      return { ai_moves: -1, chat_messages: -1 }; // unlimited
     case 'pro':
-      return {
-        daily_ai_moves_limit: 500,
-        daily_chat_messages_limit: 200,
-      };
+      return { ai_moves: 500, chat_messages: 200 };
     default:
-      return {
-        daily_ai_moves_limit: 50,
-        daily_chat_messages_limit: 20,
-      };
+      return { ai_moves: 50, chat_messages: 20 };
   }
+}
+
+// Check if a price ID is a move pack (one-time purchase)
+export function isMovePack(priceId: string): boolean {
+  return priceId === STRIPE_PRICES.movePack;
 }

@@ -1,5 +1,5 @@
 // Chester AI Chess Service Worker
-const CACHE_NAME = 'chester-ai-chess-v1';
+const CACHE_NAME = 'chester-ai-chess-v2';
 const urlsToCache = [
   '/',
   '/manifest.json',

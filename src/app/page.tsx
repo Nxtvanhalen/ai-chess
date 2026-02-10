@@ -8,7 +8,7 @@ import ChessBoardLazy from '@/components/chess/ChessBoardLazy';
 import ThemeSelector from '@/components/chess/ThemeSelector';
 import GameLayout from '@/components/layout/GameLayout';
 import UpgradeModal from '@/components/subscription/UpgradeModal';
-import UsageDisplay from '@/components/subscription/UsageDisplay';
+import UsageDisplay, { invalidateUsageCache } from '@/components/subscription/UsageDisplay';
 import ErrorBoundary from '@/components/utils/ErrorBoundary';
 import { useAuth } from '@/contexts/AuthContext';
 import { useChesterStream } from '@/hooks/useChesterStream';
@@ -43,7 +43,7 @@ export default function Home() {
   const [upgradeModal, setUpgradeModal] = useState<{
     isOpen: boolean;
     type: 'ai_move' | 'chat';
-    resetAt?: string;
+    currentPlan?: string;
   }>({
     isOpen: false,
     type: 'ai_move',
@@ -105,6 +105,16 @@ export default function Home() {
   useEffect(() => {
     messagesRef.current = messages;
   }, [messages]);
+
+  // Detect return from move pack purchase and refresh usage
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('moves_purchased') === 'true') {
+      invalidateUsageCache();
+      // Clean URL without reload
+      window.history.replaceState({}, '', '/');
+    }
+  }, []);
 
   // Initialize and preload libraries
   useEffect(() => {
@@ -392,7 +402,7 @@ export default function Home() {
                 setUpgradeModal({
                   isOpen: true,
                   type: 'ai_move',
-                  resetAt: errorData.details?.resetAt,
+                  currentPlan: errorData.details?.plan,
                 });
                 // Remove the thinking message
                 setMessages((prev) => prev.filter((msg) => msg.id !== engineMoveMessage.id));
@@ -402,6 +412,8 @@ export default function Home() {
 
             if (aiMoveResponse.ok) {
               const aiMoveData = await aiMoveResponse.json();
+              // Bust usage cache so move counter updates
+              invalidateUsageCache();
 
               // Show realistic thinking process (or book move)
               const analysisText = aiMoveData.analysis?.fromBook
@@ -762,7 +774,7 @@ export default function Home() {
           isOpen={upgradeModal.isOpen}
           onClose={() => setUpgradeModal((prev) => ({ ...prev, isOpen: false }))}
           type={upgradeModal.type}
-          resetAt={upgradeModal.resetAt}
+          currentPlan={upgradeModal.currentPlan}
         />
       </ErrorBoundary>
     </LoginGate>

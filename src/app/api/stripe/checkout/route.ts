@@ -7,20 +7,22 @@ import { getStripeClient, STRIPE_PRICES } from '@/lib/stripe/config';
 // =============================================================================
 // STRIPE CHECKOUT SESSION API - Chester AI Chess
 // =============================================================================
-// Creates Stripe checkout sessions for subscription purchases
+// Creates Stripe checkout sessions for subscriptions and one-time purchases
 // =============================================================================
 
 const checkoutSchema = z
   .object({
-    // Support both direct priceId or plan+interval
+    // Purchase type: subscription (default) or movePack (one-time)
+    type: z.enum(['subscription', 'movePack']).optional().default('subscription'),
+    // Support both direct priceId or plan+interval (for subscriptions)
     priceId: z.string().min(1).optional(),
     plan: z.enum(['pro', 'premium']).optional(),
     interval: z.enum(['monthly', 'yearly']).optional(),
     successUrl: z.string().url().optional(),
     cancelUrl: z.string().url().optional(),
   })
-  .refine((data) => data.priceId || (data.plan && data.interval), {
-    message: 'Either priceId or both plan and interval are required',
+  .refine((data) => data.type === 'movePack' || data.priceId || (data.plan && data.interval), {
+    message: 'Either priceId or both plan and interval are required for subscriptions',
   });
 
 export async function POST(request: NextRequest) {
@@ -68,12 +70,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: validation.error.errors[0].message }, { status: 400 });
     }
 
-    const { priceId: directPriceId, plan, interval, successUrl, cancelUrl } = validation.data;
+    const { type, priceId: directPriceId, plan, interval, successUrl, cancelUrl } = validation.data;
 
-    // Resolve price ID from plan+interval or use direct priceId
-    let priceId = directPriceId;
-    if (!priceId && plan && interval) {
+    const isMovePack = type === 'movePack';
+
+    // Resolve price ID
+    let priceId: string;
+    if (isMovePack) {
+      priceId = STRIPE_PRICES.movePack;
+    } else if (directPriceId) {
+      priceId = directPriceId;
+    } else if (plan && interval) {
       priceId = STRIPE_PRICES[plan][interval];
+    } else {
+      return NextResponse.json({ error: 'Invalid price configuration' }, { status: 400 });
     }
 
     // Validate price ID is one of our configured prices
@@ -82,9 +92,10 @@ export async function POST(request: NextRequest) {
       STRIPE_PRICES.pro.yearly,
       STRIPE_PRICES.premium.monthly,
       STRIPE_PRICES.premium.yearly,
+      STRIPE_PRICES.movePack,
     ];
 
-    if (!priceId || !validPrices.includes(priceId)) {
+    if (!validPrices.includes(priceId)) {
       return NextResponse.json({ error: 'Invalid price ID or plan selection' }, { status: 400 });
     }
 
@@ -119,6 +130,31 @@ export async function POST(request: NextRequest) {
     // Create checkout session
     const origin = request.headers.get('origin') || 'http://localhost:3000';
 
+    if (isMovePack) {
+      // One-time payment for move pack - redirect back to game after purchase
+      const session = await stripe.checkout.sessions.create({
+        customer: customerId,
+        mode: 'payment',
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price: priceId,
+            quantity: 1,
+          },
+        ],
+        success_url: successUrl || `${origin}/?moves_purchased=true`,
+        cancel_url: cancelUrl || `${origin}/?moves_canceled=true`,
+        metadata: {
+          supabase_user_id: user.id,
+          purchase_type: 'move_pack',
+        },
+      });
+
+      console.log(`[Stripe Checkout] Move pack session created: user=${user.id} session=${session.id}`);
+      return NextResponse.json({ sessionId: session.id, url: session.url });
+    }
+
+    // Subscription checkout
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: 'subscription',
@@ -143,6 +179,7 @@ export async function POST(request: NextRequest) {
       allow_promotion_codes: true,
     });
 
+    console.log(`[Stripe Checkout] Subscription session created: user=${user.id} plan=${plan} session=${session.id}`);
     return NextResponse.json({ sessionId: session.id, url: session.url });
   } catch (error) {
     console.error('[Stripe Checkout] Error:', error);

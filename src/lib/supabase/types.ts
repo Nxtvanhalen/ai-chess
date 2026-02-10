@@ -77,47 +77,40 @@ export interface Subscription {
   current_period_end: string | null;
   cancel_at_period_end: boolean;
   canceled_at: string | null;
-  daily_ai_moves_limit: number;
-  daily_ai_moves_used: number;
-  daily_chat_messages_limit: number;
-  daily_chat_messages_used: number;
-  last_usage_reset: string;
+  ai_moves_balance: number;
+  chat_messages_balance: number;
   last_payment_date: string | null;
   last_payment_amount: number | null;
 }
 
 export interface SubscriptionUsage {
   ai_moves: {
-    used: number;
-    limit: number;
-    remaining: number;
+    balance: number;
     unlimited: boolean;
   };
   chat_messages: {
-    used: number;
-    limit: number;
-    remaining: number;
+    balance: number;
     unlimited: boolean;
   };
 }
 
-// Plan limits configuration
-export const PLAN_LIMITS: Record<
+// Plan allocation per billing cycle (monthly top-up amounts)
+export const PLAN_ALLOCATIONS: Record<
   SubscriptionTier,
   {
-    daily_ai_moves: number;
-    daily_chat_messages: number;
+    monthly_ai_moves: number;
+    monthly_chat_messages: number;
     features: string[];
   }
 > = {
   free: {
-    daily_ai_moves: 50,
-    daily_chat_messages: 20,
+    monthly_ai_moves: 50, // non-stacking: resets to 50
+    monthly_chat_messages: 20,
     features: ['Play against Chester AI', 'Basic move suggestions', 'Game history (last 10 games)'],
   },
   pro: {
-    daily_ai_moves: 500,
-    daily_chat_messages: 200,
+    monthly_ai_moves: 500, // stacking: adds 500 to balance
+    monthly_chat_messages: 200,
     features: [
       'Everything in Free',
       'Unlimited game history',
@@ -127,8 +120,8 @@ export const PLAN_LIMITS: Record<
     ],
   },
   premium: {
-    daily_ai_moves: -1, // unlimited
-    daily_chat_messages: -1, // unlimited
+    monthly_ai_moves: -1, // unlimited
+    monthly_chat_messages: -1, // unlimited
     features: [
       'Everything in Pro',
       'Unlimited AI moves',
@@ -419,8 +412,12 @@ export interface Database {
         Args: { p_user_id: string };
         Returns: undefined;
       };
-      reset_daily_usage: {
-        Args: Record<string, never>;
+      add_to_balance: {
+        Args: { p_user_id: string; p_ai_moves?: number; p_chat_messages?: number };
+        Returns: undefined;
+      };
+      set_balance: {
+        Args: { p_user_id: string; p_ai_moves?: number; p_chat_messages?: number };
         Returns: undefined;
       };
     };

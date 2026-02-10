@@ -9,6 +9,7 @@ import { GameMemoryService } from '@/lib/services/GameMemoryService';
 import {
   canUseChat,
   createUsageLimitError,
+  getUserTier,
   getUsageHeaders,
   incrementChatUsage,
 } from '@/lib/supabase/subscription';
@@ -95,7 +96,8 @@ export async function POST(request: NextRequest) {
     if (authUser) {
       const usageCheck = await canUseChat(authUser.id);
       if (!usageCheck.allowed) {
-        return new Response(JSON.stringify(createUsageLimitError('chat', usageCheck)), {
+        const tier = await getUserTier(authUser.id);
+        return new Response(JSON.stringify(createUsageLimitError('chat', usageCheck, tier)), {
           status: 429,
           headers: {
             'Content-Type': 'application/json',

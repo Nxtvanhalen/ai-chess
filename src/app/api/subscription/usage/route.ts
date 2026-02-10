@@ -42,7 +42,7 @@ export async function GET() {
       getUserTier(user.id),
     ]);
 
-    console.log(`[Usage API] Fetched in ${Date.now() - start}ms`);
+    console.log(`[Usage API] Fetched in ${Date.now() - start}ms`, JSON.stringify({ ...usage, plan }));
 
     return NextResponse.json(
       {
@@ -51,8 +51,8 @@ export async function GET() {
       },
       {
         headers: {
-          // Allow browser to cache for 30 seconds
-          'Cache-Control': 'private, max-age=30',
+          // Never let browser cache this - balance changes on every AI move
+          'Cache-Control': 'no-store',
         },
       },
     );

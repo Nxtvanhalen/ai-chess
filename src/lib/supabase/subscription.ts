@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import {
-  PLAN_LIMITS,
+  PLAN_ALLOCATIONS,
   type Subscription,
   type SubscriptionTier,
   type SubscriptionUsage,
@@ -10,7 +10,7 @@ import {
 // =============================================================================
 // SUBSCRIPTION SERVICE - Chester AI Chess
 // =============================================================================
-// Server-side functions for subscription management and usage limits
+// Server-side functions for subscription management and usage (balance model)
 // =============================================================================
 
 /**
@@ -62,51 +62,27 @@ export async function getUserSubscription(userId: string): Promise<Subscription 
 }
 
 /**
- * Get user's current usage and limits
+ * Get user's current usage (balance model)
  */
 export async function getUserUsage(userId: string): Promise<SubscriptionUsage | null> {
   const subscription = await getUserSubscription(userId);
 
   if (!subscription) {
-    // Return free tier limits for users without subscription record
+    // Return free tier defaults for users without subscription record
     return {
-      ai_moves: {
-        used: 0,
-        limit: PLAN_LIMITS.free.daily_ai_moves,
-        remaining: PLAN_LIMITS.free.daily_ai_moves,
-        unlimited: false,
-      },
-      chat_messages: {
-        used: 0,
-        limit: PLAN_LIMITS.free.daily_chat_messages,
-        remaining: PLAN_LIMITS.free.daily_chat_messages,
-        unlimited: false,
-      },
+      ai_moves: { balance: 50, unlimited: false },
+      chat_messages: { balance: 20, unlimited: false },
     };
   }
 
-  const aiUnlimited = subscription.daily_ai_moves_limit === -1;
-  const chatUnlimited = subscription.daily_chat_messages_limit === -1;
-
   return {
     ai_moves: {
-      used: subscription.daily_ai_moves_used,
-      limit: subscription.daily_ai_moves_limit,
-      remaining: aiUnlimited
-        ? Infinity
-        : Math.max(0, subscription.daily_ai_moves_limit - subscription.daily_ai_moves_used),
-      unlimited: aiUnlimited,
+      balance: subscription.ai_moves_balance,
+      unlimited: subscription.ai_moves_balance === -1,
     },
     chat_messages: {
-      used: subscription.daily_chat_messages_used,
-      limit: subscription.daily_chat_messages_limit,
-      remaining: chatUnlimited
-        ? Infinity
-        : Math.max(
-            0,
-            subscription.daily_chat_messages_limit - subscription.daily_chat_messages_used,
-          ),
-      unlimited: chatUnlimited,
+      balance: subscription.chat_messages_balance,
+      unlimited: subscription.chat_messages_balance === -1,
     },
   };
 }
@@ -116,8 +92,7 @@ export async function getUserUsage(userId: string): Promise<SubscriptionUsage | 
  */
 export async function canUseAIMove(userId: string): Promise<{
   allowed: boolean;
-  remaining: number;
-  limit: number;
+  balance: number;
   unlimited: boolean;
 }> {
   const start = Date.now();
@@ -135,15 +110,12 @@ export async function canUseAIMove(userId: string): Promise<{
     // INTENTIONAL DESIGN DECISION: Fail open for UX (reviewed 2026-02-09)
     // Rationale: Monthly subscription model means brief outage windows don't
     // cause per-call cost exposure. Usage counters catch up once DB resumes.
-    // Blocking users from playing during a DB hiccup is worse than a few
-    // uncounted moves. Revisit if switching to per-usage billing.
-    return { allowed: true, remaining: 0, limit: 0, unlimited: false };
+    return { allowed: true, balance: 0, unlimited: false };
   }
 
   return {
     allowed: rpcResult.data as boolean,
-    remaining: usage?.ai_moves.remaining ?? 0,
-    limit: usage?.ai_moves.limit ?? 0,
+    balance: usage?.ai_moves.balance ?? 0,
     unlimited: usage?.ai_moves.unlimited ?? false,
   };
 }
@@ -153,8 +125,7 @@ export async function canUseAIMove(userId: string): Promise<{
  */
 export async function canUseChat(userId: string): Promise<{
   allowed: boolean;
-  remaining: number;
-  limit: number;
+  balance: number;
   unlimited: boolean;
 }> {
   const start = Date.now();
@@ -171,19 +142,18 @@ export async function canUseChat(userId: string): Promise<{
     console.error('[Subscription] Error checking chat usage:', rpcResult.error);
     // INTENTIONAL DESIGN DECISION: Fail open for UX (reviewed 2026-02-09)
     // See canUseAIMove above for full rationale.
-    return { allowed: true, remaining: 0, limit: 0, unlimited: false };
+    return { allowed: true, balance: 0, unlimited: false };
   }
 
   return {
     allowed: rpcResult.data as boolean,
-    remaining: usage?.chat_messages.remaining ?? 0,
-    limit: usage?.chat_messages.limit ?? 0,
+    balance: usage?.chat_messages.balance ?? 0,
     unlimited: usage?.chat_messages.unlimited ?? false,
   };
 }
 
 /**
- * Increment AI move usage counter
+ * Increment AI move usage counter (decrements balance)
  */
 export async function incrementAIMoveUsage(userId: string): Promise<void> {
   const supabase = await getServerClient();
@@ -196,7 +166,7 @@ export async function incrementAIMoveUsage(userId: string): Promise<void> {
 }
 
 /**
- * Increment chat message usage counter
+ * Increment chat message usage counter (decrements balance)
  */
 export async function incrementChatUsage(userId: string): Promise<void> {
   const supabase = await getServerClient();
@@ -234,7 +204,7 @@ export async function hasPaidSubscription(userId: string): Promise<boolean> {
  */
 export async function getUserFeatures(userId: string): Promise<string[]> {
   const tier = await getUserTier(userId);
-  return PLAN_LIMITS[tier].features;
+  return PLAN_ALLOCATIONS[tier].features;
 }
 
 // -----------------------------------------------------------------------------
@@ -247,33 +217,28 @@ export async function getUserFeatures(userId: string): Promise<string[]> {
 export function createUsageLimitError(
   type: 'ai_move' | 'chat',
   usage: {
-    remaining: number;
-    limit: number;
+    balance: number;
   },
+  plan: SubscriptionTier = 'free',
 ): {
   error: string;
   code: string;
   details: {
     type: string;
-    remaining: number;
-    limit: number;
-    resetAt: string;
+    balance: number;
+    plan: string;
   };
 } {
-  const resetAt = new Date();
-  resetAt.setUTCHours(24, 0, 0, 0); // Midnight UTC
-
   return {
     error:
       type === 'ai_move'
-        ? 'Daily AI move limit reached. Upgrade your plan for more moves.'
-        : 'Daily chat message limit reached. Upgrade your plan for more messages.',
+        ? "You're out of AI moves."
+        : "You're out of chat messages.",
     code: 'USAGE_LIMIT_EXCEEDED',
     details: {
       type,
-      remaining: usage.remaining,
-      limit: usage.limit,
-      resetAt: resetAt.toISOString(),
+      balance: usage.balance,
+      plan,
     },
   };
 }
@@ -284,15 +249,13 @@ export function createUsageLimitError(
 export function getUsageHeaders(
   type: 'ai_move' | 'chat',
   usage: {
-    remaining: number;
-    limit: number;
+    balance: number;
     unlimited: boolean;
   },
 ): Record<string, string> {
   const prefix = type === 'ai_move' ? 'X-AI-Moves' : 'X-Chat-Messages';
 
   return {
-    [`${prefix}-Remaining`]: usage.unlimited ? 'unlimited' : String(usage.remaining),
-    [`${prefix}-Limit`]: usage.unlimited ? 'unlimited' : String(usage.limit),
+    [`${prefix}-Balance`]: usage.unlimited ? 'unlimited' : String(usage.balance),
   };
 }

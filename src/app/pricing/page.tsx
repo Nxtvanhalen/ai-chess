@@ -309,6 +309,48 @@ export default function PricingPage() {
           </div>
         </div>
 
+        {/* Move Pack Section */}
+        <div className="max-w-md mx-auto mt-12 bg-gray-800/30 backdrop-blur-sm border border-emerald-500/30 rounded-2xl p-8 text-center">
+          <h3 className="text-xl font-semibold text-white mb-2">Need More Moves?</h3>
+          <p className="text-gray-400 text-sm mb-4">
+            Top up your move bank anytime. Works with any plan.
+          </p>
+          <div className="mb-6">
+            <span className="text-4xl font-bold text-white">$1</span>
+            <span className="text-gray-500"> for 50 moves</span>
+          </div>
+          <button
+            onClick={async () => {
+              if (!user) {
+                window.location.href = '/login?redirect=/pricing';
+                return;
+              }
+              setLoading('movePack');
+              try {
+                const response = await fetch('/api/stripe/checkout', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ type: 'movePack' }),
+                });
+                const data = await response.json();
+                if (data.url) {
+                  window.location.href = data.url;
+                } else {
+                  console.error('No checkout URL returned');
+                }
+              } catch (error) {
+                console.error('Move pack checkout error:', error);
+              } finally {
+                setLoading(null);
+              }
+            }}
+            disabled={loading === 'movePack'}
+            className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-medium transition-colors disabled:opacity-50"
+          >
+            {loading === 'movePack' ? 'Loading...' : 'Buy 50 Moves'}
+          </button>
+        </div>
+
         {/* Footer Links */}
         <div className="text-center mt-12 space-x-6">
           <Link href="/" className="text-gray-400 hover:text-white transition-colors">

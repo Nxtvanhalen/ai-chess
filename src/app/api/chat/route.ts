@@ -103,8 +103,7 @@ export async function POST(request: NextRequest) {
     // Check subscription usage limit (only for authenticated users with subscriptions)
     let usageCheck: {
       allowed: boolean;
-      remaining: number;
-      limit: number;
+      balance: number;
       unlimited: boolean;
     } | null = null;
     if (authUser) {
@@ -420,8 +419,7 @@ export async function POST(request: NextRequest) {
       Object.assign(
         responseHeaders,
         getUsageHeaders('chat', {
-          remaining: usageCheck.unlimited ? Infinity : usageCheck.remaining - 1,
-          limit: usageCheck.limit,
+          balance: usageCheck.unlimited ? -1 : Math.max(0, usageCheck.balance - 1),
           unlimited: usageCheck.unlimited,
         }),
       );

@@ -7,6 +7,7 @@ import { checkRateLimitRedis, getClientIPFromRequest, getRateLimitHeadersRedis }
 import {
   canUseAIMove,
   createUsageLimitError,
+  getUserTier,
   getUsageHeaders,
   incrementAIMoveUsage,
 } from '@/lib/supabase/subscription';
@@ -72,14 +73,14 @@ export async function POST(request: NextRequest) {
     // Check subscription usage limit (only for authenticated users with subscriptions)
     let usageCheck: {
       allowed: boolean;
-      remaining: number;
-      limit: number;
+      balance: number;
       unlimited: boolean;
     } | null = null;
     if (user) {
       usageCheck = await canUseAIMove(user.id);
       if (!usageCheck.allowed) {
-        return NextResponse.json(createUsageLimitError('ai_move', usageCheck), {
+        const tier = await getUserTier(user.id);
+        return NextResponse.json(createUsageLimitError('ai_move', usageCheck, tier), {
           status: 429,
           headers: getUsageHeaders('ai_move', usageCheck),
         });
@@ -135,8 +136,7 @@ export async function POST(request: NextRequest) {
           Object.assign(
             responseHeaders,
             getUsageHeaders('ai_move', {
-              remaining: usageCheck.unlimited ? Infinity : usageCheck.remaining - 1,
-              limit: usageCheck.limit,
+              balance: usageCheck.unlimited ? -1 : Math.max(0, usageCheck.balance - 1),
               unlimited: usageCheck.unlimited,
             }),
           );
