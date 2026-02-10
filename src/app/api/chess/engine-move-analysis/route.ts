@@ -3,6 +3,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { PositionAnalyzer } from '@/lib/chess/positionAnalyzer';
 import { getDeepSeekClient } from '@/lib/openai/client';
 import { checkRateLimitRedis, getClientIPFromRequest, getRateLimitHeadersRedis } from '@/lib/redis';
+import { withRetry } from '@/lib/utils/retry';
 import { engineMoveAnalysisSchema, validateRequest } from '@/lib/validation/schemas';
 
 interface CachedAnalysis {
@@ -542,20 +543,23 @@ Mandatory:
     let payload: CachedAnalysis['payload'];
     try {
       const deepseek = getDeepSeekClient();
-      const completion = await withTimeout(
-        deepseek.chat.completions.create({
-          model: 'deepseek-chat',
-          messages: [
-            { role: 'system', content: systemPrompt },
-            {
-              role: 'user',
-              content: `${context}${evaluationContext}${userMoveContext}${urgencyContext}\n\nThe engine just played: ${moveStr}\n\nWhat's your casual take on ${userMove ? 'these moves' : 'this move'}, and what should the player try next?`,
-            },
-          ],
-          max_completion_tokens: 160,
-          response_format: { type: 'json_object' },
-        }),
-        LLM_TIMEOUT_MS,
+      const completion = await withRetry(
+        () => withTimeout(
+          deepseek.chat.completions.create({
+            model: 'deepseek-chat',
+            messages: [
+              { role: 'system', content: systemPrompt },
+              {
+                role: 'user',
+                content: `${context}${evaluationContext}${userMoveContext}${urgencyContext}\n\nThe engine just played: ${moveStr}\n\nWhat's your casual take on ${userMove ? 'these moves' : 'this move'}, and what should the player try next?`,
+              },
+            ],
+            max_completion_tokens: 160,
+            response_format: { type: 'json_object' },
+          }),
+          LLM_TIMEOUT_MS,
+        ),
+        { maxRetries: 1, baseDelayMs: 500, maxDelayMs: 2000 },
       );
 
       const response = JSON.parse(completion.choices[0].message.content || '{}');

@@ -6,6 +6,7 @@ import { getOpenAIClient } from '@/lib/openai/client';
 import { checkRateLimitRedis, getClientIPFromRequest, getRateLimitHeadersRedis } from '@/lib/redis';
 import { ChesterMemoryService } from '@/lib/services/ChesterMemoryService';
 import { GameMemoryService } from '@/lib/services/GameMemoryService';
+import { withOpenAIRetry } from '@/lib/utils/retry';
 import { preMoveAnalysisSchema, validateRequest } from '@/lib/validation/schemas';
 import type { MoveSuggestion } from '@/types';
 
@@ -207,18 +208,20 @@ export async function POST(request: NextRequest) {
     DO NOT respond with empty JSON. ALWAYS provide at least one suggestion and a comment.`;
 
     const openai = getOpenAIClient();
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-5.2-2025-12-11',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        {
-          role: 'user',
-          content: `${context}\n\nGame phase: ${gamePhase || 'opening'}\nRecent moves: ${moveHistory?.slice(-3).join(', ') || 'None yet'}\n\nWhat moves would you casually suggest?`,
-        },
-      ],
-      max_completion_tokens: 300,
-      response_format: { type: 'json_object' },
-    });
+    const completion = await withOpenAIRetry(() =>
+      openai.chat.completions.create({
+        model: 'gpt-5.2-2025-12-11',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          {
+            role: 'user',
+            content: `${context}\n\nGame phase: ${gamePhase || 'opening'}\nRecent moves: ${moveHistory?.slice(-3).join(', ') || 'None yet'}\n\nWhat moves would you casually suggest?`,
+          },
+        ],
+        max_completion_tokens: 300,
+        response_format: { type: 'json_object' },
+      }),
+    );
 
     const response = JSON.parse(completion.choices[0].message.content || '{}');
 

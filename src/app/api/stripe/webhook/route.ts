@@ -143,7 +143,7 @@ async function handleCheckoutCompleted(
 
   if (error) {
     console.error('[Stripe Webhook] Failed to update subscription:', error);
-    return;
+    throw new Error(`Database error in handleCheckoutCompleted: ${error.message}`);
   }
 
   // Update user profile subscription tier
@@ -203,7 +203,7 @@ async function handleSubscriptionUpdate(
 
   if (error) {
     console.error('[Stripe Webhook] Failed to update subscription:', error);
-    return;
+    throw new Error(`Database error in handleSubscriptionUpdate: ${error.message}`);
   }
 
   // Update user profile
@@ -238,7 +238,7 @@ async function handleSubscriptionCanceled(
 
   if (error) {
     console.error('[Stripe Webhook] Failed to cancel subscription:', error);
-    return;
+    throw new Error(`Database error in handleSubscriptionCanceled: ${error.message}`);
   }
 
   // Update user profile
@@ -273,6 +273,7 @@ async function handlePaymentSucceeded(supabase: ServiceRoleClient, invoice: Stri
 
   if (error) {
     console.error('[Stripe Webhook] Failed to record payment:', error);
+    throw new Error(`Database error in handlePaymentSucceeded: ${error.message}`);
   }
 
 }
@@ -290,6 +291,7 @@ async function handlePaymentFailed(supabase: ServiceRoleClient, invoice: Stripe.
 
   if (error) {
     console.error('[Stripe Webhook] Failed to update payment failure:', error);
+    throw new Error(`Database error in handlePaymentFailed: ${error.message}`);
   }
 
 }
