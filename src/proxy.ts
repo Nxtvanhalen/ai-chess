@@ -161,6 +161,39 @@ function isMobileUserAgent(ua: string): boolean {
   return mobilePatterns.some((pattern) => pattern.test(ua));
 }
 
+function isMaliciousUserAgent(ua: string): boolean {
+  // Empty or very short UAs are almost always bots
+  if (ua.length < 10) return true;
+
+  // UA contains a URL - dead giveaway for scanners (e.g. "http://example.com/wp-admin/...")
+  if (/^https?:\/\//i.test(ua)) return true;
+
+  // Known scanner/attack tool signatures
+  const scannerPatterns = [
+    /sqlmap/i,
+    /nikto/i,
+    /nmap/i,
+    /masscan/i,
+    /zgrab/i,
+    /nuclei/i,
+    /dirbuster/i,
+    /gobuster/i,
+    /wpscan/i,
+    /joomla/i,
+    /drupal/i,
+    /wp-scan/i,
+    /python-requests/i,
+    /Go-http-client/i,
+    /curl\//i,
+    /wget\//i,
+    /libwww-perl/i,
+    /Scrapy/i,
+    /HTTPClient/i,
+  ];
+
+  return scannerPatterns.some((pattern) => pattern.test(ua));
+}
+
 function _isSuspiciousMobileUA(ua: string): boolean {
   // Detect common spoofed mobile UAs from bots
   const _spoofedPatterns = [
@@ -295,6 +328,12 @@ export async function proxy(request: NextRequest) {
     return new NextResponse(null, { status: 404 });
   }
 
+  // Quick UA-based blocking for obvious bots/scanners
+  const userAgent = request.headers.get('user-agent') || '';
+  if (isMaliciousUserAgent(userAgent)) {
+    return new NextResponse(null, { status: 403 });
+  }
+
   const analysis = analyzeRequest(request);
 
   if (analysis.isBlocked) {
@@ -362,11 +401,15 @@ export async function proxy(request: NextRequest) {
   const publicRoutes = ['/login', '/signup', '/auth'];
   const isPublicRoute = publicRoutes.some((route) => request.nextUrl.pathname.startsWith(route));
 
+  // Static assets that should never require auth (PWA manifest, service worker, etc.)
+  const publicAssets = ['/manifest.json', '/sw.js', '/robots.txt', '/sitemap.xml'];
+  const isPublicAsset = publicAssets.includes(request.nextUrl.pathname);
+
   // API routes - let them handle their own auth
   const isApiRoute = request.nextUrl.pathname.startsWith('/api/');
 
   // If not logged in and trying to access protected route, redirect to login
-  if (!user && !isPublicRoute && !isApiRoute) {
+  if (!user && !isPublicRoute && !isPublicAsset && !isApiRoute) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     url.searchParams.set('redirectTo', request.nextUrl.pathname);
