@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { PLAN_FEATURES, PRICING } from '@/lib/stripe/config';
 import Link from 'next/link';
@@ -12,6 +12,24 @@ export default function PricingPage() {
   const [interval, setInterval] = useState<BillingInterval>('monthly');
   const [loading, setLoading] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [currentPlan, setCurrentPlan] = useState<string>('free');
+
+  const fetchCurrentPlan = useCallback(async () => {
+    if (!user) return;
+    try {
+      const response = await fetch('/api/subscription/usage');
+      if (response.ok) {
+        const data = await response.json();
+        setCurrentPlan(data.plan || 'free');
+      }
+    } catch (error) {
+      console.error('[Pricing] Failed to fetch current plan:', error);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    fetchCurrentPlan();
+  }, [fetchCurrentPlan]);
 
   const handleCheckout = async (plan: 'pro' | 'premium') => {
     if (!user) {
@@ -172,12 +190,21 @@ export default function PricingPage() {
                 </li>
               ))}
             </ul>
-            <button
-              disabled
-              className="w-full py-3 rounded-xl bg-gray-700 text-gray-400 font-medium cursor-not-allowed"
-            >
-              Current Plan
-            </button>
+            {currentPlan === 'free' ? (
+              <button
+                disabled
+                className="w-full py-3 rounded-xl bg-gray-700 text-gray-400 font-medium cursor-not-allowed"
+              >
+                Current Plan
+              </button>
+            ) : (
+              <button
+                disabled
+                className="w-full py-3 rounded-xl bg-gray-700 text-gray-500 font-medium cursor-not-allowed"
+              >
+                Free Plan
+              </button>
+            )}
           </div>
 
           {/* Pro Plan */}
@@ -215,13 +242,22 @@ export default function PricingPage() {
                 </li>
               ))}
             </ul>
-            <button
-              onClick={() => handleCheckout('pro')}
-              disabled={loading === 'pro'}
-              className="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-medium transition-colors disabled:opacity-50"
-            >
-              {loading === 'pro' ? 'Loading...' : 'Get Pro'}
-            </button>
+            {currentPlan === 'pro' ? (
+              <button
+                disabled
+                className="w-full py-3 rounded-xl bg-purple-600/50 text-purple-200 font-medium cursor-not-allowed"
+              >
+                Current Plan
+              </button>
+            ) : (
+              <button
+                onClick={() => handleCheckout('pro')}
+                disabled={loading === 'pro'}
+                className="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-medium transition-colors disabled:opacity-50"
+              >
+                {loading === 'pro' ? 'Loading...' : 'Get Pro'}
+              </button>
+            )}
           </div>
 
           {/* Premium Plan */}
@@ -254,13 +290,22 @@ export default function PricingPage() {
                 </li>
               ))}
             </ul>
-            <button
-              onClick={() => handleCheckout('premium')}
-              disabled={loading === 'premium'}
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-medium transition-colors disabled:opacity-50"
-            >
-              {loading === 'premium' ? 'Loading...' : 'Get Premium'}
-            </button>
+            {currentPlan === 'premium' ? (
+              <button
+                disabled
+                className="w-full py-3 rounded-xl bg-amber-600/50 text-amber-200 font-medium cursor-not-allowed"
+              >
+                Current Plan
+              </button>
+            ) : (
+              <button
+                onClick={() => handleCheckout('premium')}
+                disabled={loading === 'premium'}
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-medium transition-colors disabled:opacity-50"
+              >
+                {loading === 'premium' ? 'Loading...' : 'Get Premium'}
+              </button>
+            )}
           </div>
         </div>
 
