@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { redirectToCustomerPortal } from '@/lib/stripe/client';
 
 interface UsageData {
   ai_moves: {
@@ -144,10 +143,29 @@ export default function UsageDisplay() {
 
   const handleManageSubscription = async () => {
     setPortalLoading(true);
+    setMenuOpen(false);
     try {
-      await redirectToCustomerPortal();
+      const response = await fetch('/api/stripe/portal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        console.warn('[UsageDisplay] Portal error:', data.error || response.status);
+        setPortalLoading(false);
+        return;
+      }
+
+      const { url } = await response.json();
+      if (url) {
+        window.location.href = url;
+      } else {
+        console.warn('[UsageDisplay] No portal URL returned');
+        setPortalLoading(false);
+      }
     } catch (err) {
-      console.error('[UsageDisplay] Portal error:', err);
+      console.warn('[UsageDisplay] Portal network error:', err);
       setPortalLoading(false);
     }
   };
@@ -207,7 +225,7 @@ export default function UsageDisplay() {
         </button>
 
         {menuOpen && (
-          <div className="absolute right-0 top-full mt-2 w-56 bg-gray-800 border border-gray-700 rounded-xl shadow-xl overflow-hidden">
+          <div className="absolute right-0 bottom-full mb-2 w-56 bg-gray-800 border border-gray-700 rounded-xl shadow-xl overflow-hidden z-[200]">
             {/* Plan info */}
             <div className="px-4 py-3 border-b border-gray-700">
               <p className="text-xs text-gray-400 truncate">{user.email}</p>

@@ -40,17 +40,25 @@ export async function POST(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
+      console.error('[Stripe Portal] Auth failed:', authError?.message || 'No user');
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
+    console.log('[Stripe Portal] User:', user.id, user.email);
+
     // Get user's Stripe customer ID
-    const { data: subscription } = await supabase
+    const { data: subscription, error: subError } = await supabase
       .from('subscriptions')
       .select('stripe_customer_id')
       .eq('user_id', user.id)
       .single();
 
+    if (subError) {
+      console.error('[Stripe Portal] Subscription lookup error:', subError.message);
+    }
+
     if (!subscription?.stripe_customer_id) {
+      console.error('[Stripe Portal] No stripe_customer_id for user:', user.id, 'subscription:', subscription);
       return NextResponse.json(
         { error: 'No subscription found. Please subscribe first.' },
         { status: 400 },
@@ -63,6 +71,7 @@ export async function POST(request: NextRequest) {
       'https://chesswithai.com',
       'https://www.chesswithai.com',
       'http://localhost:3000',
+      'http://localhost:3001',
     ].filter(Boolean);
     const rawOrigin = request.headers.get('origin') || '';
     const origin = allowedOrigins.includes(rawOrigin) ? rawOrigin : (allowedOrigins[0] || 'http://localhost:3000');
