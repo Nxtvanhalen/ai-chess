@@ -132,7 +132,11 @@ export async function canUseAIMove(userId: string): Promise<{
 
   if (rpcResult.error) {
     console.error('[Subscription] Error checking AI move usage:', rpcResult.error);
-    // Default to allowing in case of error (fail open for UX)
+    // INTENTIONAL DESIGN DECISION: Fail open for UX (reviewed 2026-02-09)
+    // Rationale: Monthly subscription model means brief outage windows don't
+    // cause per-call cost exposure. Usage counters catch up once DB resumes.
+    // Blocking users from playing during a DB hiccup is worse than a few
+    // uncounted moves. Revisit if switching to per-usage billing.
     return { allowed: true, remaining: 0, limit: 0, unlimited: false };
   }
 
@@ -165,6 +169,8 @@ export async function canUseChat(userId: string): Promise<{
 
   if (rpcResult.error) {
     console.error('[Subscription] Error checking chat usage:', rpcResult.error);
+    // INTENTIONAL DESIGN DECISION: Fail open for UX (reviewed 2026-02-09)
+    // See canUseAIMove above for full rationale.
     return { allowed: true, remaining: 0, limit: 0, unlimited: false };
   }
 
