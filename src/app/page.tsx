@@ -12,7 +12,7 @@ import UsageDisplay, { invalidateUsageCache } from '@/components/subscription/Us
 import ErrorBoundary from '@/components/utils/ErrorBoundary';
 import { useAuth } from '@/contexts/AuthContext';
 import { useChesterStream } from '@/hooks/useChesterStream';
-import { type BoardTheme, defaultTheme } from '@/lib/chess/boardThemes';
+import { type BoardTheme, boardThemes, defaultTheme } from '@/lib/chess/boardThemes';
 import { GameMemoryService } from '@/lib/services/GameMemoryService';
 import {
   calculateNewRating,
@@ -54,7 +54,16 @@ export default function Home() {
   const checkmateHandledRef = useRef(false);
   const drawHandledRef = useRef(false);
   const [playerRating, setPlayerRating] = useState<number>(DEFAULT_RATING);
-  const [boardTheme, setBoardTheme] = useState<BoardTheme>(defaultTheme);
+  const [boardTheme, setBoardTheme] = useState<BoardTheme>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('chester:board-theme');
+      if (saved) {
+        const found = boardThemes.find((t) => t.id === saved);
+        if (found) return found;
+      }
+    }
+    return defaultTheme;
+  });
   const [upgradeModal, setUpgradeModal] = useState<{
     isOpen: boolean;
     type: 'ai_move' | 'chat';
@@ -945,7 +954,10 @@ export default function Home() {
               >
                 New Game
               </button>
-              <ThemeSelector currentTheme={boardTheme} onThemeChange={setBoardTheme} />
+              <ThemeSelector currentTheme={boardTheme} onThemeChange={(theme) => {
+                setBoardTheme(theme);
+                localStorage.setItem('chester:board-theme', theme.id);
+              }} />
               <UsageDisplay />
             </div>
           }
