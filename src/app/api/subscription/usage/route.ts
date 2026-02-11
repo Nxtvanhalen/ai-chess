@@ -40,18 +40,20 @@ export async function GET() {
     const [usage, plan, profileResult] = await Promise.all([
       getUserUsage(user.id),
       getUserTier(user.id),
-      supabase.from('user_profiles').select('rating').eq('id', user.id).single(),
+      supabase.from('user_profiles').select('rating, avatar_url').eq('id', user.id).single(),
     ]);
 
     const rating = profileResult.data?.rating ?? 1200;
+    const avatar_url = profileResult.data?.avatar_url ?? null;
 
-    console.log(`[Usage API] Fetched in ${Date.now() - start}ms`, JSON.stringify({ ...usage, plan, rating }));
+    console.log(`[Usage API] Fetched in ${Date.now() - start}ms`, JSON.stringify({ ...usage, plan, rating, avatar_url }));
 
     return NextResponse.json(
       {
         ...usage,
         plan,
         rating,
+        avatar_url,
       },
       {
         headers: {

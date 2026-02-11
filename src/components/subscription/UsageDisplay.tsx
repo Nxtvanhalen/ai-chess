@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import AvatarUpload from '@/components/profile/AvatarUpload';
 
 interface UsageData {
   ai_moves: {
@@ -14,6 +15,7 @@ interface UsageData {
   };
   plan: string;
   rating?: number;
+  avatar_url?: string | null;
 }
 
 const PLAN_LABELS: Record<string, string> = {
@@ -46,6 +48,8 @@ export default function UsageDisplay() {
   const [usage, setUsage] = useState<UsageData | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
+  const [avatarModalOpen, setAvatarModalOpen] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   // Single fetch function - no caching games, just fetch from server
   useEffect(() => {
@@ -112,6 +116,13 @@ export default function UsageDisplay() {
       document.removeEventListener('visibilitychange', handleFocus);
     };
   }, [user?.id]);
+
+  // Sync avatar URL from usage data
+  useEffect(() => {
+    if (usage?.avatar_url) {
+      setAvatarUrl(usage.avatar_url);
+    }
+  }, [usage?.avatar_url]);
 
   // Close menu on outside click
   useEffect(() => {
@@ -249,12 +260,16 @@ export default function UsageDisplay() {
       <div ref={menuRef} className="relative">
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="w-7 h-7 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-colors border border-gray-600"
+          className="w-7 h-7 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-colors border border-gray-600 overflow-hidden"
           title="Account menu"
         >
-          <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-          </svg>
+          {avatarUrl ? (
+            <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+          ) : (
+            <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+          )}
         </button>
 
         {menuOpen && (
@@ -281,6 +296,15 @@ export default function UsageDisplay() {
                   {portalLoading ? 'Opening...' : 'Manage Subscription'}
                 </button>
               )}
+              <button
+                onClick={() => {
+                  setMenuOpen(false);
+                  setAvatarModalOpen(true);
+                }}
+                className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
+              >
+                Change Avatar
+              </button>
               <a
                 href="/pricing"
                 className="block px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
@@ -297,6 +321,13 @@ export default function UsageDisplay() {
           </div>
         )}
       </div>
+
+      <AvatarUpload
+        isOpen={avatarModalOpen}
+        onClose={() => setAvatarModalOpen(false)}
+        onSaved={(url) => setAvatarUrl(url)}
+        currentAvatarUrl={avatarUrl}
+      />
     </div>
   );
 }
