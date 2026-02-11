@@ -130,29 +130,39 @@ export default function Home() {
     messagesRef.current = messages;
   }, [messages]);
 
-  // Fetch player rating from usage API (hydrate on mount + after invalidation)
+  // Fetch player rating + preferences from usage API (hydrate on mount + after invalidation)
   useEffect(() => {
     if (!user?.id) return;
     let cancelled = false;
 
-    const fetchRating = async () => {
+    const fetchProfile = async () => {
       try {
         const res = await fetch('/api/subscription/usage');
         if (res.ok) {
           const data = await res.json();
-          if (!cancelled && typeof data.rating === 'number') {
-            setPlayerRating(data.rating);
+          if (!cancelled) {
+            if (typeof data.rating === 'number') {
+              setPlayerRating(data.rating);
+            }
+            // Sync board theme from server (overrides localStorage)
+            if (data.board_theme) {
+              const serverTheme = boardThemes.find((t) => t.id === data.board_theme);
+              if (serverTheme) {
+                setBoardTheme(serverTheme);
+                localStorage.setItem('chester:board-theme', serverTheme.id);
+              }
+            }
           }
         }
       } catch (err) {
-        console.error('[Rating] Error fetching rating:', err);
+        console.error('[Profile] Error fetching profile:', err);
       }
     };
 
-    fetchRating();
+    fetchProfile();
 
     // Also re-fetch when usage cache is invalidated (after game end, etc.)
-    const handleInvalidate = () => fetchRating();
+    const handleInvalidate = () => fetchProfile();
     window.addEventListener('chester:usage-invalidate', handleInvalidate);
 
     return () => {
@@ -957,6 +967,14 @@ export default function Home() {
               <ThemeSelector currentTheme={boardTheme} onThemeChange={(theme) => {
                 setBoardTheme(theme);
                 localStorage.setItem('chester:board-theme', theme.id);
+                // Persist to user profile for cross-device sync
+                if (user?.id) {
+                  fetch('/api/subscription/usage', {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ board_theme: theme.id }),
+                  }).catch((err) => console.error('[Theme] Error saving preference:', err));
+                }
               }} />
               <UsageDisplay />
             </div>
