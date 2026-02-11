@@ -13,6 +13,7 @@ interface ChessBoardProps {
   orientation?: 'white' | 'black';
   interactive?: boolean;
   onCheckmate?: (winner: 'white' | 'black') => void;
+  onDraw?: () => void;
   theme?: BoardTheme;
 }
 

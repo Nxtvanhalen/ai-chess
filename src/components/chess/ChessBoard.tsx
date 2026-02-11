@@ -14,6 +14,7 @@ interface ChessBoardProps {
   orientation?: 'white' | 'black';
   interactive?: boolean;
   onCheckmate?: (winner: 'white' | 'black') => void;
+  onDraw?: () => void;
   theme?: BoardTheme;
 }
 
@@ -23,6 +24,7 @@ export default function ChessBoard({
   orientation = 'white',
   interactive = true,
   onCheckmate,
+  onDraw,
   theme = defaultTheme,
 }: ChessBoardProps) {
   const [game, setGame] = useState(new Chess());
@@ -169,6 +171,9 @@ export default function ChessBoard({
       }
     } else if (game.isDraw()) {
       setStatusAnnouncement((prev) => (prev === 'Game is a draw!' ? prev : 'Game is a draw!'));
+      if (onDraw) {
+        onDraw();
+      }
     } else if (game.inCheck()) {
       const inCheckColor = game.turn() === 'w' ? 'White' : 'Black';
       const message = `${inCheckColor} is in check!`;
@@ -227,7 +232,7 @@ export default function ChessBoard({
     } else {
       setCheckInfo(null);
     }
-  }, [game, onCheckmate, getPathBetweenSquares]);
+  }, [game, onCheckmate, onDraw, getPathBetweenSquares]);
 
   const handleSquareClick = useCallback(
     (square: string) => {

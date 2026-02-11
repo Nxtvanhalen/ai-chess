@@ -47,10 +47,12 @@ export default function Home() {
   const [currentGameId, setCurrentGameId] = useState<string | null>(null);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [moveCount, setMoveCount] = useState(0);
-  const [gameOver, setGameOver] = useState<{ checkmate: boolean; winner?: 'white' | 'black' }>({
+  const [gameOver, setGameOver] = useState<{ checkmate: boolean; draw: boolean; winner?: 'white' | 'black' }>({
     checkmate: false,
+    draw: false,
   });
   const checkmateHandledRef = useRef(false);
+  const drawHandledRef = useRef(false);
   const [playerRating, setPlayerRating] = useState<number>(DEFAULT_RATING);
   const [boardTheme, setBoardTheme] = useState<BoardTheme>(defaultTheme);
   const [upgradeModal, setUpgradeModal] = useState<{
@@ -344,7 +346,7 @@ export default function Home() {
       }
       checkmateHandledRef.current = true;
 
-      setGameOver({ checkmate: true, winner });
+      setGameOver({ checkmate: true, draw: false, winner });
 
       // Finalize game in database
       if (currentGameId) {
@@ -383,6 +385,50 @@ export default function Home() {
       };
 
       setMessages((prev) => [...prev, checkmateMessage]);
+    },
+    [currentGameId, playerRating, user?.id],
+  );
+
+  const handleDraw = useCallback(
+    async () => {
+      // Guard against multiple calls
+      if (drawHandledRef.current) return;
+      drawHandledRef.current = true;
+
+      setGameOver({ checkmate: false, draw: true });
+
+      // Finalize game in database
+      if (currentGameId) {
+        try {
+          const durationSeconds = Math.floor((Date.now() - gameStartTimeRef.current) / 1000);
+          await GameMemoryService.finalizeGame(currentGameId, 'draw', durationSeconds);
+
+          // Update Elo rating with draw result (0.5)
+          if (user?.id) {
+            const difficulty = getDifficultyForRating(playerRating);
+            const engineElo = getEngineRating(difficulty);
+            const newRating = calculateNewRating(playerRating, engineElo, 0.5);
+
+            console.log(`[Rating] ${playerRating} → ${newRating} (draw vs ${difficulty} ~${engineElo})`);
+
+            await updatePlayerRating(user.id, newRating);
+            setPlayerRating(newRating);
+            invalidateUsageCache();
+          }
+        } catch (error) {
+          console.error('Error finalizing draw:', error);
+        }
+      }
+
+      // Add draw message
+      const drawMessage: ChatMessage = {
+        id: generateSimpleId(),
+        role: 'assistant',
+        content: "It's a draw! Neither side could force a win. Well played — ready for another?",
+        timestamp: new Date(),
+      };
+
+      setMessages((prev) => [...prev, drawMessage]);
     },
     [currentGameId, playerRating, user?.id],
   );
@@ -784,12 +830,13 @@ export default function Home() {
     // Reset game state - set position FIRST to prevent ChessBoard from re-detecting checkmate
     const startingFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
     setCurrentPosition(startingFen);
-    setGameOver({ checkmate: false });
+    setGameOver({ checkmate: false, draw: false });
     setMoveCount(0);
     gameStartTimeRef.current = Date.now();
 
-    // Only reset the ref AFTER position is updated to starting position
+    // Only reset the refs AFTER position is updated to starting position
     checkmateHandledRef.current = false;
+    drawHandledRef.current = false;
 
     try {
       // Abandon the current game so it won't be restored on next load
@@ -847,8 +894,9 @@ export default function Home() {
                 onMove={handleMove}
                 position={currentPosition}
                 orientation="white"
-                interactive={!gameOver.checkmate}
+                interactive={!gameOver.checkmate && !gameOver.draw}
                 onCheckmate={handleCheckmate}
+                onDraw={handleDraw}
                 theme={boardTheme}
               />
               {gameOver.checkmate && (
@@ -857,6 +905,22 @@ export default function Home() {
                     <h2 className="text-3xl font-bold text-white mb-4">Checkmate!</h2>
                     <p className="text-xl text-gray-200 mb-6">
                       {gameOver.winner === 'white' ? 'White Wins!' : 'Black Wins!'}
+                    </p>
+                    <button
+                      onClick={handleRestart}
+                      className="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all transform hover:scale-105 shadow-lg"
+                    >
+                      Start New Game
+                    </button>
+                  </div>
+                </div>
+              )}
+              {gameOver.draw && (
+                <div className="absolute inset-0 z-20 bg-black/60 flex items-center justify-center rounded-2xl backdrop-blur-md">
+                  <div className="bg-gradient-to-br from-gray-800 to-slate-900 p-8 rounded-2xl shadow-2xl text-center">
+                    <h2 className="text-3xl font-bold text-white mb-4">Draw!</h2>
+                    <p className="text-xl text-gray-300 mb-6">
+                      Neither side could force a win.
                     </p>
                     <button
                       onClick={handleRestart}
