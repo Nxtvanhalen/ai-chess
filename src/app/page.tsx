@@ -852,7 +852,7 @@ export default function Home() {
                 theme={boardTheme}
               />
               {gameOver.checkmate && (
-                <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-2xl backdrop-blur-sm">
+                <div className="absolute inset-0 z-20 bg-black/60 flex items-center justify-center rounded-2xl backdrop-blur-md">
                   <div className="bg-gradient-to-br from-purple-900 to-blue-900 p-8 rounded-2xl shadow-2xl text-center">
                     <h2 className="text-3xl font-bold text-white mb-4">Checkmate!</h2>
                     <p className="text-xl text-gray-200 mb-6">
