@@ -52,7 +52,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(session?.user ?? null);
         setLoading(false);
 
-        // Redirect to reset-password page when user clicks recovery link in email
+        // PASSWORD_RECOVERY event (implicit flow fallback)
         if (event === 'PASSWORD_RECOVERY') {
           window.location.href = '/reset-password';
         }
@@ -118,9 +118,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const resetPassword = useCallback(
     async (email: string) => {
       try {
-        const { error } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        });
+        // redirectTo is available as {{ .RedirectTo }} in the email template
+        // but we use a custom template with token_hash + /auth/confirm instead
+        const { error } = await supabase.auth.resetPasswordForEmail(email);
         return { error };
       } catch (error) {
         return { error: error as Error };
