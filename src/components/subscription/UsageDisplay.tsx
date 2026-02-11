@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import AvatarUpload from '@/components/profile/AvatarUpload';
+import { setGlobalAvatarUrl } from '@/hooks/useAvatarUrl';
 
 interface UsageData {
   ai_moves: {
@@ -117,10 +118,11 @@ export default function UsageDisplay() {
     };
   }, [user?.id]);
 
-  // Sync avatar URL from usage data
+  // Sync avatar URL from usage data → local state + global store
   useEffect(() => {
     if (usage?.avatar_url) {
       setAvatarUrl(usage.avatar_url);
+      setGlobalAvatarUrl(usage.avatar_url);
     }
   }, [usage?.avatar_url]);
 
@@ -325,7 +327,10 @@ export default function UsageDisplay() {
       <AvatarUpload
         isOpen={avatarModalOpen}
         onClose={() => setAvatarModalOpen(false)}
-        onSaved={(url) => setAvatarUrl(url)}
+        onSaved={(url) => {
+          setAvatarUrl(url);
+          setGlobalAvatarUrl(url);
+        }}
         currentAvatarUrl={avatarUrl}
       />
     </div>

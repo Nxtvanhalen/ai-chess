@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import type { ChatMessage as ChatMessageType, MoveSuggestion } from '@/types';
 import { King } from '../chess/pieces/King';
+import { useAvatarUrl } from '@/hooks/useAvatarUrl';
 import DynamicMarkdown from './DynamicMarkdown';
 
 interface ChatMessageProps {
@@ -120,6 +121,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
   const isEngine = message.role === 'engine';
   const isUser = message.role === 'user';
   const isThinking = message.metadata?.isThinking;
+  const avatarUrl = useAvatarUrl();
 
   // Engine messages now render like a 3rd person in chat (below)
 
@@ -242,15 +244,23 @@ export default function ChatMessage({ message }: ChatMessageProps) {
           </div>
         ) : (
           <div className="w-5 h-5 lg:w-10 lg:h-10 rounded-full overflow-hidden shadow-lg relative">
-            <img
-              src="/profile.jpg"
-              alt="Player"
-              className="absolute inset-0 w-full h-full"
-              style={{
-                objectFit: 'contain',
-                objectPosition: 'center',
-              }}
-            />
+            {avatarUrl ? (
+              <img
+                src={avatarUrl}
+                alt="Player"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            ) : (
+              <img
+                src="/profile.jpg"
+                alt="Player"
+                className="absolute inset-0 w-full h-full"
+                style={{
+                  objectFit: 'contain',
+                  objectPosition: 'center',
+                }}
+              />
+            )}
           </div>
         )}
       </div>
