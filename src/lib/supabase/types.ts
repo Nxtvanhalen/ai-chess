@@ -38,6 +38,7 @@ export interface UserProfile {
   total_moves: number;
   email_notifications: boolean;
   marketing_emails: boolean;
+  rating: number;
 }
 
 export interface UserProfileInsert {

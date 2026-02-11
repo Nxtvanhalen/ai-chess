@@ -15,6 +15,13 @@ import { useChesterStream } from '@/hooks/useChesterStream';
 import { type BoardTheme, defaultTheme } from '@/lib/chess/boardThemes';
 import { GameMemoryService } from '@/lib/services/GameMemoryService';
 import {
+  calculateNewRating,
+  DEFAULT_RATING,
+  getDifficultyForRating,
+  getEngineRating,
+  updatePlayerRating,
+} from '@/lib/services/RatingService';
+import {
   abandonGame,
   createConversation,
   createGame,
@@ -44,6 +51,7 @@ export default function Home() {
     checkmate: false,
   });
   const checkmateHandledRef = useRef(false);
+  const [playerRating, setPlayerRating] = useState<number>(DEFAULT_RATING);
   const [boardTheme, setBoardTheme] = useState<BoardTheme>(defaultTheme);
   const [upgradeModal, setUpgradeModal] = useState<{
     isOpen: boolean;
@@ -110,6 +118,37 @@ export default function Home() {
   useEffect(() => {
     messagesRef.current = messages;
   }, [messages]);
+
+  // Fetch player rating from usage API (hydrate on mount + after invalidation)
+  useEffect(() => {
+    if (!user?.id) return;
+    let cancelled = false;
+
+    const fetchRating = async () => {
+      try {
+        const res = await fetch('/api/subscription/usage');
+        if (res.ok) {
+          const data = await res.json();
+          if (!cancelled && typeof data.rating === 'number') {
+            setPlayerRating(data.rating);
+          }
+        }
+      } catch (err) {
+        console.error('[Rating] Error fetching rating:', err);
+      }
+    };
+
+    fetchRating();
+
+    // Also re-fetch when usage cache is invalidated (after game end, etc.)
+    const handleInvalidate = () => fetchRating();
+    window.addEventListener('chester:usage-invalidate', handleInvalidate);
+
+    return () => {
+      cancelled = true;
+      window.removeEventListener('chester:usage-invalidate', handleInvalidate);
+    };
+  }, [user?.id]);
 
   // Detect return from move pack purchase and refresh usage
   useEffect(() => {
@@ -313,6 +352,20 @@ export default function Home() {
           const durationSeconds = Math.floor((Date.now() - gameStartTimeRef.current) / 1000);
           const result = winner === 'white' ? 'white_wins' : 'black_wins';
           await GameMemoryService.finalizeGame(currentGameId, result, durationSeconds);
+
+          // Update Elo rating (player is always white)
+          if (user?.id) {
+            const difficulty = getDifficultyForRating(playerRating);
+            const engineElo = getEngineRating(difficulty);
+            const gameResult: 0 | 1 = winner === 'white' ? 1 : 0;
+            const newRating = calculateNewRating(playerRating, engineElo, gameResult);
+
+            console.log(`[Rating] ${playerRating} → ${newRating} (${winner === 'white' ? 'win' : 'loss'} vs ${difficulty} ~${engineElo})`);
+
+            await updatePlayerRating(user.id, newRating);
+            setPlayerRating(newRating);
+            invalidateUsageCache();
+          }
         } catch (error) {
           console.error('Error finalizing game:', error);
         }
@@ -331,7 +384,7 @@ export default function Home() {
 
       setMessages((prev) => [...prev, checkmateMessage]);
     },
-    [currentGameId],
+    [currentGameId, playerRating, user?.id],
   );
 
   const handleMove = useCallback(
@@ -436,7 +489,7 @@ export default function Home() {
               },
               body: JSON.stringify({
                 fen: move.after,
-                difficulty: 'medium',
+                difficulty: getDifficultyForRating(playerRating),
                 playerMoveHistory,
                 newGame: moveCount === 0, // Signal new game on first move
               }),
@@ -621,6 +674,7 @@ export default function Home() {
       typeText,
       convertMoveToPlainEnglish,
       handleCheckmate,
+      playerRating,
     ],
   );
 

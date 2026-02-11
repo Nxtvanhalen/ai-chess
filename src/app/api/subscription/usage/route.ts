@@ -36,18 +36,22 @@ export async function GET() {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
-    // Fetch usage and tier in parallel (both query subscription table)
-    const [usage, plan] = await Promise.all([
+    // Fetch usage, tier, and rating in parallel
+    const [usage, plan, profileResult] = await Promise.all([
       getUserUsage(user.id),
       getUserTier(user.id),
+      supabase.from('user_profiles').select('rating').eq('id', user.id).single(),
     ]);
 
-    console.log(`[Usage API] Fetched in ${Date.now() - start}ms`, JSON.stringify({ ...usage, plan }));
+    const rating = profileResult.data?.rating ?? 1200;
+
+    console.log(`[Usage API] Fetched in ${Date.now() - start}ms`, JSON.stringify({ ...usage, plan, rating }));
 
     return NextResponse.json(
       {
         ...usage,
         plan,
+        rating,
       },
       {
         headers: {

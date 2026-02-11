@@ -13,6 +13,7 @@ interface UsageData {
     unlimited: boolean;
   };
   plan: string;
+  rating?: number;
 }
 
 const PLAN_LABELS: Record<string, string> = {
@@ -20,6 +21,14 @@ const PLAN_LABELS: Record<string, string> = {
   pro: 'Pro',
   premium: 'Premium',
 };
+
+/** Color-code rating by skill band */
+function getRatingColor(rating: number): string {
+  if (rating >= 1800) return 'text-purple-400';
+  if (rating >= 1400) return 'text-blue-400';
+  if (rating >= 1000) return 'text-green-400';
+  return 'text-gray-400';
+}
 
 // Custom event name for cross-component cache invalidation
 const USAGE_INVALIDATE_EVENT = 'chester:usage-invalidate';
@@ -216,6 +225,15 @@ export default function UsageDisplay() {
           </>
         )}
       </div>
+
+      {usage.rating != null && (
+        <div className="flex items-center gap-1.5">
+          <span className="text-gray-400">Rating:</span>
+          <span className={`font-medium ${getRatingColor(usage.rating)}`}>
+            {usage.rating}
+          </span>
+        </div>
+      )}
 
       {usage.plan !== 'premium' && (
         <a
