@@ -15,8 +15,13 @@ import { useChesterStream } from '@/hooks/useChesterStream';
 import { type BoardTheme, defaultTheme } from '@/lib/chess/boardThemes';
 import { GameMemoryService } from '@/lib/services/GameMemoryService';
 import {
+  abandonGame,
   createConversation,
   createGame,
+  getConversationMessages,
+  getCurrentGame,
+  getGameConversation,
+  getGameMoves,
   saveMessage,
   saveMove,
   updateGamePosition,
@@ -144,8 +149,50 @@ export default function Home() {
   useEffect(() => {
     const initializeGame = async () => {
       try {
-        // Create new game
-        const newGame = await createGame('white');
+        // Check for an existing active game first
+        const existingGame = await getCurrentGame();
+
+        if (existingGame) {
+          console.log('[Game] Restoring active game', existingGame.id);
+          setCurrentGameId(existingGame.id);
+          setCurrentPosition(existingGame.fen);
+          gameStartTimeRef.current = new Date(existingGame.created_at).getTime();
+
+          // Restore move count
+          try {
+            const moves = await getGameMoves(existingGame.id);
+            setMoveCount(moves?.length ?? 0);
+          } catch (error) {
+            console.error('[Game] Error loading moves:', error);
+          }
+
+          // Restore conversation and chat messages
+          try {
+            const conversation = await getGameConversation(existingGame.id);
+            if (conversation) {
+              setConversationId(conversation.id);
+              const dbMessages = await getConversationMessages(conversation.id);
+              if (dbMessages && dbMessages.length > 0) {
+                const restoredMessages: ChatMessage[] = dbMessages.map((msg) => ({
+                  id: msg.id,
+                  role: msg.role as 'user' | 'assistant' | 'system',
+                  content: msg.content,
+                  timestamp: new Date(msg.created_at),
+                  metadata: msg.metadata as Record<string, unknown> | undefined,
+                }));
+                setMessages(restoredMessages);
+              }
+            }
+          } catch (error) {
+            console.error('[Game] Error loading conversation:', error);
+          }
+
+          return; // Game restored, skip new game creation
+        }
+
+        // No active game — create a new one
+        console.log('[Game] No active game found, creating new game');
+        const newGame = await createGame('white', user?.id);
         setCurrentGameId(newGame.id);
         setCurrentPosition(newGame.fen);
 
@@ -691,10 +738,21 @@ export default function Home() {
     checkmateHandledRef.current = false;
 
     try {
+      // Abandon the current game so it won't be restored on next load
+      if (currentGameId) {
+        try {
+          await abandonGame(currentGameId);
+          console.log('[Game] Abandoned previous game', currentGameId);
+        } catch (error) {
+          console.error('[Game] Error abandoning game:', error);
+        }
+      }
+
       // Create new game
-      const newGame = await createGame('white');
+      console.log('[Game] Creating new game for user', user?.id);
+      const newGame = await createGame('white', user?.id);
+      console.log('[Game] New game created', newGame.id);
       setCurrentGameId(newGame.id);
-      // Position already set to starting FEN above
 
       // Initialize game memory
       try {
@@ -705,6 +763,7 @@ export default function Home() {
 
       // Create conversation for this game
       const conversation = await createConversation(newGame.id);
+      console.log('[Game] Conversation created', conversation.id);
       setConversationId(conversation.id);
 
       // Add new game message - full text to avoid closure issues
@@ -722,7 +781,7 @@ export default function Home() {
     } catch (error) {
       console.error('Error restarting game:', error);
     }
-  }, [user?.id]);
+  }, [user?.id, currentGameId]);
 
   return (
     <LoginGate>
@@ -758,6 +817,16 @@ export default function Home() {
           }
           controls={
             <div className="flex items-center gap-4 flex-wrap">
+              <button
+                onClick={() => {
+                  if (moveCount === 0 || window.confirm('Start a new game? Your current game will be saved as abandoned.')) {
+                    handleRestart();
+                  }
+                }}
+                className="px-4 py-2 bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 text-sm font-medium rounded-lg border border-purple-500/30 hover:border-purple-500/50 transition-all duration-200"
+              >
+                New Game
+              </button>
               <ThemeSelector currentTheme={boardTheme} onThemeChange={setBoardTheme} />
               <UsageDisplay />
             </div>

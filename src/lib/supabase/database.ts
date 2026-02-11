@@ -1,7 +1,7 @@
 import { supabase } from './client';
 
 // Game management
-export async function createGame(playerColor: 'white' | 'black' = 'white') {
+export async function createGame(playerColor: 'white' | 'black' = 'white', userId?: string) {
   const { data, error } = await supabase
     .from('games')
     .insert({
@@ -10,6 +10,7 @@ export async function createGame(playerColor: 'white' | 'black' = 'white') {
       fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', // Starting position
       pgn: '',
       metadata: { created_by: 'Chess Butler AI' },
+      ...(userId ? { user_id: userId } : {}),
     })
     .select()
     .single();
@@ -193,6 +194,48 @@ export async function getRecentGames(limit: number = 5) {
 
   if (error) throw error;
   return data;
+}
+
+// Get moves for a game
+export async function getGameMoves(gameId: string) {
+  const { data, error } = await supabase
+    .from('moves')
+    .select('*')
+    .eq('game_id', gameId)
+    .order('move_number', { ascending: true });
+
+  if (error) throw error;
+  return data;
+}
+
+// Get conversation for a game
+export async function getGameConversation(gameId: string) {
+  const { data, error } = await supabase
+    .from('conversations')
+    .select('*')
+    .eq('game_id', gameId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single();
+
+  if (error && error.code !== 'PGRST116') throw error;
+  return data;
+}
+
+// Abandon a game (so it won't be restored on next load)
+export async function abandonGame(gameId: string) {
+  const { error } = await supabase
+    .from('games')
+    .update({
+      status: 'abandoned',
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', gameId);
+
+  if (error) {
+    // May fail on old games without user_id (RLS blocks update) — that's OK
+    console.warn('[DB] abandonGame failed (likely old game without user_id):', error.message);
+  }
 }
 
 // Get current active game
