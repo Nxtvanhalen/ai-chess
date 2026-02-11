@@ -209,7 +209,7 @@ export default function PrivacyPolicyPage() {
           <Link href="/pricing" className="text-gray-400 hover:text-white transition-colors text-sm">
             Pricing
           </Link>
-          <Link href="/" className="text-gray-400 hover:text-white transition-colors text-sm">
+          <Link href="/play" className="text-gray-400 hover:text-white transition-colors text-sm">
             Back to Game
           </Link>
         </div>

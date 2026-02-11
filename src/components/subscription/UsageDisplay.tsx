@@ -313,6 +313,12 @@ export default function UsageDisplay() {
               >
                 {isPaid ? 'Change Plan' : 'View Plans'}
               </a>
+              <a
+                href="/"
+                className="block px-4 py-2.5 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
+              >
+                Home
+              </a>
               <button
                 onClick={handleSignOut}
                 className="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-gray-700 hover:text-red-300 transition-colors border-t border-gray-700"

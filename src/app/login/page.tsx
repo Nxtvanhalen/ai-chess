@@ -14,7 +14,7 @@ function LoginForm() {
   const { signIn, signInWithGoogle } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get('redirectTo') || '/';
+  const redirectTo = searchParams.get('redirectTo') || '/play';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

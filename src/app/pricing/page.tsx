@@ -91,7 +91,7 @@ export default function PricingPage() {
         {menuOpen && (
           <div className="absolute right-0 mt-2 w-48 bg-gray-800/95 backdrop-blur-sm border border-gray-700 rounded-xl shadow-xl overflow-hidden">
             <Link
-              href="/"
+              href="/play"
               className="block px-4 py-3 text-gray-300 hover:bg-gray-700/50 hover:text-white transition-colors"
               onClick={() => setMenuOpen(false)}
             >
@@ -353,7 +353,7 @@ export default function PricingPage() {
 
         {/* Footer Links */}
         <div className="text-center mt-12 space-x-6">
-          <Link href="/" className="text-gray-400 hover:text-white transition-colors">
+          <Link href="/play" className="text-gray-400 hover:text-white transition-colors">
             Back to Game
           </Link>
           <Link href="/legal/privacy" className="text-gray-400 hover:text-white transition-colors text-sm">

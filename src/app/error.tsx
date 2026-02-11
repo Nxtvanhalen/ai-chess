@@ -44,7 +44,7 @@ export default function Error({
             Try Again
           </button>
           <a
-            href="/"
+            href="/play"
             className="px-6 py-3 bg-gray-700 hover:bg-gray-600 text-gray-300 font-medium rounded-xl transition-colors"
           >
             Go Home

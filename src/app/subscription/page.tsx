@@ -67,7 +67,7 @@ function SubscriptionContent() {
           </p>
           <div className="space-y-3">
             <a
-              href="/"
+              href="/play"
               className="block px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-xl transition-colors"
             >
               Start Playing
@@ -110,7 +110,7 @@ function SubscriptionContent() {
               View Plans
             </a>
             <a
-              href="/"
+              href="/play"
               className="block px-8 py-3 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-xl transition-colors"
             >
               Back to Game
@@ -136,7 +136,7 @@ function SubscriptionContent() {
             View Plans
           </a>
           <a
-            href="/"
+            href="/play"
             className="block px-8 py-3 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-xl transition-colors text-center"
           >
             Back to Game
