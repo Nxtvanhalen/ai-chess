@@ -4,7 +4,7 @@ VALUES (
   'avatars',
   'avatars',
   true,
-  2097152,  -- 2 MB
+  10485760,  -- 10 MB
   ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/gif']
 )
 ON CONFLICT (id) DO NOTHING;

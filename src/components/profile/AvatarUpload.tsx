@@ -12,7 +12,7 @@ interface AvatarUploadProps {
   currentAvatarUrl?: string | null;
 }
 
-const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2 MB
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
 const OUTPUT_SIZE = 256;
 
 /**
@@ -102,7 +102,7 @@ export default function AvatarUpload({ isOpen, onClose, onSaved, currentAvatarUr
     console.log('[AvatarUpload] File selected:', file.name, file.type, file.size);
 
     if (file.size > MAX_FILE_SIZE) {
-      setError('Image must be under 2 MB');
+      setError('Image must be under 10 MB');
       return;
     }
 
@@ -233,7 +233,7 @@ export default function AvatarUpload({ isOpen, onClose, onSaved, currentAvatarUr
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 16v-8m0 0l-3 3m3-3l3 3M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5" />
                 </svg>
                 <span className="text-sm text-gray-400">Click to select an image</span>
-                <span className="text-xs text-gray-600">Max 2 MB</span>
+                <span className="text-xs text-gray-600">Max 10 MB</span>
               </div>
               <input
                 type="file"
