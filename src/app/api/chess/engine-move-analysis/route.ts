@@ -57,6 +57,33 @@ function getRandomMood(): string {
   return CHESTER_MOODS[Math.floor(Math.random() * CHESTER_MOODS.length)];
 }
 
+/**
+ * Sanitize a FEN string so chess.js accepts it.
+ * chess.js (v1+) rejects en-passant squares that are technically impossible
+ * (e.g., no opposing pawn can actually capture). Many engines still include
+ * them. We strip the ep square when it would cause validation to fail.
+ */
+function sanitizeFen(fen: string): string {
+  try {
+    new Chess(fen);
+    return fen;
+  } catch {
+    const parts = fen.split(' ');
+    if (parts.length >= 4 && parts[3] !== '-') {
+      console.warn(`[EngineAnalysis] Sanitizing illegal en-passant square "${parts[3]}" from FEN`);
+      parts[3] = '-';
+      try {
+        new Chess(parts.join(' '));
+        return parts.join(' ');
+      } catch (e2) {
+        console.error('[EngineAnalysis] FEN still invalid after sanitization:', e2);
+        throw e2;
+      }
+    }
+    throw new Error(`Invalid FEN: ${fen}`);
+  }
+}
+
 type EngineLegalMove = {
   from: string;
   to: string;
@@ -351,7 +378,7 @@ const PIECE_VALUE: Record<string, number> = {
 function getAttackers(chess: Chess, square: string, attackerColor: 'w' | 'b') {
   const fenParts = chess.fen().split(' ');
   fenParts[1] = attackerColor;
-  const attackerView = new Chess(fenParts.join(' '));
+  const attackerView = new Chess(sanitizeFen(fenParts.join(' ')));
   return attackerView.moves({ verbose: true }).filter((m) => m.to === square);
 }
 
@@ -508,7 +535,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: validation.error }, { status: 400 });
     }
 
-    const { engineMove, userMove, fen, engineEvaluation, alternatives } = validation.data;
+    const { engineMove, userMove, fen: rawFen, engineEvaluation, alternatives } = validation.data;
+    const fen = sanitizeFen(rawFen);
 
     // Handle engineMove being either a string or an object with san property
     const moveStr = typeof engineMove === 'string' ? engineMove : engineMove.san || '';
