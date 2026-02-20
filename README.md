@@ -43,6 +43,9 @@ All scores verified via Lighthouse (incognito), SSL Labs, and production header 
 - **Payments**: Stripe (Subscriptions + Customer Portal)
 - **AI**: OpenAI Responses API (GPT-5 series) for Chester's commentary
 - **Chess**: chess.js + react-chessboard
+- **Testing**: Vitest + React Testing Library
+- **Linting**: Biome (lint + format)
+- **CI/CD**: GitHub Actions
 - **Monitoring**: Sentry (Error tracking + Session replay)
 - **Rate Limiting**: Upstash Redis
 
@@ -140,7 +143,7 @@ src/
 │   ├── supabase/          # DB client, subscriptions
 │   ├── middleware/        # Rate limiting
 │   └── redis/             # Upstash client
-└── __tests__/             # Jest tests
+└── __tests__/             # Vitest tests
 ```
 
 ## Subscription Tiers
@@ -160,19 +163,29 @@ src/
 - **Headers**: CSP, HSTS, X-Frame-Options, etc.
 - **Payments**: Stripe webhook signature verification
 
+## CI/CD
+
+GitHub Actions pipeline runs on every push and PR to `main`:
+
+- **Lint** — Biome static analysis
+- **Build** — Next.js production build
+- **Test** — Vitest suite (40 tests across 6 suites)
+
 ## Testing
 
 ```bash
-# Run all tests
-npm test
-
-# Current coverage: 36 tests across 5 suites
-# - LoginGate component
-# - UpgradeModal component
-# - Rate limiting utilities
-# - Subscription helpers
-# - UUID utilities
+bun test               # Run all tests
+bun run test:watch     # Watch mode
+bun run test:coverage  # Coverage report
 ```
+
+**40 tests** across 6 suites:
+- API route validation (chat, streaming)
+- LoginGate component
+- UpgradeModal component
+- Rate limiting middleware
+- Subscription utilities
+- UUID generation
 
 ## Deployment
 
@@ -199,7 +212,7 @@ npm test
 1. Fork the repo
 2. Create a feature branch
 3. Make your changes
-4. Run tests: `npm test`
+4. Run tests: `bun test`
 5. Submit a PR
 
 ## License
