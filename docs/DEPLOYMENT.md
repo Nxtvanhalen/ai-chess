@@ -1,4 +1,4 @@
-# Deployment Guide - Chess Butler AI
+# Deployment Guide - Chester AI Chess
 
 ## Render Deployment (Recommended)
 
@@ -63,7 +63,7 @@ The included `render.yaml` file enables:
 
 ### Production URLs
 
-Once deployed, your Chess Butler will be available at:
+Once deployed, your app will be available at:
 ```
 https://your-service-name.onrender.com
 ```
