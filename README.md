@@ -2,9 +2,7 @@
 
 A sophisticated full-stack chess application with an intelligent AI companion named Chester.
 
-![Production Status](https://img.shields.io/badge/status-production--ready-brightgreen)
-![Grade](https://img.shields.io/badge/grade-A--blue)
-![Tests](https://img.shields.io/badge/tests-jest%20configured-blue)
+[![CI](https://github.com/Nxtvanhalen/ai-chess/actions/workflows/ci.yml/badge.svg)](https://github.com/Nxtvanhalen/ai-chess/actions/workflows/ci.yml)
 
 ## Live Demo
 
@@ -53,7 +51,7 @@ All scores verified via Lighthouse (incognito), SSL Labs, and production header 
 ### Prerequisites
 
 - Node.js 18+
-- npm or yarn
+- [Bun](https://bun.sh) (package manager + runtime)
 - Supabase account
 - Stripe account
 - OpenAI API key
@@ -66,14 +64,14 @@ git clone https://github.com/Nxtvanhalen/ai-chess.git
 cd ai-chess
 
 # Install dependencies
-npm install
+bun install
 
 # Set up environment variables
 cp .env.example .env.local
 # Edit .env.local with your credentials
 
 # Run development server
-npm run dev
+bun run dev
 ```
 
 ### Environment Variables
@@ -106,15 +104,15 @@ SENTRY_AUTH_TOKEN=
 ## Scripts
 
 ```bash
-npm run dev          # Development server
-npm run build        # Production build
-npm run start        # Start production server
-npm run lint         # Biome check
-npm run lint:fix     # Biome check + autofix
-npm run format       # Biome formatter
-npm test             # Run tests
-npm run test:watch   # Watch mode
-npm run test:coverage # Coverage report
+bun run dev          # Development server
+bun run build        # Production build
+bun run start        # Start production server
+bun run lint         # Biome check
+bun run lint:fix     # Biome check + autofix
+bun run format       # Biome formatter
+bun test             # Run tests
+bun run test:watch   # Watch mode
+bun run test:coverage # Coverage report
 ```
 
 ## Architecture
