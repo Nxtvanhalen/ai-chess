@@ -1,15 +1,15 @@
 import { ReadableStream as NodeReadableStream } from 'node:stream/web';
 import { TextEncoder as NodeTextEncoder } from 'node:util';
 
-const mockCheckRateLimitRedis = jest.fn();
-const mockGetAuthenticatedUser = jest.fn();
-const mockCanUseChat = jest.fn();
-const mockIncrementChatUsage = jest.fn();
-const mockCreateResponsesCompletion = jest.fn();
-const mockCreateResponsesCompletionStream = jest.fn();
-const mockParseResponsesStream = jest.fn();
-const mockExtractMoveSuggestions = jest.fn();
-const mockValidateMoveSuggestion = jest.fn();
+const mockCheckRateLimitRedis = vi.fn();
+const mockGetAuthenticatedUser = vi.fn();
+const mockCanUseChat = vi.fn();
+const mockIncrementChatUsage = vi.fn();
+const mockCreateResponsesCompletion = vi.fn();
+const mockCreateResponsesCompletionStream = vi.fn();
+const mockParseResponsesStream = vi.fn();
+const mockExtractMoveSuggestions = vi.fn();
+const mockValidateMoveSuggestion = vi.fn();
 
 if (typeof (globalThis as any).Response === 'undefined') {
   class MockHeaders {
@@ -57,7 +57,7 @@ if (typeof (globalThis as any).ReadableStream === 'undefined') {
   (globalThis as any).ReadableStream = NodeReadableStream;
 }
 
-jest.mock('next/server', () => ({
+vi.mock('next/server', () => ({
   NextResponse: {
     json: (body: unknown, init?: ResponseInit) =>
       new Response(JSON.stringify(body), {
@@ -70,7 +70,7 @@ jest.mock('next/server', () => ({
   },
 }));
 
-jest.mock('@/lib/redis', () => ({
+vi.mock('@/lib/redis', () => ({
   checkRateLimitRedis: (...args: unknown[]) => mockCheckRateLimitRedis(...args),
   getClientIPFromRequest: () => '127.0.0.1',
   getRateLimitHeadersRedis: () => ({
@@ -80,40 +80,40 @@ jest.mock('@/lib/redis', () => ({
   }),
 }));
 
-jest.mock('@/lib/auth/getUser', () => ({
+vi.mock('@/lib/auth/getUser', () => ({
   getAuthenticatedUser: () => mockGetAuthenticatedUser(),
 }));
 
-jest.mock('@/lib/supabase/subscription', () => ({
+vi.mock('@/lib/supabase/subscription', () => ({
   canUseChat: (...args: unknown[]) => mockCanUseChat(...args),
   createUsageLimitError: () => ({ error: 'Usage limit reached' }),
   getUsageHeaders: () => ({ 'X-Usage-Limit': '200' }),
   incrementChatUsage: (...args: unknown[]) => mockIncrementChatUsage(...args),
 }));
 
-jest.mock('@/lib/openai/client', () => ({
+vi.mock('@/lib/openai/client', () => ({
   createResponsesCompletion: (...args: unknown[]) => mockCreateResponsesCompletion(...args),
   createResponsesCompletionStream: (...args: unknown[]) =>
     mockCreateResponsesCompletionStream(...args),
   parseResponsesStream: (...args: unknown[]) => mockParseResponsesStream(...args),
 }));
 
-jest.mock('@/lib/chess/board-validator', () => ({
+vi.mock('@/lib/chess/board-validator', () => ({
   extractMoveSuggestions: (...args: unknown[]) => mockExtractMoveSuggestions(...args),
   validateMoveSuggestion: (...args: unknown[]) => mockValidateMoveSuggestion(...args),
 }));
 
-jest.mock('@/lib/services/GameMemoryService', () => ({
+vi.mock('@/lib/services/GameMemoryService', () => ({
   GameMemoryService: {
-    getGameContext: jest.fn().mockResolvedValue(null),
-    getLastCompletedGame: jest.fn().mockResolvedValue(null),
-    addCommentary: jest.fn().mockResolvedValue(undefined),
+    getGameContext: vi.fn().mockResolvedValue(null),
+    getLastCompletedGame: vi.fn().mockResolvedValue(null),
+    addCommentary: vi.fn().mockResolvedValue(undefined),
   },
 }));
 
-jest.mock('@/lib/services/ChesterMemoryService', () => ({
+vi.mock('@/lib/services/ChesterMemoryService', () => ({
   ChesterMemoryService: {
-    getPersonalityContext: jest.fn().mockResolvedValue(null),
+    getPersonalityContext: vi.fn().mockResolvedValue(null),
   },
 }));
 
@@ -136,7 +136,7 @@ describe('chat routes', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockCheckRateLimitRedis.mockResolvedValue({
       success: true,
       limit: 20,

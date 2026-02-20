@@ -2,14 +2,14 @@ import { render, screen } from '@testing-library/react';
 import LoginGate from '@/components/auth/LoginGate';
 
 // Mock useAuth
-const mockUseAuth = jest.fn();
-jest.mock('@/contexts/AuthContext', () => ({
+const mockUseAuth = vi.fn();
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => mockUseAuth(),
 }));
 
 // Mock useRouter
-const mockPush = jest.fn();
-jest.mock('next/navigation', () => ({
+const mockPush = vi.fn();
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockPush,
   }),
@@ -17,7 +17,7 @@ jest.mock('next/navigation', () => ({
 
 describe('LoginGate', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should show loading state while checking auth', () => {

@@ -2,29 +2,28 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import UpgradeModal from '@/components/subscription/UpgradeModal';
 
 describe('UpgradeModal', () => {
-  const mockOnClose = jest.fn();
+  const mockOnClose = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should not render when isOpen is false', () => {
     render(<UpgradeModal isOpen={false} onClose={mockOnClose} type="ai_move" />);
 
-    expect(screen.queryByText("You've reached your daily move limit")).not.toBeInTheDocument();
+    expect(screen.queryByText("You're out of moves")).not.toBeInTheDocument();
   });
 
   it('should render move limit message for ai_move type', () => {
     render(<UpgradeModal isOpen={true} onClose={mockOnClose} type="ai_move" />);
 
-    expect(screen.getByText("You've reached your daily move limit")).toBeInTheDocument();
-    expect(screen.getByText(/500 moves\/day/)).toBeInTheDocument();
+    expect(screen.getByText("You're out of moves")).toBeInTheDocument();
   });
 
   it('should render chat limit message for chat type', () => {
     render(<UpgradeModal isOpen={true} onClose={mockOnClose} type="chat" />);
 
-    expect(screen.getByText("You've reached your daily chat limit")).toBeInTheDocument();
+    expect(screen.getByText("You're out of chat messages")).toBeInTheDocument();
   });
 
   it('should call onClose when close button is clicked', () => {
@@ -57,28 +56,26 @@ describe('UpgradeModal', () => {
     }
   });
 
-  it('should display reset time when provided', () => {
-    const resetTime = new Date('2025-01-10T00:00:00Z').toISOString();
-
-    render(<UpgradeModal isOpen={true} onClose={mockOnClose} type="ai_move" resetAt={resetTime} />);
-
-    // Should show formatted time
-    expect(screen.getByText(/Your limit resets at/)).toBeInTheDocument();
-  });
-
   it('should have link to pricing page', () => {
     render(<UpgradeModal isOpen={true} onClose={mockOnClose} type="ai_move" />);
 
-    const viewPlansLink = screen.getByText('View Plans');
-    expect(viewPlansLink).toHaveAttribute('href', '/pricing');
+    const upgradeLink = screen.getByText('Upgrade Plan');
+    expect(upgradeLink).toHaveAttribute('href', '/pricing');
   });
 
-  it('should display both Pro and Premium plan options', () => {
+  it('should display Pro and Premium plan comparisons for free users', () => {
     render(<UpgradeModal isOpen={true} onClose={mockOnClose} type="ai_move" />);
 
     expect(screen.getByText('Pro')).toBeInTheDocument();
     expect(screen.getByText('Premium')).toBeInTheDocument();
-    expect(screen.getByText('$9.99')).toBeInTheDocument();
-    expect(screen.getByText('$19.99')).toBeInTheDocument();
+    expect(screen.getByText('500 moves/mo')).toBeInTheDocument();
+    expect(screen.getByText('$9.99/mo')).toBeInTheDocument();
+    expect(screen.getByText('$19.99/mo')).toBeInTheDocument();
+  });
+
+  it('should show buy moves button', () => {
+    render(<UpgradeModal isOpen={true} onClose={mockOnClose} type="ai_move" />);
+
+    expect(screen.getByText(/Get 50 Moves/)).toBeInTheDocument();
   });
 });

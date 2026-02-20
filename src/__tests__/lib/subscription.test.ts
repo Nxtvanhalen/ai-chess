@@ -3,77 +3,56 @@ import { createUsageLimitError, getUsageHeaders } from '@/lib/supabase/subscript
 describe('Subscription Utilities', () => {
   describe('createUsageLimitError', () => {
     it('should create AI move limit error', () => {
-      const error = createUsageLimitError('ai_move', {
-        remaining: 0,
-        limit: 10,
-      });
+      const error = createUsageLimitError('ai_move', { balance: 0 });
 
       expect(error.code).toBe('USAGE_LIMIT_EXCEEDED');
-      expect(error.error).toContain('AI move limit');
+      expect(error.error).toContain('AI moves');
       expect(error.details.type).toBe('ai_move');
-      expect(error.details.remaining).toBe(0);
-      expect(error.details.limit).toBe(10);
-      expect(error.details.resetAt).toBeDefined();
+      expect(error.details.balance).toBe(0);
     });
 
     it('should create chat limit error', () => {
-      const error = createUsageLimitError('chat', {
-        remaining: 0,
-        limit: 20,
-      });
+      const error = createUsageLimitError('chat', { balance: 0 });
 
       expect(error.code).toBe('USAGE_LIMIT_EXCEEDED');
-      expect(error.error).toContain('chat message limit');
+      expect(error.error).toContain('chat messages');
       expect(error.details.type).toBe('chat');
-      expect(error.details.remaining).toBe(0);
-      expect(error.details.limit).toBe(20);
+      expect(error.details.balance).toBe(0);
     });
 
-    it('should set resetAt to midnight UTC', () => {
-      const error = createUsageLimitError('ai_move', {
-        remaining: 0,
-        limit: 10,
-      });
+    it('should include plan in details', () => {
+      const error = createUsageLimitError('ai_move', { balance: 0 }, 'pro');
 
-      const resetDate = new Date(error.details.resetAt);
-      expect(resetDate.getUTCHours()).toBe(0);
-      expect(resetDate.getUTCMinutes()).toBe(0);
-      expect(resetDate.getUTCSeconds()).toBe(0);
+      expect(error.details.plan).toBe('pro');
     });
   });
 
   describe('getUsageHeaders', () => {
-    it('should return AI move headers', () => {
+    it('should return AI move balance header', () => {
       const headers = getUsageHeaders('ai_move', {
-        remaining: 5,
-        limit: 10,
+        balance: 5,
         unlimited: false,
       });
 
-      expect(headers['X-AI-Moves-Remaining']).toBe('5');
-      expect(headers['X-AI-Moves-Limit']).toBe('10');
+      expect(headers['X-AI-Moves-Balance']).toBe('5');
     });
 
-    it('should return chat headers', () => {
+    it('should return chat balance header', () => {
       const headers = getUsageHeaders('chat', {
-        remaining: 15,
-        limit: 20,
+        balance: 15,
         unlimited: false,
       });
 
-      expect(headers['X-Chat-Messages-Remaining']).toBe('15');
-      expect(headers['X-Chat-Messages-Limit']).toBe('20');
+      expect(headers['X-Chat-Messages-Balance']).toBe('15');
     });
 
     it('should return "unlimited" for unlimited usage', () => {
       const headers = getUsageHeaders('ai_move', {
-        remaining: Infinity,
-        limit: -1,
+        balance: Infinity,
         unlimited: true,
       });
 
-      expect(headers['X-AI-Moves-Remaining']).toBe('unlimited');
-      expect(headers['X-AI-Moves-Limit']).toBe('unlimited');
+      expect(headers['X-AI-Moves-Balance']).toBe('unlimited');
     });
   });
 });
