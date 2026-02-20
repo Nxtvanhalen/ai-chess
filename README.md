@@ -8,7 +8,24 @@ A sophisticated full-stack chess application with an intelligent AI companion na
 
 ## Live Demo
 
-🎮 **Play Now**: [chesterchess.com](https://www.chesterchess.com)
+**Play Now**: [chesterchess.com](https://www.chesterchess.com)
+
+## Production Metrics
+
+| Category | Metric | Score |
+|----------|--------|-------|
+| **Lighthouse** | Performance | 91 |
+| | Accessibility | 94 |
+| | Best Practices | 100 |
+| | SEO | 100 |
+| **SSL/TLS** | SSL Labs Grade | A+ |
+| **Security Headers** | HSTS, CSP, X-Content-Type-Options, X-Frame-Options, Referrer-Policy, Permissions-Policy | 6/6 |
+| **Protocol** | HTTP/2 + HTTP/3 | Active |
+| **Response** | Time to First Byte | 99ms |
+| **Compression** | Brotli | Active |
+| **HTTPS** | Enforcement | 301 + HSTS preload |
+
+All scores verified via Lighthouse (incognito), SSL Labs, and production header inspection.
 
 ## Features
 
