@@ -61,7 +61,6 @@ export async function POST(request: NextRequest) {
     const authUser = await getAuthenticatedUser();
     const userId = authUser?.id || null;
 
-
     // Fetch comprehensive game memory context (parallelized for performance)
     let fullGameContext = null;
     let chesterPersonality = null;
@@ -242,7 +241,6 @@ export async function POST(request: NextRequest) {
 
     const response = JSON.parse(completion.choices[0].message.content || '{}');
 
-
     const suggestions: MoveSuggestion[] =
       response.suggestions?.map((s: any) => ({
         move: s.move,
@@ -250,12 +248,10 @@ export async function POST(request: NextRequest) {
         casual: true,
       })) || [];
 
-
     const result = {
       suggestions: suggestions.slice(0, 2), // Ensure max 2 suggestions
       comment: response.casualComment || 'Your turn!',
     };
-
 
     // Save suggestions to game memory
     if (gameId && result.suggestions.length > 0) {
@@ -279,7 +275,6 @@ export async function POST(request: NextRequest) {
             urgency_level: analysis.urgencyLevel,
           },
         });
-
       } catch (error) {
         console.error('Error saving suggestions to game memory:', error);
         // Don't fail the request if memory save fails

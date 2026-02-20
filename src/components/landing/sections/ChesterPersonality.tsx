@@ -2,8 +2,7 @@
 
 import { motion } from 'framer-motion';
 import ScrollReveal from '../animations/ScrollReveal';
-import StaggerChildren from '../animations/StaggerChildren';
-import { staggerChildVariant } from '../animations/StaggerChildren';
+import StaggerChildren, { staggerChildVariant } from '../animations/StaggerChildren';
 import Section from '../ui/Section';
 
 const quotes = [
@@ -21,8 +20,8 @@ export default function ChesterPersonality() {
           Meet Chester
         </h2>
         <p className="text-[#888888] text-center max-w-[500px] mx-auto mb-16">
-          He&apos;s not a coach. He&apos;s the friend watching your game who can&apos;t
-          help but comment.
+          He&apos;s not a coach. He&apos;s the friend watching your game who can&apos;t help but
+          comment.
         </p>
       </ScrollReveal>
 

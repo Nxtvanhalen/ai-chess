@@ -47,7 +47,7 @@ export default function GoogleAnalytics() {
 
     // Define gtag function exactly as Google specifies
     // Must use 'arguments' not spread operator for GA to work
-    window.gtag = function() {
+    window.gtag = function () {
       window.dataLayer.push(arguments);
     };
 

@@ -320,7 +320,7 @@ export async function proxy(request: NextRequest) {
 
   // Quick path-based blocking for common attack patterns (no logging needed - just noise)
   const isBlockedPath = BLOCKED_PATHS.some(
-    (blocked) => pathname === blocked || pathname.startsWith(blocked + '/')
+    (blocked) => pathname === blocked || pathname.startsWith(blocked + '/'),
   );
 
   if (isBlockedPath) {

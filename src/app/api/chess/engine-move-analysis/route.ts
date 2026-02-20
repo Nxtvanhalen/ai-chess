@@ -306,12 +306,12 @@ function formatMoveText(move: { piece: string; to: string; captured?: string }):
   const destination = move.to.toUpperCase();
   if (move.piece === 'p') return `Pawn to ${destination}`;
   const piece = pieceName(move.piece);
-  return move.captured ? `${piece} to ${destination} takes ${pieceName(move.captured)}` : `${piece} to ${destination}`;
+  return move.captured
+    ? `${piece} to ${destination} takes ${pieceName(move.captured)}`
+    : `${piece} to ${destination}`;
 }
 
-function pickDefaultLegalMove(
-  legalMoves: EngineLegalMove[],
-) {
+function pickDefaultLegalMove(legalMoves: EngineLegalMove[]) {
   const checkMove = legalMoves.find((m) => m.san.includes('+'));
   if (checkMove) return checkMove;
 
@@ -326,10 +326,7 @@ function pickDefaultLegalMove(
   return legalMoves[0] || null;
 }
 
-function resolveSuggestedMove(
-  suggestionText: string | undefined,
-  legalMoves: EngineLegalMove[],
-) {
+function resolveSuggestedMove(suggestionText: string | undefined, legalMoves: EngineLegalMove[]) {
   if (!suggestionText) return null;
 
   const text = suggestionText.toLowerCase().trim();
@@ -341,7 +338,9 @@ function resolveSuggestedMove(
     return legalMoves.find((m) => m.flags.includes('q')) || null;
   }
 
-  const match = suggestionText.match(/(king|queen|rook|bishop|knight|pawn)\s+(?:from\s+([a-h][1-8])\s+)?to\s+([a-h][1-8])/i);
+  const match = suggestionText.match(
+    /(king|queen|rook|bishop|knight|pawn)\s+(?:from\s+([a-h][1-8])\s+)?to\s+([a-h][1-8])/i,
+  );
   if (!match) return null;
 
   const [, pieceWord, fromSquare, toSquare] = match;
@@ -382,10 +381,7 @@ function getAttackers(chess: Chess, square: string, attackerColor: 'w' | 'b') {
   return attackerView.moves({ verbose: true }).filter((m) => m.to === square);
 }
 
-function isMoveTacticallySafe(
-  positionFen: string,
-  move: EngineLegalMove,
-) {
+function isMoveTacticallySafe(positionFen: string, move: EngineLegalMove) {
   const chess = new Chess(positionFen);
   chess.move(move.san);
 
@@ -402,9 +398,7 @@ function isMoveTacticallySafe(
   if (movedPieceValue >= 3 && defenders.length === 0) return false;
 
   // Reject if a low-value attacker can win a high-value moved piece immediately.
-  const cheapestAttackerValue = Math.min(
-    ...attackers.map((a) => PIECE_VALUE[a.piece] || 9),
-  );
+  const cheapestAttackerValue = Math.min(...attackers.map((a) => PIECE_VALUE[a.piece] || 9));
   if (movedPieceValue - cheapestAttackerValue >= 2 && attackers.length > defenders.length) {
     return false;
   }
@@ -425,9 +419,7 @@ function scoreMoveRelevance(
   const currentColor = chess.turn();
   const myThreats = analysis.threats.filter((t) => t.piece.startsWith(currentColor));
   const threatenedSquares = new Set(
-    myThreats
-      .filter((t) => t.value >= 3 || t.isHanging)
-      .map((t) => t.square.toLowerCase()),
+    myThreats.filter((t) => t.value >= 3 || t.isHanging).map((t) => t.square.toLowerCase()),
   );
 
   let score = 0;
@@ -438,7 +430,8 @@ function scoreMoveRelevance(
   if (move.piece === 'k' && chess.inCheck()) score += 15;
 
   const fromRank = move.from[1];
-  if ((move.piece === 'n' || move.piece === 'b') && (fromRank === '1' || fromRank === '8')) score += 5;
+  if ((move.piece === 'n' || move.piece === 'b') && (fromRank === '1' || fromRank === '8'))
+    score += 5;
   if (move.piece === 'p' && CENTRAL_FILES.has(move.to[0])) score += 4;
   if (CENTRAL_FILES.has(move.to[0])) score += 2;
 
@@ -461,7 +454,10 @@ function reasoningForMove(
   if (move.captured) return `Wins ${pieceName(move.captured).toLowerCase()}`;
   if (move.piece === 'k' && analysis.urgencyLevel === 'emergency') return 'King safety first';
   if (move.san.includes('+')) return 'Creates immediate pressure';
-  if ((move.piece === 'n' || move.piece === 'b') && (move.from[1] === '1' || move.from[1] === '8')) {
+  if (
+    (move.piece === 'n' || move.piece === 'b') &&
+    (move.from[1] === '1' || move.from[1] === '8')
+  ) {
     return 'Develops active piece';
   }
   if (move.piece === 'p' && CENTRAL_FILES.has(move.to[0])) return 'Controls center squares';
@@ -601,31 +597,33 @@ Mandatory:
 
     const userMoveContext = userMove ? `\n\nPlayer just made: ${userMove}` : '';
 
-    const urgencyContext = analysis.urgencyLevel === 'emergency'
-      ? '\n\nURGENT SITUATION: Focus on critical issues (check, hanging pieces, free captures)'
-      : analysis.urgencyLevel === 'tactical'
-        ? '\n\nTACTICAL OPPORTUNITY: Look for active play and threats'
-        : '\n\nSTRATEGIC POSITION: Focus on piece activity, king safety, or pawn structure';
+    const urgencyContext =
+      analysis.urgencyLevel === 'emergency'
+        ? '\n\nURGENT SITUATION: Focus on critical issues (check, hanging pieces, free captures)'
+        : analysis.urgencyLevel === 'tactical'
+          ? '\n\nTACTICAL OPPORTUNITY: Look for active play and threats'
+          : '\n\nSTRATEGIC POSITION: Focus on piece activity, king safety, or pawn structure';
 
     let payload: CachedAnalysis['payload'];
     try {
       const deepseek = getDeepSeekClient();
       const completion = await withRetry(
-        () => withTimeout(
-          deepseek.chat.completions.create({
-            model: 'deepseek-chat',
-            messages: [
-              { role: 'system', content: systemPrompt },
-              {
-                role: 'user',
-                content: `${context}${evaluationContext}${userMoveContext}${urgencyContext}\n\nThe engine just played: ${moveStr}\n\nWhat's your casual take on ${userMove ? 'these moves' : 'this move'}, and what should the player try next?`,
-              },
-            ],
-            max_completion_tokens: 160,
-            response_format: { type: 'json_object' },
-          }),
-          LLM_TIMEOUT_MS,
-        ),
+        () =>
+          withTimeout(
+            deepseek.chat.completions.create({
+              model: 'deepseek-chat',
+              messages: [
+                { role: 'system', content: systemPrompt },
+                {
+                  role: 'user',
+                  content: `${context}${evaluationContext}${userMoveContext}${urgencyContext}\n\nThe engine just played: ${moveStr}\n\nWhat's your casual take on ${userMove ? 'these moves' : 'this move'}, and what should the player try next?`,
+                },
+              ],
+              max_completion_tokens: 160,
+              response_format: { type: 'json_object' },
+            }),
+            LLM_TIMEOUT_MS,
+          ),
         { maxRetries: 1, baseDelayMs: 500, maxDelayMs: 2000 },
       );
 

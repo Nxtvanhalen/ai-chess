@@ -65,7 +65,6 @@ export async function POST(request: NextRequest) {
     const authUser = await getAuthenticatedUser();
     const userId = authUser?.id || null;
 
-
     // Fetch comprehensive game memory context with timeout
     let fullGameContext = null;
     let chesterPersonality = null;
@@ -309,7 +308,9 @@ export async function POST(request: NextRequest) {
           if (detectedThemes.length > 0) {
             const themeStart = Date.now();
             await GameMemoryService.addTacticalThemes(gameId, detectedThemes);
-            console.log(`[Move] addTacticalThemes (${detectedThemes.length} themes): ${Date.now() - themeStart}ms`);
+            console.log(
+              `[Move] addTacticalThemes (${detectedThemes.length} themes): ${Date.now() - themeStart}ms`,
+            );
           }
 
           console.log(`[Move] Background save total: ${Date.now() - bgStart}ms`);

@@ -29,9 +29,7 @@ function ManageSubscriptionButton() {
       >
         {loading ? 'Opening Portal...' : 'Manage Subscription'}
       </button>
-      {error && (
-        <p className="text-red-400 text-sm mt-2">{error}</p>
-      )}
+      {error && <p className="text-red-400 text-sm mt-2">{error}</p>}
     </div>
   );
 }

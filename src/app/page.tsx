@@ -1,12 +1,12 @@
 'use client';
 
-import Nav from '@/components/landing/sections/Nav';
+import ChesterPersonality from '@/components/landing/sections/ChesterPersonality';
+import Features from '@/components/landing/sections/Features';
+import Footer from '@/components/landing/sections/Footer';
 import Hero from '@/components/landing/sections/Hero';
 import HowItWorks from '@/components/landing/sections/HowItWorks';
-import Features from '@/components/landing/sections/Features';
-import ChesterPersonality from '@/components/landing/sections/ChesterPersonality';
+import Nav from '@/components/landing/sections/Nav';
 import Pricing from '@/components/landing/sections/Pricing';
-import Footer from '@/components/landing/sections/Footer';
 
 export default function LandingPage() {
   return (

@@ -116,7 +116,6 @@ export async function POST(request: NextRequest) {
       }
     }
 
-
     // Fetch comprehensive game memory context (parallelized for performance)
     let fullGameContext = null;
     let chesterPersonality = null;
@@ -250,7 +249,8 @@ export async function POST(request: NextRequest) {
       if (pastGameContext.moveHistory.length > 0) {
         const moveSequence = pastGameContext.moveHistory
           .map(
-            (m: any) => `${m.move_number}. ${m.player_type === 'human' ? 'Player' : 'AI'}: ${m.san}`,
+            (m: any) =>
+              `${m.move_number}. ${m.player_type === 'human' ? 'Player' : 'AI'}: ${m.san}`,
           )
           .join(', ');
         instructions += `\n- Key Moves: ${moveSequence}`;
@@ -398,7 +398,6 @@ export async function POST(request: NextRequest) {
             urgency_level: isStyleAnalysis ? 'strategic' : undefined,
           },
         });
-
       } catch (error) {
         console.error('Error saving chat to game memory:', error);
         // Don't fail the request if memory save fails

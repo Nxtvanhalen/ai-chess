@@ -43,14 +43,21 @@ export async function GET() {
     const [usage, plan, profileResult] = await Promise.all([
       getUserUsage(user.id),
       getUserTier(user.id),
-      supabase.from('user_profiles').select('rating, avatar_url, board_theme').eq('id', user.id).single(),
+      supabase
+        .from('user_profiles')
+        .select('rating, avatar_url, board_theme')
+        .eq('id', user.id)
+        .single(),
     ]);
 
     const rating = profileResult.data?.rating ?? 1200;
     const avatar_url = profileResult.data?.avatar_url ?? null;
     const board_theme = profileResult.data?.board_theme ?? null;
 
-    console.log(`[Usage API] Fetched in ${Date.now() - start}ms`, JSON.stringify({ ...usage, plan, rating, avatar_url, board_theme }));
+    console.log(
+      `[Usage API] Fetched in ${Date.now() - start}ms`,
+      JSON.stringify({ ...usage, plan, rating, avatar_url, board_theme }),
+    );
 
     return NextResponse.json(
       {
@@ -122,10 +129,7 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 });
     }
 
-    const { error } = await supabase
-      .from('user_profiles')
-      .update(updates)
-      .eq('id', user.id);
+    const { error } = await supabase.from('user_profiles').update(updates).eq('id', user.id);
 
     if (error) {
       console.error('[Usage API] PATCH error:', error);

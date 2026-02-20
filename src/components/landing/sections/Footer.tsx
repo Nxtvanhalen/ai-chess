@@ -13,16 +13,10 @@ export default function Footer() {
 
           {/* Links */}
           <nav className="flex items-center gap-6 text-sm">
-            <Link
-              href="/play"
-              className="text-[#666666] hover:text-[#E8E8E8] transition-colors"
-            >
+            <Link href="/play" className="text-[#666666] hover:text-[#E8E8E8] transition-colors">
               Play
             </Link>
-            <Link
-              href="/pricing"
-              className="text-[#666666] hover:text-[#E8E8E8] transition-colors"
-            >
+            <Link href="/pricing" className="text-[#666666] hover:text-[#E8E8E8] transition-colors">
               Pricing
             </Link>
             <Link

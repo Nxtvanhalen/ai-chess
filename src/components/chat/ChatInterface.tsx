@@ -181,11 +181,7 @@ export default function ChatInterface({
       className={`chat-interface ${isLandscape ? 'landscape' : 'portrait'}`}
       aria-label="Chat with Chester, your chess coach"
     >
-      <div
-        ref={scrollContainerRef}
-        className="chat-messages-container"
-        onScroll={handleScroll}
-      >
+      <div ref={scrollContainerRef} className="chat-messages-container" onScroll={handleScroll}>
         {/* Message container with ref for MutationObserver */}
         <div
           ref={messagesContentRef}

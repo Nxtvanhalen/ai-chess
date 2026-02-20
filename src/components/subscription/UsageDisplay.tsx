@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
 import AvatarUpload from '@/components/profile/AvatarUpload';
+import { useAuth } from '@/contexts/AuthContext';
 import { setGlobalAvatarUrl } from '@/hooks/useAvatarUrl';
 
 interface UsageData {
@@ -144,7 +144,10 @@ export default function UsageDisplay() {
   // Show skeleton while loading
   if (!usage) {
     return (
-      <div className="flex items-center gap-3 px-3 py-1 rounded-lg text-sm relative z-[100]" style={{ pointerEvents: 'auto' }}>
+      <div
+        className="flex items-center gap-3 px-3 py-1 rounded-lg text-sm relative z-[100]"
+        style={{ pointerEvents: 'auto' }}
+      >
         <div className="flex items-center gap-2">
           <span className="text-gray-400">Moves:</span>
           <div className="w-20 h-2 bg-gray-700 rounded-full overflow-hidden animate-pulse" />
@@ -156,8 +159,18 @@ export default function UsageDisplay() {
             className="w-7 h-7 rounded-full bg-gray-700 flex items-center justify-center border border-gray-600 opacity-50"
             disabled
           >
-            <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            <svg
+              className="w-4 h-4 text-gray-300"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+              />
             </svg>
           </button>
         </div>
@@ -213,7 +226,10 @@ export default function UsageDisplay() {
   };
 
   return (
-    <div className="flex items-center gap-3 px-3 py-1 rounded-lg text-sm relative z-[100]" style={{ pointerEvents: 'auto' }}>
+    <div
+      className="flex items-center gap-3 px-3 py-1 rounded-lg text-sm relative z-[100]"
+      style={{ pointerEvents: 'auto' }}
+    >
       <div className="flex items-center gap-2">
         <span className="text-gray-400">Moves:</span>
         {usage.ai_moves.unlimited ? (
@@ -242,9 +258,7 @@ export default function UsageDisplay() {
       {usage.rating != null && (
         <div className="flex items-center gap-1.5">
           <span className="text-gray-400">Rating:</span>
-          <span className={`font-medium ${getRatingColor(usage.rating)}`}>
-            {usage.rating}
-          </span>
+          <span className={`font-medium ${getRatingColor(usage.rating)}`}>{usage.rating}</span>
         </div>
       )}
 
@@ -268,8 +282,18 @@ export default function UsageDisplay() {
           {avatarUrl ? (
             <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
           ) : (
-            <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            <svg
+              className="w-4 h-4 text-gray-300"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+              />
             </svg>
           )}
         </button>

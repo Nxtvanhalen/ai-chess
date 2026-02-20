@@ -40,7 +40,7 @@ const DIFFICULTY_THRESHOLDS = {
  * E = 1 / (1 + 10^((opponent - player) / 400))
  */
 function expectedScore(playerRating: number, opponentRating: number): number {
-  return 1 / (1 + Math.pow(10, (opponentRating - playerRating) / 400));
+  return 1 / (1 + 10 ** ((opponentRating - playerRating) / 400));
 }
 
 /**
@@ -78,8 +78,8 @@ export function getEngineRating(difficulty: Difficulty): number {
  * 1400+  → hard (engine ~1600)
  */
 export function getDifficultyForRating(playerRating: number): Difficulty {
-  if (playerRating < (DIFFICULTY_THRESHOLDS.medium.min)) return 'easy';
-  if (playerRating < (DIFFICULTY_THRESHOLDS.hard.min)) return 'medium';
+  if (playerRating < DIFFICULTY_THRESHOLDS.medium.min) return 'easy';
+  if (playerRating < DIFFICULTY_THRESHOLDS.hard.min) return 'medium';
   return 'hard';
 }
 

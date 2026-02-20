@@ -47,7 +47,11 @@ export default function Home() {
   const [currentGameId, setCurrentGameId] = useState<string | null>(null);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [moveCount, setMoveCount] = useState(0);
-  const [gameOver, setGameOver] = useState<{ checkmate: boolean; draw: boolean; winner?: 'white' | 'black' }>({
+  const [gameOver, setGameOver] = useState<{
+    checkmate: boolean;
+    draw: boolean;
+    winner?: 'white' | 'black';
+  }>({
     checkmate: false,
     draw: false,
   });
@@ -321,7 +325,6 @@ export default function Home() {
     return 'endgame';
   };
 
-
   const convertMoveToPlainEnglish = useCallback((san: string) => {
     // Convert algebraic notation to plain English
     const pieceMap: Record<string, string> = {
@@ -349,7 +352,9 @@ export default function Home() {
     // Handle regular moves
     const piece = cleaned[0];
     const pieceName = pieceMap[piece] || 'Pawn';
-    let text = isCapture ? `${pieceName} takes on ${destination}` : `${pieceName} to ${destination}`;
+    let text = isCapture
+      ? `${pieceName} takes on ${destination}`
+      : `${pieceName} to ${destination}`;
 
     if (isCheckmate) text += ' (checkmate)';
     else if (isCheck) text += ' (check)';
@@ -381,7 +386,9 @@ export default function Home() {
             const gameResult: 0 | 1 = winner === 'white' ? 1 : 0;
             const newRating = calculateNewRating(playerRating, engineElo, gameResult);
 
-            console.log(`[Rating] ${playerRating} → ${newRating} (${winner === 'white' ? 'win' : 'loss'} vs ${difficulty} ~${engineElo})`);
+            console.log(
+              `[Rating] ${playerRating} → ${newRating} (${winner === 'white' ? 'win' : 'loss'} vs ${difficulty} ~${engineElo})`,
+            );
 
             await updatePlayerRating(user.id, newRating);
             setPlayerRating(newRating);
@@ -408,49 +415,48 @@ export default function Home() {
     [currentGameId, playerRating, user?.id],
   );
 
-  const handleDraw = useCallback(
-    async () => {
-      // Guard against multiple calls
-      if (drawHandledRef.current) return;
-      drawHandledRef.current = true;
+  const handleDraw = useCallback(async () => {
+    // Guard against multiple calls
+    if (drawHandledRef.current) return;
+    drawHandledRef.current = true;
 
-      setGameOver({ checkmate: false, draw: true });
+    setGameOver({ checkmate: false, draw: true });
 
-      // Finalize game in database
-      if (currentGameId) {
-        try {
-          const durationSeconds = Math.floor((Date.now() - gameStartTimeRef.current) / 1000);
-          await GameMemoryService.finalizeGame(currentGameId, 'draw', durationSeconds);
+    // Finalize game in database
+    if (currentGameId) {
+      try {
+        const durationSeconds = Math.floor((Date.now() - gameStartTimeRef.current) / 1000);
+        await GameMemoryService.finalizeGame(currentGameId, 'draw', durationSeconds);
 
-          // Update Elo rating with draw result (0.5)
-          if (user?.id) {
-            const difficulty = getDifficultyForRating(playerRating);
-            const engineElo = getEngineRating(difficulty);
-            const newRating = calculateNewRating(playerRating, engineElo, 0.5);
+        // Update Elo rating with draw result (0.5)
+        if (user?.id) {
+          const difficulty = getDifficultyForRating(playerRating);
+          const engineElo = getEngineRating(difficulty);
+          const newRating = calculateNewRating(playerRating, engineElo, 0.5);
 
-            console.log(`[Rating] ${playerRating} → ${newRating} (draw vs ${difficulty} ~${engineElo})`);
+          console.log(
+            `[Rating] ${playerRating} → ${newRating} (draw vs ${difficulty} ~${engineElo})`,
+          );
 
-            await updatePlayerRating(user.id, newRating);
-            setPlayerRating(newRating);
-            invalidateUsageCache();
-          }
-        } catch (error) {
-          console.error('Error finalizing draw:', error);
+          await updatePlayerRating(user.id, newRating);
+          setPlayerRating(newRating);
+          invalidateUsageCache();
         }
+      } catch (error) {
+        console.error('Error finalizing draw:', error);
       }
+    }
 
-      // Add draw message
-      const drawMessage: ChatMessage = {
-        id: generateSimpleId(),
-        role: 'assistant',
-        content: "It's a draw! Neither side could force a win. Well played — ready for another?",
-        timestamp: new Date(),
-      };
+    // Add draw message
+    const drawMessage: ChatMessage = {
+      id: generateSimpleId(),
+      role: 'assistant',
+      content: "It's a draw! Neither side could force a win. Well played — ready for another?",
+      timestamp: new Date(),
+    };
 
-      setMessages((prev) => [...prev, drawMessage]);
-    },
-    [currentGameId, playerRating, user?.id],
-  );
+    setMessages((prev) => [...prev, drawMessage]);
+  }, [currentGameId, playerRating, user?.id]);
 
   const handleMove = useCallback(
     async (move: Move) => {
@@ -938,9 +944,7 @@ export default function Home() {
                 <div className="absolute inset-0 z-20 bg-black/60 flex items-center justify-center rounded-2xl backdrop-blur-md">
                   <div className="bg-gradient-to-br from-gray-800 to-slate-900 p-8 rounded-2xl shadow-2xl text-center">
                     <h2 className="text-3xl font-bold text-white mb-4">Draw!</h2>
-                    <p className="text-xl text-gray-300 mb-6">
-                      Neither side could force a win.
-                    </p>
+                    <p className="text-xl text-gray-300 mb-6">Neither side could force a win.</p>
                     <button
                       onClick={handleRestart}
                       className="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all transform hover:scale-105 shadow-lg"
@@ -956,7 +960,12 @@ export default function Home() {
             <div className="flex items-center gap-4 flex-wrap">
               <button
                 onClick={() => {
-                  if (moveCount === 0 || window.confirm('Start a new game? Your current game will be saved as abandoned.')) {
+                  if (
+                    moveCount === 0 ||
+                    window.confirm(
+                      'Start a new game? Your current game will be saved as abandoned.',
+                    )
+                  ) {
                     handleRestart();
                   }
                 }}
@@ -964,18 +973,21 @@ export default function Home() {
               >
                 New Game
               </button>
-              <ThemeSelector currentTheme={boardTheme} onThemeChange={(theme) => {
-                setBoardTheme(theme);
-                localStorage.setItem('chester:board-theme', theme.id);
-                // Persist to user profile for cross-device sync
-                if (user?.id) {
-                  fetch('/api/subscription/usage', {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ board_theme: theme.id }),
-                  }).catch((err) => console.error('[Theme] Error saving preference:', err));
-                }
-              }} />
+              <ThemeSelector
+                currentTheme={boardTheme}
+                onThemeChange={(theme) => {
+                  setBoardTheme(theme);
+                  localStorage.setItem('chester:board-theme', theme.id);
+                  // Persist to user profile for cross-device sync
+                  if (user?.id) {
+                    fetch('/api/subscription/usage', {
+                      method: 'PATCH',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ board_theme: theme.id }),
+                    }).catch((err) => console.error('[Theme] Error saving preference:', err));
+                  }
+                }}
+              />
               <UsageDisplay />
             </div>
           }

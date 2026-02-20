@@ -9,8 +9,8 @@ import { GameMemoryService } from '@/lib/services/GameMemoryService';
 import {
   canUseChat,
   createUsageLimitError,
-  getUserTier,
   getUsageHeaders,
+  getUserTier,
   incrementChatUsage,
 } from '@/lib/supabase/subscription';
 import { chatSchema, validateRequest } from '@/lib/validation/schemas';
@@ -158,7 +158,6 @@ export async function POST(request: NextRequest) {
       }
     }
 
-
     // Create streaming response
     const stream = await createResponsesCompletionStream({
       model: 'gpt-5.2-2025-12-11',
@@ -220,7 +219,6 @@ export async function POST(request: NextRequest) {
                 timestamp: new Date().toISOString(),
                 metadata: {},
               });
-
             } catch (error) {
               console.error('[Chester Stream] Error saving to memory:', error);
             }

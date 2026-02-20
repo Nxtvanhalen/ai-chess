@@ -150,7 +150,9 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      console.log(`[Stripe Checkout] Move pack session created: user=${user.id} session=${session.id}`);
+      console.log(
+        `[Stripe Checkout] Move pack session created: user=${user.id} session=${session.id}`,
+      );
       return NextResponse.json({ sessionId: session.id, url: session.url });
     }
 
@@ -179,7 +181,9 @@ export async function POST(request: NextRequest) {
       allow_promotion_codes: true,
     });
 
-    console.log(`[Stripe Checkout] Subscription session created: user=${user.id} plan=${plan} session=${session.id}`);
+    console.log(
+      `[Stripe Checkout] Subscription session created: user=${user.id} plan=${plan} session=${session.id}`,
+    );
     return NextResponse.json({ sessionId: session.id, url: session.url });
   } catch (error) {
     console.error('[Stripe Checkout] Error:', error);

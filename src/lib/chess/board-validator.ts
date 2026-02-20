@@ -246,7 +246,8 @@ export function assessMoveSuggestionSafety(
 
     const legalMoves = chess.moves({ verbose: true });
     const candidate = legalMoves.find(
-      (m) => m.piece === parsed.piece && m.to === parsed.to && (!parsed.from || m.from === parsed.from),
+      (m) =>
+        m.piece === parsed.piece && m.to === parsed.to && (!parsed.from || m.from === parsed.from),
     );
     if (!candidate) {
       return { isSafe: false, reason: `${moveDescription} is not legal here.` };
@@ -281,9 +282,18 @@ export function assessMoveSuggestionSafety(
   }
 }
 
-function canOpponentCapturePieceNextTurn(fen: string, pieceName: 'queen' | 'rook' | 'bishop' | 'knight' | 'pawn') {
+function canOpponentCapturePieceNextTurn(
+  fen: string,
+  pieceName: 'queen' | 'rook' | 'bishop' | 'knight' | 'pawn',
+) {
   const chess = new Chess(fen);
-  const pieceMap: Record<string, string> = { queen: 'q', rook: 'r', bishop: 'b', knight: 'n', pawn: 'p' };
+  const pieceMap: Record<string, string> = {
+    queen: 'q',
+    rook: 'r',
+    bishop: 'b',
+    knight: 'n',
+    pawn: 'p',
+  };
   const targetPiece = pieceMap[pieceName];
 
   const fenParts = chess.fen().split(' ');
@@ -304,7 +314,10 @@ export function generateSafetyNotice(fen: string, response: string): string | nu
     }
   }
 
-  if (/can(?:not|'t)\s+take\s+your\s+queen/i.test(response) && canOpponentCapturePieceNextTurn(fen, 'queen')) {
+  if (
+    /can(?:not|'t)\s+take\s+your\s+queen/i.test(response) &&
+    canOpponentCapturePieceNextTurn(fen, 'queen')
+  ) {
     notices.push('Caution: The queen may still be capturable on the next move.');
   }
 

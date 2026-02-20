@@ -230,10 +230,7 @@ export function createUsageLimitError(
   };
 } {
   return {
-    error:
-      type === 'ai_move'
-        ? "You're out of AI moves."
-        : "You're out of chat messages.",
+    error: type === 'ai_move' ? "You're out of AI moves." : "You're out of chat messages.",
     code: 'USAGE_LIMIT_EXCEEDED',
     details: {
       type,

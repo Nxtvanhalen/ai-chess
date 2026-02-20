@@ -52,13 +52,20 @@ function SimpleMarkdown({ children, className }: DynamicMarkdownProps) {
     return formatted;
   };
 
-  return <div className={className} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(formatText(children)) }} />;
+  return (
+    <div
+      className={className}
+      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(formatText(children)) }}
+    />
+  );
 }
 
 export default function DynamicMarkdown({ children, className }: DynamicMarkdownProps) {
   // Dynamic imports don't have static types available - using ComponentType for the renderer
   // and unknown for the remark plugin since we only pass them through
-  const [ReactMarkdown, setReactMarkdown] = useState<React.ComponentType<Record<string, unknown>> | null>(null);
+  const [ReactMarkdown, setReactMarkdown] = useState<React.ComponentType<
+    Record<string, unknown>
+  > | null>(null);
   const [remarkGfm, setRemarkGfm] = useState<unknown>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -135,14 +142,18 @@ export default function DynamicMarkdown({ children, className }: DynamicMarkdown
             strong: ({ children }: { children?: React.ReactNode }) => (
               <strong className="font-bold text-white">{children}</strong>
             ),
-            em: ({ children }: { children?: React.ReactNode }) => <em className="italic text-blue-200">{children}</em>,
+            em: ({ children }: { children?: React.ReactNode }) => (
+              <em className="italic text-blue-200">{children}</em>
+            ),
             ul: ({ children }: { children?: React.ReactNode }) => (
               <ul className="list-disc list-inside mb-3 space-y-1 text-slate-200">{children}</ul>
             ),
             ol: ({ children }: { children?: React.ReactNode }) => (
               <ol className="list-decimal list-inside mb-3 space-y-1 text-slate-200">{children}</ol>
             ),
-            li: ({ children }: { children?: React.ReactNode }) => <li className="text-slate-200">{children}</li>,
+            li: ({ children }: { children?: React.ReactNode }) => (
+              <li className="text-slate-200">{children}</li>
+            ),
             blockquote: ({ children }: { children?: React.ReactNode }) => (
               <blockquote className="border-l-4 border-blue-500 pl-4 italic my-3 text-blue-200">
                 {children}

@@ -7,8 +7,8 @@ import { checkRateLimitRedis, getClientIPFromRequest, getRateLimitHeadersRedis }
 import {
   canUseAIMove,
   createUsageLimitError,
-  getUserTier,
   getUsageHeaders,
+  getUserTier,
   incrementAIMoveUsage,
 } from '@/lib/supabase/subscription';
 import { aiMoveSchema, validateRequest } from '@/lib/validation/schemas';

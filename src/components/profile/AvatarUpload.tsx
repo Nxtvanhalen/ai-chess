@@ -1,9 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
-import Cropper, { Area } from 'react-easy-crop';
-import { useAuth } from '@/contexts/AuthContext';
 import { createBrowserClient } from '@supabase/ssr';
+import { useCallback, useEffect, useState } from 'react';
+import Cropper, { type Area } from 'react-easy-crop';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface AvatarUploadProps {
   isOpen: boolean;
@@ -59,7 +59,12 @@ async function cropImage(imageSrc: string, cropArea: Area): Promise<Blob> {
   });
 }
 
-export default function AvatarUpload({ isOpen, onClose, onSaved, currentAvatarUrl }: AvatarUploadProps) {
+export default function AvatarUpload({
+  isOpen,
+  onClose,
+  onSaved,
+  currentAvatarUrl,
+}: AvatarUploadProps) {
   const { user } = useAuth();
 
   const [imageSrc, setImageSrc] = useState<string | null>(null);
@@ -141,12 +146,10 @@ export default function AvatarUpload({ isOpen, onClose, onSaved, currentAvatarUr
       const filePath = `${user.id}/avatar.webp`;
       console.log('[AvatarUpload] Uploading to storage path:', filePath);
 
-      const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, blob, {
-          contentType: 'image/webp',
-          upsert: true,
-        });
+      const { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, blob, {
+        contentType: 'image/webp',
+        upsert: true,
+      });
 
       if (uploadError) {
         console.error('[AvatarUpload] Storage upload failed:', uploadError);
@@ -154,9 +157,7 @@ export default function AvatarUpload({ isOpen, onClose, onSaved, currentAvatarUr
       }
 
       // 3. Get public URL
-      const { data: urlData } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath);
+      const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
 
       // Append cache-buster so the browser picks up the new image
       const publicUrl = `${urlData.publicUrl}?t=${Date.now()}`;
@@ -200,7 +201,12 @@ export default function AvatarUpload({ isOpen, onClose, onSaved, currentAvatarUr
           className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
 
@@ -229,18 +235,23 @@ export default function AvatarUpload({ isOpen, onClose, onSaved, currentAvatarUr
 
             <label className="w-full cursor-pointer">
               <div className="flex flex-col items-center justify-center gap-2 py-8 border-2 border-dashed border-gray-600 rounded-xl hover:border-purple-500 hover:bg-purple-500/5 transition-colors">
-                <svg className="w-10 h-10 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 16v-8m0 0l-3 3m3-3l3 3M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5" />
+                <svg
+                  className="w-10 h-10 text-gray-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M12 16v-8m0 0l-3 3m3-3l3 3M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5"
+                  />
                 </svg>
                 <span className="text-sm text-gray-400">Click to select an image</span>
                 <span className="text-xs text-gray-600">Max 10 MB</span>
               </div>
-              <input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleFileSelect}
-              />
+              <input type="file" accept="image/*" className="hidden" onChange={handleFileSelect} />
             </label>
 
             <button
@@ -270,8 +281,18 @@ export default function AvatarUpload({ isOpen, onClose, onSaved, currentAvatarUr
 
             {/* Zoom slider */}
             <div className="flex items-center gap-3 px-1">
-              <svg className="w-4 h-4 text-gray-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+              <svg
+                className="w-4 h-4 text-gray-500 shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"
+                />
               </svg>
               <input
                 type="range"
@@ -300,8 +321,20 @@ export default function AvatarUpload({ isOpen, onClose, onSaved, currentAvatarUr
                 {uploading ? (
                   <span className="flex items-center justify-center gap-2">
                     <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                        fill="none"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                      />
                     </svg>
                     Saving...
                   </span>

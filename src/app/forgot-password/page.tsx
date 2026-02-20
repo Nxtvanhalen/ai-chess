@@ -37,7 +37,8 @@ export default function ForgotPasswordPage() {
             <h2 className="text-2xl font-bold text-white mb-4">Check your email</h2>
             <p className="text-gray-400 mb-6">
               We&apos;ve sent a password reset link to{' '}
-              <span className="text-purple-400">{email}</span>. Click the link to set a new password.
+              <span className="text-purple-400">{email}</span>. Click the link to set a new
+              password.
             </p>
             <Link
               href="/login"

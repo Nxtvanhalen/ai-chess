@@ -167,7 +167,9 @@ async function handleCheckoutCompleted(
 
   // Update user profile subscription tier
   await supabase.from('user_profiles').update({ subscription_tier: plan }).eq('id', userId);
-  console.log(`[Stripe Webhook] Checkout completed: user=${userId} plan=${plan} balance=${allocation.ai_moves}`);
+  console.log(
+    `[Stripe Webhook] Checkout completed: user=${userId} plan=${plan} balance=${allocation.ai_moves}`,
+  );
 }
 
 /**
@@ -328,7 +330,9 @@ async function handlePaymentSucceeded(supabase: ServiceRoleClient, invoice: Stri
         p_ai_moves: allocation.ai_moves,
         p_chat_messages: allocation.chat_messages,
       });
-      console.log(`[Stripe Webhook] Free tier reset: user=${sub.user_id} balance=${allocation.ai_moves}`);
+      console.log(
+        `[Stripe Webhook] Free tier reset: user=${sub.user_id} balance=${allocation.ai_moves}`,
+      );
     } else {
       // Paid tier: stacking, ADD allocation to existing balance
       await supabase.rpc('add_to_balance', {
@@ -336,7 +340,9 @@ async function handlePaymentSucceeded(supabase: ServiceRoleClient, invoice: Stri
         p_ai_moves: allocation.ai_moves,
         p_chat_messages: allocation.chat_messages,
       });
-      console.log(`[Stripe Webhook] Renewal top-up: user=${sub.user_id} +${allocation.ai_moves} moves`);
+      console.log(
+        `[Stripe Webhook] Renewal top-up: user=${sub.user_id} +${allocation.ai_moves} moves`,
+      );
     }
   }
 

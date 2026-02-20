@@ -2,8 +2,7 @@
 
 import { motion } from 'framer-motion';
 import ScrollReveal from '../animations/ScrollReveal';
-import StaggerChildren from '../animations/StaggerChildren';
-import { staggerChildVariant } from '../animations/StaggerChildren';
+import StaggerChildren, { staggerChildVariant } from '../animations/StaggerChildren';
 import Section from '../ui/Section';
 
 const steps = [
@@ -17,7 +16,7 @@ const steps = [
     emoji: '💬',
     title: 'Chester Reacts',
     description:
-      "Your AI buddy watches every move and drops real-time commentary. Sometimes helpful, sometimes sarcastic — always honest.",
+      'Your AI buddy watches every move and drops real-time commentary. Sometimes helpful, sometimes sarcastic — always honest.',
   },
   {
     emoji: '📈',
@@ -41,15 +40,9 @@ export default function HowItWorks() {
 
       <StaggerChildren className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {steps.map((step, i) => (
-          <motion.div
-            key={step.title}
-            variants={staggerChildVariant}
-            className="text-center"
-          >
+          <motion.div key={step.title} variants={staggerChildVariant} className="text-center">
             <div className="text-5xl mb-5">{step.emoji}</div>
-            <div className="text-[#9B7ED1] text-sm font-semibold mb-2">
-              Step {i + 1}
-            </div>
+            <div className="text-[#9B7ED1] text-sm font-semibold mb-2">Step {i + 1}</div>
             <h3 className="text-xl font-bold text-[#E8E8E8] mb-3">{step.title}</h3>
             <p className="text-[#888888] leading-relaxed text-[15px]">{step.description}</p>
           </motion.div>

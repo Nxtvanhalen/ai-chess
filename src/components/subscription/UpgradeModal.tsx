@@ -9,7 +9,12 @@ interface UpgradeModalProps {
   currentPlan?: string;
 }
 
-export default function UpgradeModal({ isOpen, onClose, type, currentPlan = 'free' }: UpgradeModalProps) {
+export default function UpgradeModal({
+  isOpen,
+  onClose,
+  type,
+  currentPlan = 'free',
+}: UpgradeModalProps) {
   const [buying, setBuying] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -37,15 +42,12 @@ export default function UpgradeModal({ isOpen, onClose, type, currentPlan = 'fre
   const isPro = currentPlan === 'pro';
   const isPremium = currentPlan === 'premium';
 
-  const title =
-    type === 'ai_move'
-      ? "You're out of moves"
-      : "You're out of chat messages";
+  const title = type === 'ai_move' ? "You're out of moves" : "You're out of chat messages";
 
   const description =
     type === 'ai_move'
-      ? "Grab more moves to keep playing, or upgrade your plan for a bigger monthly bank."
-      : "Grab more messages to keep chatting with Chester, or upgrade your plan.";
+      ? 'Grab more moves to keep playing, or upgrade your plan for a bigger monthly bank.'
+      : 'Grab more messages to keep chatting with Chester, or upgrade your plan.';
 
   async function handleBuyMoves() {
     setBuying(true);
@@ -123,7 +125,8 @@ export default function UpgradeModal({ isOpen, onClose, type, currentPlan = 'fre
         {/* Current plan indicator */}
         {(isPro || isPremium) && (
           <p className="text-sm text-purple-400 text-center mb-6">
-            You&apos;re on the <span className="font-semibold">{isPro ? 'Pro' : 'Premium'}</span> plan
+            You&apos;re on the <span className="font-semibold">{isPro ? 'Pro' : 'Premium'}</span>{' '}
+            plan
           </p>
         )}
         {!isPro && !isPremium && <div className="mb-6" />}
@@ -144,8 +147,20 @@ export default function UpgradeModal({ isOpen, onClose, type, currentPlan = 'fre
           {buying ? (
             <span className="flex items-center justify-center gap-2">
               <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  fill="none"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                />
               </svg>
               Processing...
             </span>

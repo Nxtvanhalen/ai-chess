@@ -46,18 +46,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(
-      async (event: AuthChangeEvent, session: Session | null) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
+    } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session: Session | null) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
 
-        // PASSWORD_RECOVERY event (implicit flow fallback)
-        if (event === 'PASSWORD_RECOVERY') {
-          window.location.href = '/reset-password';
-        }
-      },
-    );
+      // PASSWORD_RECOVERY event (implicit flow fallback)
+      if (event === 'PASSWORD_RECOVERY') {
+        window.location.href = '/reset-password';
+      }
+    });
 
     return () => {
       subscription.unsubscribe();

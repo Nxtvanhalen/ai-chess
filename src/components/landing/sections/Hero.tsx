@@ -25,9 +25,7 @@ export default function Hero() {
         </FadeIn>
 
         <FadeIn delay={0.2}>
-          <h1
-            className="text-4xl sm:text-5xl md:text-7xl lg:text-[84px] font-bold text-[#E8E8E8] leading-[1.1] mb-6"
-          >
+          <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-[84px] font-bold text-[#E8E8E8] leading-[1.1] mb-6">
             Play Chess with a
             <br />
             <span className="text-[#9B7ED1]">Witty AI Buddy</span>
@@ -36,9 +34,8 @@ export default function Hero() {
 
         <FadeIn delay={0.35}>
           <p className="text-[#888888] text-lg md:text-xl max-w-[600px] mx-auto mb-10 leading-relaxed">
-            Chester watches your games, drops sarcastic commentary, and quietly
-            makes you a better player. No lectures. No boring tutorials.
-            Just chess with personality.
+            Chester watches your games, drops sarcastic commentary, and quietly makes you a better
+            player. No lectures. No boring tutorials. Just chess with personality.
           </p>
         </FadeIn>
 

@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useState } from 'react';
 import ScrollReveal from '../animations/ScrollReveal';
 import StaggerChildren from '../animations/StaggerChildren';
-import Card from '../ui/Card';
 import Button from '../ui/Button';
+import Card from '../ui/Card';
 import Section from '../ui/Section';
 
 type Interval = 'monthly' | 'yearly';
@@ -121,9 +121,7 @@ export default function Pricing() {
                 <span className="text-4xl font-bold text-[#E8E8E8]">$0</span>
               ) : (
                 <>
-                  <span className="text-4xl font-bold text-[#E8E8E8]">
-                    ${plan.price[interval]}
-                  </span>
+                  <span className="text-4xl font-bold text-[#E8E8E8]">${plan.price[interval]}</span>
                   <span className="text-[#666666] text-sm ml-1">
                     /{interval === 'monthly' ? 'mo' : 'yr'}
                   </span>
@@ -153,8 +151,8 @@ export default function Pricing() {
 
       <ScrollReveal>
         <p className="text-center text-[#666666] text-sm mt-10">
-          Need more moves right now?{' '}
-          <span className="text-[#9B7ED1]">50 moves for $1</span> — works with any plan.
+          Need more moves right now? <span className="text-[#9B7ED1]">50 moves for $1</span> — works
+          with any plan.
         </p>
       </ScrollReveal>
     </Section>

@@ -1,9 +1,9 @@
 'use client';
 
+import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { PLAN_FEATURES, PRICING } from '@/lib/stripe/config';
-import Link from 'next/link';
 
 type BillingInterval = 'monthly' | 'yearly';
 
@@ -81,9 +81,19 @@ export default function PricingPage() {
             viewBox="0 0 24 24"
           >
             {menuOpen ? (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
             )}
           </svg>
         </button>
@@ -356,10 +366,16 @@ export default function PricingPage() {
           <Link href="/play" className="text-gray-400 hover:text-white transition-colors">
             Back to Game
           </Link>
-          <Link href="/legal/privacy" className="text-gray-400 hover:text-white transition-colors text-sm">
+          <Link
+            href="/legal/privacy"
+            className="text-gray-400 hover:text-white transition-colors text-sm"
+          >
             Privacy
           </Link>
-          <Link href="/legal/terms" className="text-gray-400 hover:text-white transition-colors text-sm">
+          <Link
+            href="/legal/terms"
+            className="text-gray-400 hover:text-white transition-colors text-sm"
+          >
             Terms
           </Link>
         </div>

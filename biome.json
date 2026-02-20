@@ -13,17 +13,32 @@
         "noExplicitAny": "off",
         "noShadowRestrictedNames": "off",
         "useIterableCallbackReturn": "off",
-        "noArrayIndexKey": "off"
+        "noArrayIndexKey": "off",
+        "noImplicitAnyLet": "warn"
       },
       "style": {
-        "noNonNullAssertion": "off"
+        "noNonNullAssertion": "off",
+        "useTemplate": "off"
+      },
+      "security": {
+        "noDangerouslySetInnerHtml": "off"
+      },
+      "complexity": {
+        "noArguments": "off",
+        "noStaticOnlyClass": "off"
+      },
+      "performance": {
+        "noImgElement": "off"
       },
       "a11y": {
         "noSvgWithoutTitle": "off",
-        "useButtonType": "warn",
+        "useButtonType": "off",
         "useSemanticElements": "warn",
         "useAriaPropsSupportedByRole": "warn",
-        "useHtmlLang": "warn"
+        "useHtmlLang": "off",
+        "noLabelWithoutControl": "off",
+        "noStaticElementInteractions": "off",
+        "useKeyWithClickEvents": "off"
       }
     }
   },

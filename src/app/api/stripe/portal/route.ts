@@ -58,7 +58,12 @@ export async function POST(request: NextRequest) {
     }
 
     if (!subscription?.stripe_customer_id) {
-      console.error('[Stripe Portal] No stripe_customer_id for user:', user.id, 'subscription:', subscription);
+      console.error(
+        '[Stripe Portal] No stripe_customer_id for user:',
+        user.id,
+        'subscription:',
+        subscription,
+      );
       return NextResponse.json(
         { error: 'No subscription found. Please subscribe first.' },
         { status: 400 },
@@ -74,7 +79,9 @@ export async function POST(request: NextRequest) {
       'http://localhost:3001',
     ].filter(Boolean);
     const rawOrigin = request.headers.get('origin') || '';
-    const origin = allowedOrigins.includes(rawOrigin) ? rawOrigin : (allowedOrigins[0] || 'http://localhost:3000');
+    const origin = allowedOrigins.includes(rawOrigin)
+      ? rawOrigin
+      : allowedOrigins[0] || 'http://localhost:3000';
 
     // Create portal session
     const portalSession = await stripe.billingPortal.sessions.create({

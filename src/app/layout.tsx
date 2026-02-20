@@ -1,16 +1,14 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
-import { Providers } from '@/components/Providers';
-import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import GoogleAnalytics from '@/components/analytics/GoogleAnalytics';
 import CookieConsent from '@/components/cookies/CookieConsent';
+import { Providers } from '@/components/Providers';
+import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import JsonLd from '@/components/seo/JsonLd';
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NODE_ENV === 'production'
-      ? 'https://chesterchess.com'
-      : 'http://localhost:3000',
+    process.env.NODE_ENV === 'production' ? 'https://chesterchess.com' : 'http://localhost:3000',
   ),
   title: 'Chester AI Chess',
   description: 'Play chess with Chester, your witty AI companion',

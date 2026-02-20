@@ -446,13 +446,15 @@ export default function ChessBoard({
   // Accessibility: Add keyboard focus indicator only when board has focus
   const squareStylesWithFocus = {
     ...customSquareStyles,
-    ...(isBoardFocused && isKeyboardNavigationActive && focusedSquare && {
-      [focusedSquare]: {
-        ...(customSquareStyles[focusedSquare] || {}),
-        outline: '3px solid hsla(200, 100%, 60%, 0.9)',
-        outlineOffset: '-3px',
-      },
-    }),
+    ...(isBoardFocused &&
+      isKeyboardNavigationActive &&
+      focusedSquare && {
+        [focusedSquare]: {
+          ...(customSquareStyles[focusedSquare] || {}),
+          outline: '3px solid hsla(200, 100%, 60%, 0.9)',
+          outlineOffset: '-3px',
+        },
+      }),
   };
 
   const renderSquareIdentifiers = () => {
