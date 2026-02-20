@@ -217,7 +217,7 @@ bun run test:coverage  # Coverage report
 
 ## License
 
-MIT
+AGPL-3.0 — See [LICENSE](LICENSE) for details.
 
 ## Author
 
