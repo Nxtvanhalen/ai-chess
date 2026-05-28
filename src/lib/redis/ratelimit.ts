@@ -151,9 +151,39 @@ export interface RateLimitResult {
   pending?: Promise<unknown>;
 }
 
+// Circuit breaker: when Upstash is throttled or unhealthy, skip Redis entirely
+// for a cool-down period so we stop adding to its load (which can extend the
+// throttle window) and stop paying the latency cost of doomed calls.
+const REDIS_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
+const REDIS_FAIL_THRESHOLD = 3; // consecutive failures before opening the circuit
+let redisConsecutiveFailures = 0;
+let redisCircuitOpenUntil = 0;
+
+function isRedisCircuitOpen(): boolean {
+  return Date.now() < redisCircuitOpenUntil;
+}
+
+function recordRedisFailure(): void {
+  redisConsecutiveFailures++;
+  if (redisConsecutiveFailures >= REDIS_FAIL_THRESHOLD && !isRedisCircuitOpen()) {
+    redisCircuitOpenUntil = Date.now() + REDIS_COOLDOWN_MS;
+    console.warn(
+      `[RateLimit] Redis circuit OPEN — suspending Redis calls for ${REDIS_COOLDOWN_MS / 1000}s after ${REDIS_FAIL_THRESHOLD} failures`,
+    );
+  }
+}
+
+function recordRedisSuccess(): void {
+  if (redisConsecutiveFailures > 0 || redisCircuitOpenUntil > 0) {
+    console.log('[RateLimit] Redis circuit CLOSED — Redis recovered');
+  }
+  redisConsecutiveFailures = 0;
+  redisCircuitOpenUntil = 0;
+}
+
 /**
  * Check rate limit for an identifier
- * Uses Redis if available, falls back to in-memory
+ * Uses Redis if available and healthy, falls back to in-memory
  */
 export async function checkRateLimitRedis(
   identifier: string,
@@ -161,10 +191,11 @@ export async function checkRateLimitRedis(
 ): Promise<RateLimitResult> {
   const limiters = getRateLimiters();
 
-  if (limiters) {
+  if (limiters && !isRedisCircuitOpen()) {
     const limiter = limiters.get(type) || limiters.get('default')!;
     try {
       const result = await limiter.limit(identifier);
+      recordRedisSuccess();
       return {
         success: result.success,
         limit: result.limit,
@@ -177,6 +208,7 @@ export async function checkRateLimitRedis(
       // exhaustion) which crash @upstash/ratelimit's pipelined script with
       // "s.map is not a function". Fail open to the in-memory limiter so the
       // app keeps working when Redis is degraded.
+      recordRedisFailure();
       console.warn(
         '[RateLimit] Redis limiter failed, falling back to in-memory:',
         err instanceof Error ? err.message : String(err),
