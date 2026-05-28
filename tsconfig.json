@@ -40,6 +40,8 @@
     "node_modules",
     "jest.config.ts",
     "jest.setup.ts",
+    "vitest.config.ts",
+    "vitest.setup.ts",
     "src/__tests__"
   ]
 }
