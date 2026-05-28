@@ -10,8 +10,41 @@ export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NODE_ENV === 'production' ? 'https://chesterchess.com' : 'http://localhost:3000',
   ),
-  title: 'Chester AI Chess',
-  description: 'Play chess with Chester, your witty AI companion',
+  title: {
+    default: 'Chester AI Chess — Play, Learn & Improve with a Witty AI Coach',
+    template: '%s | Chester AI Chess',
+  },
+  description:
+    'Play free online chess against Chester, an AI coach with personality. Real-time move analysis, Elo rating, adaptive difficulty, and engaging commentary on every move.',
+  applicationName: 'Chester AI Chess',
+  authors: [{ name: 'Chris Lee Bergstrom' }],
+  creator: 'Chris Lee Bergstrom',
+  publisher: 'Chester Chess',
+  keywords: [
+    'chess',
+    'AI chess',
+    'AI chess coach',
+    'play chess online',
+    'free chess',
+    'chess AI opponent',
+    'chess analysis',
+    'chess move analysis',
+    'Elo rating',
+    'chess training',
+    'chess companion',
+    'Chester chess',
+    'chess opening book',
+    'AI chess commentary',
+    'chess for beginners',
+    'chess improvement',
+  ],
+  category: 'games',
+  alternates: {
+    canonical: '/',
+    languages: {
+      'en-US': '/',
+    },
+  },
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
@@ -19,8 +52,9 @@ export const metadata: Metadata = {
     title: 'Chester AI Chess',
   },
   openGraph: {
-    title: 'Chester AI Chess',
-    description: 'Play chess with Chester, your witty AI companion',
+    title: 'Chester AI Chess — Play, Learn & Improve with a Witty AI Coach',
+    description:
+      'Free online chess vs an AI coach with personality. Move analysis, Elo rating, adaptive difficulty, and Chester commentating every move.',
     url: 'https://chesterchess.com',
     siteName: 'Chester AI Chess',
     images: [
@@ -28,7 +62,7 @@ export const metadata: Metadata = {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Chester AI Chess - Your intelligent chess companion',
+        alt: 'Chester AI Chess — Free online chess against an AI coach with personality',
       },
     ],
     locale: 'en_US',
@@ -36,9 +70,22 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Chester AI Chess',
-    description: 'Play chess with Chester, your witty AI companion',
+    title: 'Chester AI Chess — Play & Improve with an AI Coach',
+    description:
+      'Free online chess vs an AI coach. Move analysis, Elo rating, witty commentary, adaptive difficulty.',
     images: ['/og-image.png'],
+    creator: '@chesterchess',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-snippet': -1,
+      'max-image-preview': 'large',
+      'max-video-preview': -1,
+    },
   },
   icons: {
     icon: [
