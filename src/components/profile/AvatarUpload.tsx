@@ -1,9 +1,9 @@
 'use client';
 
-import { createBrowserClient } from '@supabase/ssr';
 import { useCallback, useEffect, useState } from 'react';
 import Cropper, { type Area } from 'react-easy-crop';
 import { useAuth } from '@/contexts/AuthContext';
+import { getSupabaseBrowserClient } from '@/lib/supabase/browser';
 
 interface AvatarUploadProps {
   isOpen: boolean;
@@ -137,11 +137,9 @@ export default function AvatarUpload({
       const blob = await cropImage(imageSrc, croppedArea);
       console.log('[AvatarUpload] Cropped blob size:', blob.size);
 
-      // 2. Upload to Supabase Storage
-      const supabase = createBrowserClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      );
+      // 2. Upload to Supabase Storage (reuse the shared singleton so we don't
+      // instantiate a second GoTrueClient against the same storage key)
+      const supabase = getSupabaseBrowserClient();
 
       const filePath = `${user.id}/avatar.webp`;
       console.log('[AvatarUpload] Uploading to storage path:', filePath);
