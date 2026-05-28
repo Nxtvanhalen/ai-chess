@@ -401,9 +401,15 @@ export async function proxy(request: NextRequest) {
   const publicRoutes = ['/login', '/signup', '/auth', '/forgot-password', '/reset-password'];
   const isPublicRoute = publicRoutes.some((route) => request.nextUrl.pathname.startsWith(route));
 
-  // Static assets that should never require auth (PWA manifest, service worker, etc.)
+  // Static assets that should never require auth (PWA manifest, service worker,
+  // SEO verification files, etc.)
   const publicAssets = ['/manifest.json', '/sw.js', '/robots.txt', '/sitemap.xml'];
-  const isPublicAsset = publicAssets.includes(request.nextUrl.pathname);
+  const isPublicAsset =
+    publicAssets.includes(request.nextUrl.pathname) ||
+    // Search engine verification files (Google, Bing, etc.) live at the root
+    // as small .html files. They must be reachable without auth or the
+    // verification fetch redirects to /login and fails.
+    /^\/(google[a-f0-9]+\.html|BingSiteAuth\.xml)$/i.test(request.nextUrl.pathname);
 
   // API routes - let them handle their own auth
   const isApiRoute = request.nextUrl.pathname.startsWith('/api/');
