@@ -4,6 +4,11 @@ import { withSentryConfig } from "@sentry/nextjs";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   // Note: The @ alias is configured in tsconfig.json and works with both Webpack and Turbopack
+  // Emit and serve source maps in production. Bundles already carry a
+  // //# sourceMappingURL=... comment (added by Sentry's plugin); without
+  // serving the maps, the browser hits /_next/static/chunks/*.map and 404s.
+  // Code is open source (AGPL-3.0) so map exposure is not a leak.
+  productionBrowserSourceMaps: true,
 };
 
 
@@ -95,9 +100,11 @@ const sentryConfig = withSentryConfig(configWithHeaders, {
   // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers
   tunnelRoute: "/monitoring",
 
-  // Source maps configuration
+  // Keep source maps in the served build so the browser can fetch them.
+  // productionBrowserSourceMaps emits them into .next/static; leaving Sentry's
+  // delete-after-upload on would wipe them and reintroduce the 404 flood.
   sourcemaps: {
-    deleteSourcemapsAfterUpload: true,
+    deleteSourcemapsAfterUpload: false,
   },
 });
 
