@@ -163,18 +163,28 @@ export async function checkRateLimitRedis(
 
   if (limiters) {
     const limiter = limiters.get(type) || limiters.get('default')!;
-    const result = await limiter.limit(identifier);
-
-    return {
-      success: result.success,
-      limit: result.limit,
-      remaining: result.remaining,
-      reset: result.reset,
-      pending: result.pending,
-    };
+    try {
+      const result = await limiter.limit(identifier);
+      return {
+        success: result.success,
+        limit: result.limit,
+        remaining: result.remaining,
+        reset: result.reset,
+        pending: result.pending,
+      };
+    } catch (err) {
+      // Upstash can return non-array error payloads (e.g. free-tier quota
+      // exhaustion) which crash @upstash/ratelimit's pipelined script with
+      // "s.map is not a function". Fail open to the in-memory limiter so the
+      // app keeps working when Redis is degraded.
+      console.warn(
+        '[RateLimit] Redis limiter failed, falling back to in-memory:',
+        err instanceof Error ? err.message : String(err),
+      );
+      return checkInMemoryLimit(identifier, type);
+    }
   }
 
-  // Fallback to in-memory
   return checkInMemoryLimit(identifier, type);
 }
 
