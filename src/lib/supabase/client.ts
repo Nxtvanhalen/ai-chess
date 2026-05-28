@@ -10,8 +10,6 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
 // For server-side operations that need elevated permissions
 // Returns null if service role key not available (e.g., client-side)
 export const createAdminClient = () => {

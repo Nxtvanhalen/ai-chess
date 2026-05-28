@@ -3,7 +3,7 @@
 // =============================================================================
 
 // Client instances
-export { createAdminClient, supabase } from './client';
+export { createAdminClient } from './client';
 
 // Database operations
 export * from './database';
