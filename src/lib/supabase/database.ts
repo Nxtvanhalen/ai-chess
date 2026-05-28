@@ -1,4 +1,10 @@
-import { supabase } from './client';
+import { getSupabaseBrowserClient } from './browser';
+
+// Use the SSR-cookie-backed browser client so writes carry the authenticated
+// user's JWT. The legacy @supabase/supabase-js client stored sessions in
+// localStorage which was never populated (auth goes through @supabase/ssr),
+// causing every INSERT/UPDATE to fall through RLS as anon and 401.
+const supabase = getSupabaseBrowserClient();
 
 // Game management
 export async function createGame(playerColor: 'white' | 'black' = 'white', userId?: string) {

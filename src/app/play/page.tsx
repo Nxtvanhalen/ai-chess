@@ -237,7 +237,14 @@ export default function Home() {
               setConversationId(conversation.id);
               const dbMessages = await getConversationMessages(conversation.id);
               if (dbMessages && dbMessages.length > 0) {
-                const restoredMessages: ChatMessage[] = dbMessages.map((msg) => ({
+                type DbMessage = {
+                  id: string;
+                  role: string;
+                  content: string;
+                  created_at: string;
+                  metadata: unknown;
+                };
+                const restoredMessages: ChatMessage[] = (dbMessages as DbMessage[]).map((msg) => ({
                   id: msg.id,
                   role: msg.role as 'user' | 'assistant' | 'system',
                   content: msg.content,
